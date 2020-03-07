@@ -13,16 +13,45 @@
 # limitations under the License.
 
 .DEFAULT_GOAL := check
+SHELL := /bin/bash
 
-check: test-run build clean
+check: static-check build clean
 
-# run basic check scripts
-test-run:
+static-check:
 	hack/verify-gofmt.sh
 	hack/verify-govet.sh
 	hack/verify-staticcheck.sh
 	hack/runtests.sh
 	@rm -f coverage.txt
+
+# run basic check scripts
+run-test:
+	source test/init_tools.sh && \
+	source test/test_utils.sh && \
+	dump_system_info && \
+	set_local_build_and_deploy_env && \
+	build_images_and_cli && \
+	helm_remove_old_releases && \
+	install && \
+	set_local_test_env && \
+	run_test_suites && \
+	check_result && \
+	cleanup
+
+
+run-full-test:
+	source test/init_tools.sh && \
+	source test/test_utils.sh && \
+	dump_system_info && \
+	set_local_build_and_deploy_env && \
+	build_images_and_cli && \
+	build_env_images && \
+	helm_remove_old_releases && \
+	install && \
+	set_local_test_env && \
+	run_test_suites && \
+	check_result && \
+	cleanup
 
 # ensure the changes are buildable
 build:

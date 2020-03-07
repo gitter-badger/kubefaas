@@ -13,7 +13,6 @@ ROOT=$(dirname $0)/../../..
 
 cleanup() {
     clean_resource_by_id $TEST_ID
-    rm -rf $tmp_dir
 }
 
 if [ -z "${TEST_NOCLEANUP:-}" ]; then
@@ -31,13 +30,13 @@ cd $ROOT/examples/tensorflow-serving
 log "Creating environment for Tensorflow Serving"
 fission env create --name $env --image $TS_RUNTIME_IMAGE --version 2 --period 5
 
-zip -r half_plus_two.zip ./half_plus_two
+zip -r ${tmp_dir}/half_plus_two.zip ./half_plus_two
 
 pkgName=$(generate_test_id)
-fission package create --name $pkgName --deploy half_plus_two.zip --env $env
+fission package create --name $pkgName --deploy ${tmp_dir}/half_plus_two.zip --env $env
 
 # wait for build to finish at most 90s
-timeout 90 bash -c "waitBuild $pkgName"
+timeout 90 bash -c "waitBuildExpectedStatus $pkgName 'none'"
 
 log "Creating pool manager & new deployment function for Tensorflow Serving"
 fission fn create --name $fn_poolmgr --env $env --pkg $pkgName --entrypoint "half_plus_two"

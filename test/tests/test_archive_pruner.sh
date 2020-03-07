@@ -51,8 +51,13 @@ get_archive_url_from_package() {
 
 get_archive_from_storage() {
     storage_service_url=$1
-    controller_ip=$(kubectl -n $FISSION_NAMESPACE get svc controller -o jsonpath='{...ip}')
-    controller_proxy_url=`echo $storage_service_url | sed -e "s/storagesvc.$FISSION_NAMESPACE/$controller_ip\/proxy\/storage/"`
+    if [ "${LB_SUPPORT}" == true ]; then
+        controller_ip=$(kubectl -n $FISSION_NAMESPACE get svc controller -o jsonpath='{...ip}')
+        controller_proxy_url=`echo $storage_service_url | sed -e "s/storagesvc.$FISSION_NAMESPACE/$controller_ip\/proxy\/storage/"`
+    else
+        controller_address=${NODE_IP}:$(kubectl -n $FISSION_NAMESPACE get svc controller -o jsonpath="{.spec.ports[0].nodePort}")
+        controller_proxy_url=`echo $storage_service_url | sed -e "s/storagesvc.$FISSION_NAMESPACE/$controller_address\/proxy\/storage/"`
+    fi
     log "controller_proxy_url=$controller_proxy_url"
     http_status=`curl --retry 5 -sw "%{http_code}" $controller_proxy_url -o /dev/null`
     echo "http_status: $http_status"

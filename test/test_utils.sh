@@ -8,37 +8,15 @@
 
 set -euo pipefail
 
-ROOT=`realpath $(dirname $0)/..`
+# ${BASH_SOURCE[0]} returns the relative path of this file.
+ROOT=$(realpath `dirname "${BASH_SOURCE[0]}"`/..)
 
-travis_fold_start() {
-    echo -e "travis_fold:start:$1\r\033[33;1m$2\033[0m"
+log_start() {
+    echo -e `date +%Y/%m/%d:%H:%M:%S`" start: \r\033[33;1m$2\033[0m"
 }
 
-travis_fold_end() {
-    echo -e "travis_fold:end:$1\r"
-}
-
-helm_setup() {
-    helm init
-    # wait for tiller ready
-    while true; do
-      kubectl --namespace kube-system get pod|grep tiller|grep Running
-      if [[ $? -eq 0 ]]; then
-          break
-      fi
-      sleep 1
-    done
-}
-export -f helm_setup
-
-gcloud_login() {
-    KEY=${HOME}/gcloud-service-key.json
-    if [ ! -f $KEY ]
-    then
-	echo $FISSION_CI_SERVICE_ACCOUNT | base64 -d - > $KEY
-    fi
-
-    gcloud auth activate-service-account --key-file $KEY
+log_end() {
+    echo -e `date +%Y/%m/%d:%H:%M:%S`" end:$1\r"
 }
 
 getVersion() {
@@ -53,99 +31,167 @@ getGitCommit() {
     echo $(git rev-parse HEAD)
 }
 
-setupCIBuildEnv() {
+set_ci_build_and_deploy_env() {
+    export GKE_PROJECT_NAME="srcmesh"
     export REPO=gcr.io/$GKE_PROJECT_NAME
     export IMAGE=fission-bundle
     export FETCHER_IMAGE=$REPO/fetcher
     export BUILDER_IMAGE=$REPO/builder
-    export TAG=test-${TRAVIS_BUILD_ID}
-    export PRUNE_INTERVAL=1 # this variable controls the interval to run archivePruner. The unit is in minutes.
-    export ROUTER_SERVICE_TYPE=LoadBalancer
-    export SERVICE_TYPE=LoadBalancer
     export PRE_UPGRADE_CHECK_IMAGE=$REPO/pre-upgrade-checks
+
+    export BUILD_ID=${CI_BUILD_NUMBER}
+    export TAG=test-${BUILD_ID}
+    export PRUNE_INTERVAL=1 # this variable controls the interval to run archivePruner. The unit is in minutes.
+
+    export IMAGE_PULL_POLICY="IfNotPresent"
+
+    export ROUTER_SERVICE_TYPE=NodePort
+    export SERVICE_TYPE=NodePort
+    export NODE_IP="192.168.1.15" # no need it if LB is supported
+    export LB_SUPPORT=false
+
+    export FISSION_NAMESPACE="fission-${BUILD_ID}"
+    export FUNCTION_NAMESPACE="fission-${BUILD_ID}-func"
+    export FISSION_BUILDER_NAMESPACE="fission-builder"
+
+    export CONTROLLER_ADDRESS=
+    export CONTROLLER_NODE_PORT=31234
+    export ROUTER_NODE_PORT=31235
+
+    TEST_BIN=/tmp/${BUILD_ID}/bin
+    mkdir -p ${TEST_BIN}
+    export PATH=${TEST_BIN}:${PATH}
+}
+
+set_ci_test_env() {
+    # fission env
+    export FISSION_URL=http://$(kubectl -n ${FISSION_NAMESPACE} get svc controller -o jsonpath='{...ip}')
+    export FISSION_ROUTER=$(kubectl -n ${FISSION_NAMESPACE} get svc router -o jsonpath='{...ip}')
+    export FISSION_NATS_STREAMING_URL="http://defaultFissionAuthToken@$(kubectl -n ${FISSION_NAMESPACE} get svc nats-streaming -o jsonpath='{...ip}:{.spec.ports[0].port}')"
+
+    # ingress controller env
+    export INGRESS_CONTROLLER=$(kubectl -n ingress-nginx get svc ingress-nginx -o jsonpath='{...ip}')
+}
+
+set_local_build_and_deploy_env() {
+    export GKE_PROJECT_NAME="srcmesh"
+    export REPO=gcr.io/$GKE_PROJECT_NAME
+    export IMAGE=fission-bundle
+    export FETCHER_IMAGE=$REPO/fetcher
+    export BUILDER_IMAGE=$REPO/builder
+    export PRE_UPGRADE_CHECK_IMAGE=$REPO/pre-upgrade-checks
+
+    export BUILD_ID=$(generate_test_id)
+    export TAG=test-${BUILD_ID}
+    export PRUNE_INTERVAL=1 # this variable controls the interval to run archivePruner. The unit is in minutes.
+
+    export IMAGE_PULL_POLICY="IfNotPresent"
+
+    export ROUTER_SERVICE_TYPE=NodePort
+    export SERVICE_TYPE=NodePort
+    export NODE_IP="192.168.1.15"
+    export LB_SUPPORT=false
+
+    export FISSION_NAMESPACE="fission"
+    export FUNCTION_NAMESPACE="fission-function"
+    export FISSION_BUILDER_NAMESPACE="fission-builder"
+
+    export CONTROLLER_NODE_PORT=31234
+    export ROUTER_NODE_PORT=31235
+
+    TEST_BIN=/tmp/${BUILD_ID}/bin
+    mkdir -p ${TEST_BIN}
+    export PATH=${TEST_BIN}:${PATH}
+}
+
+set_local_test_env() {
+    # fission env
+    export FISSION_HOST=${NODE_IP}:$(kubectl -n ${FISSION_NAMESPACE} get svc controller -o jsonpath="{.spec.ports[0].nodePort}")
+    export FISSION_URL=http://${NODE_IP}:$(kubectl -n ${FISSION_NAMESPACE} get svc controller -o jsonpath="{.spec.ports[0].nodePort}")
+    export FISSION_ROUTER=${NODE_IP}:$(kubectl -n ${FISSION_NAMESPACE} get svc router -o jsonpath="{.spec.ports[0].nodePort}")
+    export FISSION_NATS_STREAMING_URL="http://defaultFissionAuthToken@${NODE_IP}:$(kubectl -n ${FISSION_NAMESPACE} get svc nats-streaming -o jsonpath='{.spec.ports[0].nodePort}')"
+
+    # ingress controller env
+#    export INGRESS_CONTROLLER=${NODE_IP}:$(kubectl -n ingress-nginx get svc ingress-nginx -o jsonpath="{.spec.ports[0].nodePort}")
 }
 
 setupIngressController() {
-    # set up NGINX ingress controller
-    kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $(gcloud config get-value account) || true
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.25.1/deploy/static/mandatory.yaml || true
-    kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.25.1/deploy/static/provider/cloud-generic.yaml || true
+    if [ "$LB_SUPPORT" = true ];
+    then
+        # set up NGINX ingress controller
+        kubectl create clusterrolebinding cluster-admin-binding --clusterrole cluster-admin --user $(gcloud config get-value account) || true
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.25.1/deploy/static/mandatory.yaml || true
+        kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.25.1/deploy/static/provider/cloud-generic.yaml || true
+    fi
 }
 
 removeIngressController() {
-    # set up NGINX ingress controller
-    kubectl delete clusterrolebinding cluster-admin-binding || true
-    kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.25.1/deploy/static/provider/cloud-generic.yaml || true
-    kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.25.1/deploy/static/mandatory.yaml || true
+    if [ "$LB_SUPPORT" = true ];
+    then
+        # set up NGINX ingress controller
+        kubectl delete clusterrolebinding cluster-admin-binding || true
+        kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.25.1/deploy/static/provider/cloud-generic.yaml || true
+        kubectl delete -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/nginx-0.25.1/deploy/static/mandatory.yaml || true
+    fi
 }
 
 build_and_push_go_mod_cache_image() {
     image_tag=$1
-    travis_fold_start go_mod_cache_image $image_tag
+    log_start go_mod_cache_image $image_tag
 
-    gcloud_login
-
-    if ! gcloud docker -- pull $image_tag >/dev/null 2>&1 ; then
+    if ! docker image ls | grep $image_tag >/dev/null 2>&1 ; then
       docker build -q -t $image_tag -f $ROOT/cmd/fission-bundle/Dockerfile.fission-bundle --target godep --build-arg GITCOMMIT=$(getGitCommit) --build-arg BUILDDATE=$(getDate) --build-arg BUILDVERSION=$(getVersion) .
     else
       docker build -q -t $image_tag -f $ROOT/cmd/fission-bundle/Dockerfile.fission-bundle --cache-from ${image_tag} --target godep --build-arg GITCOMMIT=$(getGitCommit) --build-arg BUILDDATE=$(getDate) --build-arg BUILDVERSION=$(getVersion) .
     fi
 
-    gcloud docker -- push $image_tag &
-    travis_fold_end go_mod_cache_image
+#   docker push $image_tag &
+    log_end go_mod_cache_image
 }
 
 build_and_push_pre_upgrade_check_image() {
     image_tag=$1
     cache_image=$2
-    travis_fold_start build_and_push_pre_upgrade_check_image $image_tag
+    log_start build_and_push_pre_upgrade_check_image $image_tag
 
     docker build -q -t $image_tag -f $ROOT/cmd/preupgradechecks/Dockerfile.fission-preupgradechecks --cache-from ${cache_image} --build-arg GITCOMMIT=$(getGitCommit) --build-arg BUILDDATE=$(getDate) --build-arg BUILDVERSION=$(getVersion) .
 
-    gcloud_login
-
-    gcloud docker -- push $image_tag &
-    travis_fold_end build_and_push_pre_upgrade_check_image
+#   docker push $image_tag &
+    log_end build_and_push_pre_upgrade_check_image
 }
 
 build_and_push_fission_bundle() {
     image_tag=$1
     cache_image=$2
-    travis_fold_start build_and_push_fission_bundle $image_tag
+    log_start build_and_push_fission_bundle $image_tag
 
     docker build -q -t $image_tag -f $ROOT/cmd/fission-bundle/Dockerfile.fission-bundle --cache-from ${cache_image} --build-arg GITCOMMIT=$(getGitCommit) --build-arg BUILDDATE=$(getDate) --build-arg BUILDVERSION=$(getVersion) .
 
-    gcloud_login
-
-    gcloud docker -- push $image_tag &
-    travis_fold_end build_and_push_fission_bundle
+#   docker push $image_tag &
+    log_end build_and_push_fission_bundle
 }
 
 build_and_push_fetcher() {
     image_tag=$1
     cache_image=$2
-    travis_fold_start build_and_push_fetcher $image_tag
+    log_start build_and_push_fetcher $image_tag
 
     docker build -q -t $image_tag -f $ROOT/cmd/fetcher/Dockerfile.fission-fetcher --cache-from ${cache_image} --build-arg GITCOMMIT=$(getGitCommit) --build-arg BUILDDATE=$(getDate) --build-arg BUILDVERSION=$(getVersion) .
 
-    gcloud_login
-
-    gcloud docker -- push $image_tag &
-    travis_fold_end build_and_push_fetcher
+#   docker push $image_tag &
+    log_end build_and_push_fetcher
 }
 
 
 build_and_push_builder() {
     image_tag=$1
     cache_image=$2
-    travis_fold_start build_and_push_builder $image_tag
+    log_start build_and_push_builder $image_tag
 
     docker build -q -t $image_tag -f $ROOT/cmd/builder/Dockerfile.fission-builder --cache-from ${cache_image} --build-arg GITCOMMIT=$(getGitCommit) --build-arg BUILDDATE=$(getDate) --build-arg BUILDVERSION=$(getVersion) .
 
-    gcloud_login
-
-    gcloud docker -- push $image_tag &
-    travis_fold_end build_and_push_builder
+#   docker push $image_tag &
+    log_end build_and_push_builder
 }
 
 build_and_push_env_runtime() {
@@ -153,7 +199,7 @@ build_and_push_env_runtime() {
     image_tag=$2
     variant=$3
 
-    travis_fold_start build_and_push_env_runtime.$env $image_tag
+    log_start build_and_push_env_runtime.$env $image_tag
 
     dockerfile="Dockerfile"
 
@@ -164,11 +210,9 @@ build_and_push_env_runtime() {
     pushd $ROOT/environments/$env/
     docker build -q -t $image_tag . -f ${dockerfile}
 
-    gcloud_login
-
-    gcloud docker -- push $image_tag &
+#   docker push $image_tag &
     popd
-    travis_fold_end build_and_push_env_runtime.$env
+    log_end build_and_push_env_runtime.$env
 }
 
 build_and_push_env_builder() {
@@ -177,7 +221,7 @@ build_and_push_env_builder() {
     builder_image=$3
     variant=$4
 
-    travis_fold_start build_and_push_env_builder.$env $image_tag
+    log_start build_and_push_env_builder.$env $image_tag
 
     dockerfile="Dockerfile"
 
@@ -189,109 +233,26 @@ build_and_push_env_builder() {
 
     docker build -q -t ${image_tag} --build-arg BUILDER_IMAGE=${builder_image} . -f ${dockerfile}
 
-    gcloud_login
-
-    gcloud docker -- push ${image_tag} &
+#   docker push ${image_tag} &
     popd
-    travis_fold_end build_and_push_env_builder.$env
+    log_end build_and_push_env_builder.$env
 }
 
 build_fission_cli() {
-    travis_fold_start build_fission_cli "fission cli"
+    log_start build_fission_cli "fission cli"
     pushd $ROOT/cmd/fission-cli
-    go build -ldflags "-X github.com/srcmesh/kubefaas/pkg/info.GitCommit=$(getGitCommit) -X github.com/srcmesh/kubefaas/pkg/info.BuildDate=$(getDate) -X github.com/srcmesh/kubefaas/pkg/info.Version=$(getVersion)" -o $HOME/tool/fission .
+    go build -ldflags "-X github.com/srcmesh/kubefaas/pkg/info.GitCommit=$(getGitCommit) -X github.com/srcmesh/kubefaas/pkg/info.BuildDate=$(getDate) -X github.com/srcmesh/kubefaas/pkg/info.Version=$(getVersion)" -o ${TEST_BIN}/fission .
     popd
-    travis_fold_end build_fission_cli
+    log_end build_fission_cli
 }
 
 clean_crd_resources() {
     kubectl --namespace default get crd| grep -v NAME| grep "fission.io"| awk '{print $1}'|xargs -I@ bash -c "kubectl --namespace default delete crd @"  || true
 }
 
-set_environment() {
-    id=$1
-    ns=f-$id
-
-    # fission env
-    export FISSION_URL=http://$(kubectl -n $ns get svc controller -o jsonpath='{...ip}')
-    export FISSION_ROUTER=$(kubectl -n $ns get svc router -o jsonpath='{...ip}')
-    export FISSION_NATS_STREAMING_URL="http://defaultFissionAuthToken@$(kubectl -n $ns get svc nats-streaming -o jsonpath='{...ip}:{.spec.ports[0].port}')"
-
-    # ingress controller env
-    export INGRESS_CONTROLLER=$(kubectl -n ingress-nginx get svc ingress-nginx -o jsonpath='{...ip}')
-}
-
 generate_test_id() {
     echo $(cat /dev/urandom | tr -dc 'a-z' | fold -w 6 | head -n 1)
 }
-
-helm_install_fission() {
-    id=$1
-    repo=$2
-    image=$3
-    imageTag=$4
-    fetcherImage=$5
-    fetcherImageTag=$6
-    controllerNodeport=$7
-    routerNodeport=$8
-    pruneInterval=$9
-    routerServiceType=${10}
-    serviceType=${11}
-    preUpgradeCheckImage=${12}
-    travis_fold_start helm_install_fission "helm install fission id=$id"
-
-    ns=f-$id
-    fns=f-func-$id
-
-    helmVars=repository=$repo,image=$image,imageTag=$imageTag,fetcher.image=$fetcherImage,fetcher.imageTag=$fetcherImageTag,functionNamespace=$fns,controllerPort=$controllerNodeport,routerPort=$routerNodeport,pullPolicy=Always,analytics=false,debugEnv=true,pruneInterval=$pruneInterval,routerServiceType=$routerServiceType,serviceType=$serviceType,preUpgradeChecksImage=$preUpgradeCheckImage,prometheus.server.persistentVolume.enabled=false,prometheus.alertmanager.enabled=false,prometheus.kubeStateMetrics.enabled=false,prometheus.nodeExporter.enabled=false
-
-    timeout 30 bash -c "helm_setup"
-
-    echo "Deleting old releases"
-    helm list -q|xargs -I@ bash -c "helm_uninstall_fission @"
-
-    # deleting ns does take a while after command is issued
-    while kubectl get ns| grep "fission-builder"
-    do
-        sleep 5
-    done
-
-    helm dependency update $ROOT/charts/fission-all
-
-    echo "Installing fission"
-    helm install		\
-	 --wait			\
-	 --timeout 540	        \
-	 --name $id		\
-	 --set $helmVars	\
-	 --namespace $ns        \
-	 $ROOT/charts/fission-all
-
-    helm list
-    travis_fold_end helm_install_fission
-}
-
-dump_kubernetes_events() {
-    id=$1
-    ns=f-$id
-    fns=f-func-$id
-    echo "--- kubectl events $fns ---"
-    kubectl get events -n $fns
-    echo "--- end kubectl events $fns ---"
-
-    echo "--- kubectl events $ns ---"
-    kubectl get events -n $ns
-    echo "--- end kubectl events $ns ---"
-}
-export -f dump_kubernetes_events
-
-dump_tiller_logs() {
-    echo "--- tiller logs ---"
-    tiller_pod=`kubectl get pods -n kube-system | grep tiller| tr -s " "| cut -d" " -f1`
-    kubectl logs $tiller_pod --since=30m -n kube-system
-    echo "--- end tiller logs ---"
-}
-export -f dump_tiller_logs
 
 wait_for_service() {
     ns=$1
@@ -299,42 +260,49 @@ wait_for_service() {
 
     while true
     do
-	     ip=$(kubectl -n $ns get svc $svc -o jsonpath='{...ip}')
-	      if [ ! -z $ip ]; then
-	         break
-	      fi
-	      echo Waiting for service $svc...
-	      sleep 1
+        ip=$(kubectl -n $ns get svc $svc -o jsonpath='{...ip}')
+        if [ ! -z $ip ]; then
+           break
+        fi
+        echo Waiting for service $svc...
+        sleep 5
     done
 }
 export -f wait_for_service
 
 wait_for_services() {
-    id=$1
-    ns=f-$id
+    ns=$1
 
-    wait_for_service $ns controller
-    wait_for_service $ns router
-    wait_for_service "ingress-nginx" ingress-nginx
+    if [ "$LB_SUPPORT" = true ];
+    then
+        wait_for_service $ns controller
+        wait_for_service $ns router
+        wait_for_service "ingress-nginx" ingress-nginx
 
-    echo Waiting for service is routable...
-    sleep 30
+        echo Waiting for service is routable...
+        sleep 30
+    fi
 }
 export -f wait_for_services
 
-check_gitcommit_version() {
-    while true
+helm_remove_old_releases() {(set -euo pipefail
+    # $1: release name
+    # $2: namespace
+
+    helm list --all-namespaces | grep "fission" | awk '{printf "helm delete -n %s %s && kubectl delete ns %s && kubectl delete ns %s-func\n", $2, $1, $2, $2}' | xargs -I@ bash -c @ || true
+    clean_crd_resources
+
+    kubectl delete ns ${FISSION_NAMESPACE} || true
+    kubectl delete ns ${FUNCTION_NAMESPACE} || true
+    kubectl delete ns ${FISSION_BUILDER_NAMESPACE} || true
+
+    # deleting ns does take a while after command is issued
+    while kubectl get ns| grep "fission-builder"
     do
-        # ensure we run tests against with the same git commit version of CLI & server
-	      ip=$(fission version|grep "GitCommit"|tr -d ' '|uniq -c|grep "2 GitCommit")
-	      if [ $? -eq 0 ]; then
-	        break
-	      fi
-	      echo Retrying getting build version from the controller...
-	      sleep 1
+        sleep 5
     done
-}
-export -f check_gitcommit_version
+)}
+export -f helm_remove_old_releases
 
 helm_uninstall_fission() {(set +e
     id=$1
@@ -361,43 +329,6 @@ port_forward_services() {
         xargs -I{} kubectl port-forward {} $port:$port -n $ns &
 }
 
-dump_builder_pod_logs() {
-    bns=$1
-    builderPods=$(kubectl -n $bns get pod -o name)
-
-    for p in $builderPods
-    do
-    echo "--- builder pod logs $p ---"
-    containers=$(kubectl -n $bns get $p -o jsonpath={.spec.containers[*].name} --ignore-not-found)
-    for c in $containers
-    do
-        echo "--- builder pod logs $p: container $c ---"
-        kubectl -n $bns logs $p $c || true
-        echo "--- end builder pod logs $p: container $c ---"
-    done
-    echo "--- end builder pod logs $p ---"
-    done
-}
-
-dump_function_pod_logs() {
-    ns=$1
-    fns=$2
-
-    functionPods=$(kubectl -n $fns get pod -o name -l functionName)
-    for p in $functionPods
-    do
-	echo "--- function pod logs $p ---"
-	containers=$(kubectl -n $fns get $p -o jsonpath={.spec.containers[*].name} --ignore-not-found)
-	for c in $containers
-	do
-	    echo "--- function pod logs $p: container $c ---"
-	    kubectl -n $fns logs $p $c || true
-	    echo "--- end function pod logs $p: container $c ---"
-	done
-	echo "--- end function pod logs $p ---"
-    done
-}
-
 dump_fission_logs() {
     ns=$1
     fns=$2
@@ -408,31 +339,6 @@ dump_fission_logs() {
     echo --- end $component logs ---
 }
 
-dump_fission_crd() {
-    type=$1
-    echo --- All objects of type $type ---
-    kubectl --all-namespaces=true get $type -o yaml
-    echo --- End objects of type $type ---
-}
-
-dump_fission_crds() {
-    dump_fission_crd environments.fission.io
-    dump_fission_crd functions.fission.io
-    dump_fission_crd httptriggers.fission.io
-    dump_fission_crd kuberneteswatchtriggers.fission.io
-    dump_fission_crd messagequeuetriggers.fission.io
-    dump_fission_crd packages.fission.io
-    dump_fission_crd timetriggers.fission.io
-}
-
-dump_env_pods() {
-    fns=$1
-
-    echo --- All environment pods ---
-    kubectl -n $fns get pod -o yaml
-    echo --- End environment pods ---
-}
-
 describe_pods_ns() {
     echo "--- describe pods $1---"
     kubectl describe pods -n $1
@@ -440,10 +346,9 @@ describe_pods_ns() {
 }
 
 describe_all_pods() {
-    id=$1
-    ns=f-$id
-    fns=f-func-$id
-    bns=fission-builder
+    ns=$1
+    fns=$2
+    bns=$3
 
     describe_pods_ns $ns
     describe_pods_ns $fns
@@ -461,61 +366,72 @@ dump_all_fission_resources() {
 }
 
 dump_system_info() {
-    travis_fold_start dump_system_info "System Info"
+    log_start dump_system_info "System Info"
     go version
     docker version
     kubectl version
     helm version
-    travis_fold_end dump_system_info
+    log_end dump_system_info
 }
 
-dump_logs() {
-    id=$1
-    travis_fold_start dump_logs "dump logs $id"
+install() {
+    ns=${FISSION_NAMESPACE}
+    fns=${FUNCTION_NAMESPACE}
+    bns=${FISSION_BUILDER_NAMESPACE}
+    repo=${REPO}
+    image=${IMAGE}
+    imageTag=${TAG}
+    fetcherImage=${FETCHER_IMAGE}
+    fetcherImageTag=${TAG}
+    controllerNodeport=${CONTROLLER_NODE_PORT}
+    routerNodeport=${ROUTER_NODE_PORT}
+    pruneInterval=${PRUNE_INTERVAL}
+    routerServiceType=${ROUTER_SERVICE_TYPE}
+    serviceType=${SERVICE_TYPE}
+    preUpgradeCheckImage=$${PRE_UPGRADE_CHECK_IMAGE}
 
-    ns=f-$id
-    fns=f-func-$id
-    bns=fission-builder
+    setupIngressController
 
-    dump_all_fission_resources $ns
-    dump_env_pods $fns
-    dump_fission_logs $ns $fns controller
-    dump_fission_logs $ns $fns router
-    dump_fission_logs $ns $fns buildermgr
-    dump_fission_logs $ns $fns executor
-    dump_fission_logs $ns $fns storagesvc
-    dump_fission_logs $ns $fns mqtrigger
-    dump_fission_logs $ns $fns mqtrigger-nats-streaming
-    dump_function_pod_logs $ns $fns
-    dump_builder_pod_logs $bns
-    dump_fission_crds
-    travis_fold_end dump_logs
+    helm dependency update $ROOT/charts/fission-all
+    helmVars=repository=$repo,image=$image,imageTag=$imageTag,fetcher.image=$fetcherImage,fetcher.imageTag=$fetcherImageTag,functionNamespace=$fns,controllerPort=$controllerNodeport,routerPort=$routerNodeport,pullPolicy=${IMAGE_PULL_POLICY},analytics=false,debugEnv=true,pruneInterval=$pruneInterval,routerServiceType=$routerServiceType,serviceType=$serviceType,preUpgradeChecksImage=$preUpgradeCheckImage,persistence.enabled=false,prometheus.server.persistentVolume.enabled=false,prometheus.alertmanager.enabled=false,prometheus.kubeStateMetrics.enabled=false,prometheus.nodeExporter.enabled=false,prometheus.server.global.evaluation_interval=2s,prometheus.server.global.scrape_interval=2s,prometheus.server.global.scrape_timeout=1s
+
+    echo "Installing fission"
+    kubectl create namespace $ns
+    helm install \
+         --wait	\
+         --timeout 300s \
+         --name-template "fission" \
+         --set $helmVars \
+         --namespace $ns \
+         $ROOT/charts/fission-all
+
+    helm status -n ${ns} "fission" | grep STATUS | grep -i deployed
+    if [ $? -ne 0 ]; then
+        describe_all_pods "${ns}" "${fns}" "${bns}"
+        helm_remove_old_releases
+        removeIngressController
+	      exit 1
+    fi
+
+    timeout 150 bash -c "wait_for_services ${ns}"
 }
 
-export FAILURES=0
-
-run_all_tests() {
-    id=$1
-    imageTag=$2
-
-    export FISSION_NAMESPACE=f-$id
-    export FUNCTION_NAMESPACE=f-func-$id
-    export PYTHON_RUNTIME_IMAGE=gcr.io/$GKE_PROJECT_NAME/python-env:${imageTag}
-    export PYTHON_BUILDER_IMAGE=gcr.io/$GKE_PROJECT_NAME/python-env-builder:${imageTag}
-    export GO_RUNTIME_IMAGE=gcr.io/$GKE_PROJECT_NAME/go-env:${imageTag}
-    export GO_BUILDER_IMAGE=gcr.io/$GKE_PROJECT_NAME/go-env-builder:${imageTag}
-    export JVM_RUNTIME_IMAGE=gcr.io/$GKE_PROJECT_NAME/jvm-env:${imageTag}
-    export JVM_BUILDER_IMAGE=gcr.io/$GKE_PROJECT_NAME/jvm-env-builder:${imageTag}
-    export TS_RUNTIME_IMAGE=gcr.io/$GKE_PROJECT_NAME/tensorflow-serving-env:${imageTag}
-
-    set +e
+run_test_suites() {
+    export FAILURES=0   # for later exit code check
     export TIMEOUT=900  # 15 minutes per test
 
+    set +e
+
+    env
+
     # run tests without newdeploy in parallel.
-    export JOBS=6
+    export JOBS=5
     $ROOT/test/run_test.sh \
+        $ROOT/test/tests/test_pass.sh
         $ROOT/test/tests/test_canary.sh \
         $ROOT/test/tests/test_fn_update/test_idle_objects_reaper.sh \
+        $ROOT/test/tests/mqtrigger/nats/test_mqtrigger.sh \
+        $ROOT/test/tests/mqtrigger/nats/test_mqtrigger_error.sh \
         $ROOT/test/tests/mqtrigger/kafka/test_kafka.sh \
         $ROOT/test/tests/test_annotations.sh \
         $ROOT/test/tests/test_archive_pruner.sh \
@@ -525,7 +441,7 @@ run_all_tests() {
         $ROOT/test/tests/test_environments/test_python_env.sh \
         $ROOT/test/tests/test_function_test/test_fn_test.sh \
         $ROOT/test/tests/test_function_update.sh \
-        $ROOT/test/tests/test_ingress.sh \
+        $ROOT/test/tests/test_obj_create_in_diff_ns.sh \
         $ROOT/test/tests/test_internal_routes.sh \
         $ROOT/test/tests/test_logging/test_function_logs.sh \
         $ROOT/test/tests/test_node_hello_http.sh \
@@ -539,27 +455,22 @@ run_all_tests() {
         $ROOT/test/tests/test_specs/test_spec_archive/test_spec_archive.sh \
         $ROOT/test/tests/test_environments/test_tensorflow_serving_env.sh \
         $ROOT/test/tests/test_environments/test_go_env.sh \
-        $ROOT/test/tests/mqtrigger/nats/test_mqtrigger.sh \
-        $ROOT/test/tests/mqtrigger/nats/test_mqtrigger_error.sh \
         $ROOT/test/tests/test_huge_response/test_huge_response.sh \
-        $ROOT/test/tests/test_kubectl/test_kubectl.sh
-    FAILURES=$?
-
-    export JOBS=3
-    $ROOT/test/run_test.sh \
-        $ROOT/test/tests/test_backend_newdeploy.sh \
+        $ROOT/test/tests/test_kubectl/test_kubectl.sh \
         $ROOT/test/tests/test_environments/test_java_builder.sh \
         $ROOT/test/tests/test_environments/test_java_env.sh \
         $ROOT/test/tests/test_fn_update/test_configmap_update.sh \
-        $ROOT/test/tests/test_fn_update/test_env_update.sh \
         $ROOT/test/tests/test_fn_update/test_nd_pkg_update.sh \
-        $ROOT/test/tests/test_fn_update/test_poolmgr_nd.sh \
-        $ROOT/test/tests/test_fn_update/test_resource_change.sh \
-        $ROOT/test/tests/test_fn_update/test_scale_change.sh \
         $ROOT/test/tests/test_fn_update/test_secret_update.sh \
-        $ROOT/test/tests/test_obj_create_in_diff_ns.sh \
-        $ROOT/test/tests/test_secret_cfgmap/test_secret_cfgmap.sh
-    FAILURES=$((FAILURES+$?))
+        $ROOT/test/tests/test_secret_cfgmap/test_secret_cfgmap.sh \
+        $ROOT/test/tests/test_fn_update/test_scale_change.sh \
+        $ROOT/test/tests/test_backend_newdeploy.sh \
+        $ROOT/test/tests/test_fn_update/test_resource_change.sh \
+        $ROOT/test/tests/test_fn_update/test_env_update.sh \
+        $ROOT/test/tests/test_fn_update/test_poolmgr_nd.sh
+        # $ROOT/test/tests/test_ingress.sh \
+    FAILURES=$?
+
     set -e
 
     # dump test logs
@@ -568,62 +479,99 @@ run_all_tests() {
     log_files=$(find $ROOT/test/logs/ -name '*.log')
     for log_file in $log_files; do
         test_name=${log_file#$ROOT/test/logs/}
-        travis_fold_start run_test.$idx $test_name
+        log_start run_test.$idx $test_name
         echo "========== start $test_name =========="
         cat $log_file
         echo "========== end $test_name =========="
-        travis_fold_end run_test.$idx
+        log_end run_test.$idx
         idx=$((idx+1))
     done
 }
 
-install_and_test() {
-    repo=$1
-    image=$2
-    imageTag=$3
-    fetcherImage=$4
-    fetcherImageTag=$5
-    pruneInterval=$6
-    routerServiceType=$7
-    serviceType=$8
-    preUpgradeCheckImage=$9
-
-
-    controllerPort=31234
-    routerPort=31235
-
-    clean_crd_resources
-    
-    id=$(generate_test_id)
-    trap "helm_uninstall_fission $id" EXIT
-
-    setupIngressController
-
-    helm_install_fission $id $repo $image $imageTag $fetcherImage $fetcherImageTag $controllerPort $routerPort $pruneInterval $routerServiceType $serviceType $preUpgradeCheckImage
-    helm status $id | grep STATUS | grep -i deployed
-    if [ $? -ne 0 ]; then
-        describe_all_pods $id
-        dump_kubernetes_events $id
-        dump_tiller_logs
-	    exit 1
-    fi
-
-    timeout 150 bash -c "wait_for_services $id"
-    timeout 120 bash -c "check_gitcommit_version"
-    set_environment $id
-
-    run_all_tests $id $imageTag
-
-    dump_logs $id
+cleanup() {
+    helm_remove_old_releases
     removeIngressController
+}
+
+check_result() {
+    ns=${FISSION_NAMESPACE}
+    fns=${FUNCTION_NAMESPACE}
+    bns=${FISSION_BUILDER_NAMESPACE}
+
+    dump_all_fission_resources $ns
+    dump_fission_logs $ns $fns controller
+    dump_fission_logs $ns $fns router
+    dump_fission_logs $ns $fns buildermgr
+    dump_fission_logs $ns $fns executor
+    dump_fission_logs $ns $fns storagesvc
+    dump_fission_logs $ns $fns mqtrigger-nats-streaming
 
     if [ $FAILURES -ne 0 ]
     then
         # Commented out due to Travis-CI log length limit
         # describe each pod in fission ns and function namespace
-        # describe_all_pods $id
+        # describe_all_pods ${build_id}
 	      exit 1
     fi
+}
+
+wait_for_CI_cluster() {
+    while true; do
+        # ensure that gke cluster is now free for testing
+
+        previous_build_id=$(kubectl --namespace default get configmap in-test --ignore-not-found -o=jsonpath='{.metadata.labels.buildID}')
+
+        if [[ ! -z ${previous_build_id} ]]; then
+
+            build_state=$(curl -s -X GET http://${DRONE_SYSTEM_HOSTNAME}/api/repos/${CI_REPO_NAME}/builds/${previous_build_id} \
+            -H "Authorization: Bearer ${CI_API_TOKEN}" | python3 -c "import sys,json; print(json.load(sys.stdin)['status'])")
+
+            # If previous build state is not equal to "running" or the previous build id
+            # equals to the current build ID means the previous build is end or restart.
+            # We can remove the configmap safely and start next k8s test safely.
+            if [[ ${CI_BUILD_NUMBER} == ${previous_build_id} ]] || [[ $build_state != "running" ]]; then
+                kubectl --namespace default delete configmap -l buildID=${previous_build_id}
+            fi
+        fi
+
+        created=$(kubectl --namespace default create configmap in-test|grep "created"||true)
+        if [[ -z $created ]]; then
+            echo "Cluster is now in used. Retrying after 15 seconds..."
+            sleep 15
+            continue
+        fi
+        kubectl --namespace default label configmap in-test buildID=${CI_BUILD_NUMBER}
+        break
+    done
+}
+
+build_images_and_cli() {
+    build_and_push_go_mod_cache_image ${REPO}/go-mod-image-cache
+    build_and_push_fission_bundle ${REPO}/$IMAGE:$TAG ${REPO}/go-mod-image-cache
+    build_and_push_pre_upgrade_check_image $PRE_UPGRADE_CHECK_IMAGE:$TAG ${REPO}/go-mod-image-cache
+    build_and_push_fetcher $FETCHER_IMAGE:$TAG ${REPO}/go-mod-image-cache
+    build_and_push_builder $BUILDER_IMAGE:$TAG ${REPO}/go-mod-image-cache
+
+    build_fission_cli
+}
+
+build_env_images() {
+    export PYTHON_RUNTIME_IMAGE=${repo}/python-env:${imageTag}
+    export PYTHON_BUILDER_IMAGE=${repo}/python-env-builder:${imageTag}
+    export GO_RUNTIME_IMAGE=${repo}/go-env:${imageTag}
+    export GO_BUILDER_IMAGE=${repo}/go-env-builder:${imageTag}
+    export JVM_RUNTIME_IMAGE=${repo}/jvm-env:${imageTag}
+    export JVM_BUILDER_IMAGE=${repo}/jvm-env-builder:${imageTag}
+    export TS_RUNTIME_IMAGE=${repo}/tensorflow-serving-env:${imageTag}
+
+    build_and_push_env_runtime python ${REPO}/python-env:$TAG ""
+    build_and_push_env_runtime jvm ${REPO}/jvm-env:$TAG ""
+    build_and_push_env_runtime go ${REPO}/go-env:$TAG "1.12"
+    build_and_push_env_runtime tensorflow-serving ${REPO}/tensorflow-serving-env:$TAG ""
+
+    build_and_push_env_builder python ${REPO}/python-env-builder:$TAG $BUILDER_IMAGE:$TAG ""
+    build_and_push_env_builder jvm ${REPO}/jvm-env-builder:$TAG $BUILDER_IMAGE:$TAG ""
+    build_and_push_env_builder go ${REPO}/go-env-builder:$TAG $BUILDER_IMAGE:$TAG "1.12"
 }
 
 

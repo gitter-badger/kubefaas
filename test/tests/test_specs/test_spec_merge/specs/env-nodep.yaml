@@ -5,7 +5,7 @@ metadata:
   name: nodep
   namespace: default
 spec:
-  TerminationGracePeriod: 360
+  TerminationGracePeriod: 10
   builder: {}
   keeparchive: false
   poolsize: 3

@@ -136,7 +136,7 @@ builder_mgr_test_1() {
     log "Starting builder_mgr_test_1 with env and fn in different ns"
     fission env create --name python-builder-env --envns "ns1-$id" --builder fission/python-builder --image fission/python-env
     # we need to wait sufficiently for env pods to be up
-    sleep 180
+    sleep 60
 
     zip -jr src-pkg.zip $ROOT/examples/python/sourcepkg/
     pkg=$(fission package create --src src-pkg.zip --env python-builder-env --envns "ns1-$id" --buildcmd "./build.sh" --pkgns "ns2-$id"| cut -f2 -d' '| tr -d \')

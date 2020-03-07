@@ -7,7 +7,6 @@ TEST_ID=$(generate_test_id)
 echo "TEST_ID = $TEST_ID"
 
 tmp_dir="/tmp/test-$TEST_ID"
-mkdir -p $tmp_dir
 
 ROOT=$(dirname $0)/../..
 
@@ -27,7 +26,7 @@ checkpkgsum() {
 cleanup() {
     log "Cleaning up..."
     clean_resource_by_id $TEST_ID
-    rm -rf $tmp_dir
+    rm -rf $tmp_dir || true
 }
 
 if [ -z "${TEST_NOCLEANUP:-}" ]; then
@@ -35,6 +34,8 @@ if [ -z "${TEST_NOCLEANUP:-}" ]; then
 else
     log "TEST_NOCLEANUP is set; not cleaning up test artifacts afterwards."
 fi
+
+cd $tmp_dir
 
 log "Download test script"
 
