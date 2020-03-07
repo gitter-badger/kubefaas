@@ -230,6 +230,41 @@ func (a *API) CanaryConfigApiUpdate(w http.ResponseWriter, r *http.Request) {
 	a.respondWithSuccess(w, resp)
 }
 
+func (a *API) CanaryConfigApiUpdateStatus(w http.ResponseWriter, r *http.Request) {
+	featureErr := a.featureStatus[config.CanaryFeature]
+	if len(featureErr) > 0 {
+		a.respondWithError(w, ferror.MakeError(http.StatusInternalServerError, fmt.Sprintf("Error enabling canary feature: %v", featureErr)))
+		return
+	}
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
+	var c fv1.CanaryConfig
+	err = json.Unmarshal(body, &c)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
+	canayCfgNew, err := a.fissionClient.CoreV1().CanaryConfigs(c.ObjectMeta.Namespace).UpdateStatus(&c)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
+	resp, err := json.Marshal(canayCfgNew.ObjectMeta)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
+	a.respondWithSuccess(w, resp)
+}
+
 func (a *API) CanaryConfigApiDelete(w http.ResponseWriter, r *http.Request) {
 	featureErr := a.featureStatus[config.CanaryFeature]
 	if len(featureErr) > 0 {

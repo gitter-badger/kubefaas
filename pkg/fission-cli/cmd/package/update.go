@@ -210,7 +210,7 @@ func updatePackageStatus(client client.Interface, pkg *fv1.Package, status fv1.B
 			BuildStatus:         status,
 			LastUpdateTimestamp: metav1.Time{Time: time.Now().UTC()},
 		}
-		pkg, err := client.V1().Package().Update(pkg)
+		pkg, err := client.V1().Package().UpdateStatus(pkg)
 		return pkg, err
 	}
 	return nil, errors.New("unknown package status")

@@ -44,6 +44,10 @@ func (c *FakePackage) Update(f *fv1.Package) (*metav1.ObjectMeta, error) {
 	return nil, nil
 }
 
+func (c *FakePackage) UpdateStatus(f *fv1.Package) (*metav1.ObjectMeta, error) {
+	return nil, nil
+}
+
 func (c *FakePackage) Delete(m *metav1.ObjectMeta) error {
 	return nil
 }

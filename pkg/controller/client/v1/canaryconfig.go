@@ -35,6 +35,7 @@ type (
 		Create(canaryConf *fv1.CanaryConfig) (*metav1.ObjectMeta, error)
 		Get(m *metav1.ObjectMeta) (*fv1.CanaryConfig, error)
 		Update(canaryConf *fv1.CanaryConfig) (*metav1.ObjectMeta, error)
+		UpdateStatus(canaryConf *fv1.CanaryConfig) (*metav1.ObjectMeta, error)
 		Delete(m *metav1.ObjectMeta) error
 		List(ns string) ([]fv1.CanaryConfig, error)
 	}
@@ -104,6 +105,32 @@ func (c *CanaryConfig) Update(canaryConf *fv1.CanaryConfig) (*metav1.ObjectMeta,
 		return nil, err
 	}
 	relativeUrl := fmt.Sprintf("canaryconfigs/%v", canaryConf.ObjectMeta.Name)
+
+	resp, err := c.client.Put(relativeUrl, "application/json", reqbody)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := handleResponse(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var m metav1.ObjectMeta
+	err = json.Unmarshal(body, &m)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
+func (c *CanaryConfig) UpdateStatus(canaryConf *fv1.CanaryConfig) (*metav1.ObjectMeta, error) {
+	reqbody, err := json.Marshal(canaryConf)
+	if err != nil {
+		return nil, err
+	}
+	relativeUrl := fmt.Sprintf("canaryconfigs/%v/status", canaryConf.ObjectMeta.Name)
 
 	resp, err := c.client.Put(relativeUrl, "application/json", reqbody)
 	if err != nil {

@@ -112,9 +112,6 @@ func (opts *CreateSubCommand) complete(input cli.Input) error {
 			FailureThreshold:        failureThreshold,
 			FailureType:             fv1.FailureTypeStatusCode,
 		},
-		Status: fv1.CanaryConfigStatus{
-			Status: fv1.CanaryConfigStatusPending,
-		},
 	}
 
 	return nil

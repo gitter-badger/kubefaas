@@ -201,6 +201,7 @@ func (api *API) GetHandler() http.Handler {
 	r.HandleFunc("/v2/packages", api.PackageApiCreate).Methods("POST")
 	r.HandleFunc("/v2/packages/{package}", api.PackageApiGet).Methods("GET")
 	r.HandleFunc("/v2/packages/{package}", api.PackageApiUpdate).Methods("PUT")
+	r.HandleFunc("/v2/packages/{package}/status", api.PackageApiUpdateStatus).Methods("PUT")
 	r.HandleFunc("/v2/packages/{package}", api.PackageApiDelete).Methods("DELETE")
 
 	r.HandleFunc("/v2/functions", api.FunctionApiList).Methods("GET")
@@ -245,6 +246,7 @@ func (api *API) GetHandler() http.Handler {
 	r.HandleFunc("/v2/canaryconfigs", api.CanaryConfigApiCreate).Methods("POST")
 	r.HandleFunc("/v2/canaryconfigs/{canaryConfig}", api.CanaryConfigApiGet).Methods("GET")
 	r.HandleFunc("/v2/canaryconfigs/{canaryConfig}", api.CanaryConfigApiUpdate).Methods("PUT")
+	r.HandleFunc("/v2/canaryconfigs/{canaryConfig}/status", api.CanaryConfigApiUpdateStatus).Methods("PUT")
 	r.HandleFunc("/v2/canaryconfigs/{canaryConfig}", api.CanaryConfigApiDelete).Methods("DELETE")
 	r.HandleFunc("/v2/canaryconfigs", api.CanaryConfigApiList).Methods("GET")
 

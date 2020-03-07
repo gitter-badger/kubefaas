@@ -35,6 +35,7 @@ type (
 		Create(f *fv1.Package) (*metav1.ObjectMeta, error)
 		Get(m *metav1.ObjectMeta) (*fv1.Package, error)
 		Update(f *fv1.Package) (*metav1.ObjectMeta, error)
+		UpdateStatus(f *fv1.Package) (*metav1.ObjectMeta, error)
 		Delete(m *metav1.ObjectMeta) error
 		List(pkgNamespace string) ([]fv1.Package, error)
 	}
@@ -114,6 +115,37 @@ func (c *Package) Update(f *fv1.Package) (*metav1.ObjectMeta, error) {
 		return nil, err
 	}
 	relativeUrl := fmt.Sprintf("packages/%v", f.ObjectMeta.Name)
+
+	resp, err := c.client.Put(relativeUrl, "application/json", reqbody)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	body, err := handleResponse(resp)
+	if err != nil {
+		return nil, err
+	}
+
+	var m metav1.ObjectMeta
+	err = json.Unmarshal(body, &m)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
+func (c *Package) UpdateStatus(f *fv1.Package) (*metav1.ObjectMeta, error) {
+	err := f.Validate()
+	if err != nil {
+		return nil, fv1.AggregateValidationErrors("Package", err)
+	}
+
+	reqbody, err := json.Marshal(f)
+	if err != nil {
+		return nil, err
+	}
+	relativeUrl := fmt.Sprintf("packages/%v/status", f.ObjectMeta.Name)
 
 	resp, err := c.client.Put(relativeUrl, "application/json", reqbody)
 	if err != nil {

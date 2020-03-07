@@ -43,6 +43,10 @@ func (c *FakeCanaryConfig) Update(canaryConf *fv1.CanaryConfig) (*metav1.ObjectM
 	return nil, nil
 }
 
+func (c *FakeCanaryConfig) UpdateStatus(canaryConf *fv1.CanaryConfig) (*metav1.ObjectMeta, error) {
+	return nil, nil
+}
+
 func (c *FakeCanaryConfig) Delete(m *metav1.ObjectMeta) error {
 	return nil
 }

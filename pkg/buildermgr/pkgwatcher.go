@@ -83,9 +83,35 @@ func (pkgw *packageWatcher) build(buildCache *cache.Cache, srcpkg *fv1.Package) 
 	}
 	defer buildCache.Delete(key)
 
-	pkgw.logger.Info("starting build for package", zap.String("package_name", srcpkg.ObjectMeta.Name), zap.String("resource_version", srcpkg.ObjectMeta.ResourceVersion))
+	pkgw.logger.Info("start processing package", zap.String("package_name", srcpkg.ObjectMeta.Name), zap.String("resource_version", srcpkg.ObjectMeta.ResourceVersion))
+	defer pkgw.logger.Info("end processing package", zap.String("package_name", srcpkg.ObjectMeta.Name), zap.String("resource_version", srcpkg.ObjectMeta.ResourceVersion))
 
-	pkg, err := updatePackage(pkgw.logger, pkgw.fissionClient, srcpkg, fv1.BuildStatusRunning, "", nil)
+	if srcpkg.Spec.Source.IsEmpty() {
+		var buildStatus fv1.BuildStatus
+		var buildLogs string
+
+		// if source archive is empty while the deploy archive isn't, mark the pkg as status "None".
+		// Mark as "Failed" if both archives are empty.
+
+		if srcpkg.Spec.Deployment.IsEmpty() {
+			buildStatus = fv1.BuildStatusFailed
+			buildLogs = "Both source & deploy archives are empty"
+		} else {
+			buildStatus = fv1.BuildStatusNone
+		}
+
+		_, err := updatePackageStatus(pkgw.logger, pkgw.fissionClient, srcpkg, buildStatus, buildLogs)
+		if err != nil {
+			pkgw.logger.Error("error updating package state",
+				zap.Any("status", buildStatus),
+				zap.Any("buildlogs", buildLogs),
+				zap.Error(err),
+			)
+		}
+		return
+	}
+
+	pkg, err := updatePackageStatus(pkgw.logger, pkgw.fissionClient, srcpkg, fv1.BuildStatusRunning, "")
 	if err != nil {
 		pkgw.logger.Error("error setting package pending state", zap.Error(err))
 		return
@@ -95,8 +121,8 @@ func (pkgw *packageWatcher) build(buildCache *cache.Cache, srcpkg *fv1.Package) 
 	if k8serrors.IsNotFound(err) {
 		e := "environment does not exist"
 		pkgw.logger.Error(e, zap.String("environment", pkg.Spec.Environment.Name))
-		updatePackage(pkgw.logger, pkgw.fissionClient, pkg,
-			fv1.BuildStatusFailed, fmt.Sprintf("%s: %q", e, pkg.Spec.Environment.Name), nil)
+		updatePackageStatus(pkgw.logger, pkgw.fissionClient, pkg,
+			fv1.BuildStatusFailed, fmt.Sprintf("%s: %q", e, pkg.Spec.Environment.Name))
 		return
 	}
 
@@ -168,7 +194,7 @@ func (pkgw *packageWatcher) build(buildCache *cache.Cache, srcpkg *fv1.Package) 
 			uploadResp, buildLogs, err := buildPackage(ctx, pkgw.logger, pkgw.fissionClient, builderNs, pkgw.storageSvcUrl, pkg)
 			if err != nil {
 				pkgw.logger.Error("error building package", zap.Error(err), zap.String("package_name", pkg.ObjectMeta.Name))
-				updatePackage(pkgw.logger, pkgw.fissionClient, pkg, fv1.BuildStatusFailed, buildLogs, nil)
+				updatePackageStatus(pkgw.logger, pkgw.fissionClient, pkg, fv1.BuildStatusFailed, buildLogs)
 				return
 			}
 
@@ -180,7 +206,7 @@ func (pkgw *packageWatcher) build(buildCache *cache.Cache, srcpkg *fv1.Package) 
 				e := "error getting function list"
 				pkgw.logger.Error(e, zap.Error(err))
 				buildLogs += fmt.Sprintf("%s: %v\n", e, err)
-				updatePackage(pkgw.logger, pkgw.fissionClient, pkg, fv1.BuildStatusFailed, buildLogs, nil)
+				updatePackageStatus(pkgw.logger, pkgw.fissionClient, pkg, fv1.BuildStatusFailed, buildLogs)
 			}
 
 			// A package may be used by multiple functions. Update
@@ -196,7 +222,7 @@ func (pkgw *packageWatcher) build(buildCache *cache.Cache, srcpkg *fv1.Package) 
 						e := "error updating function package resource version"
 						pkgw.logger.Error(e, zap.Error(err))
 						buildLogs += fmt.Sprintf("%s: %v\n", e, err)
-						updatePackage(pkgw.logger, pkgw.fissionClient, pkg, fv1.BuildStatusFailed, buildLogs, nil)
+						updatePackageStatus(pkgw.logger, pkgw.fissionClient, pkg, fv1.BuildStatusFailed, buildLogs)
 						return
 					}
 				}
@@ -206,7 +232,7 @@ func (pkgw *packageWatcher) build(buildCache *cache.Cache, srcpkg *fv1.Package) 
 				fv1.BuildStatusSucceeded, buildLogs, uploadResp)
 			if err != nil {
 				pkgw.logger.Error("error updating package info", zap.Error(err), zap.String("package_name", pkg.ObjectMeta.Name))
-				updatePackage(pkgw.logger, pkgw.fissionClient, pkg, fv1.BuildStatusFailed, buildLogs, nil)
+				updatePackageStatus(pkgw.logger, pkgw.fissionClient, pkg, fv1.BuildStatusFailed, buildLogs)
 				return
 			}
 
@@ -215,8 +241,8 @@ func (pkgw *packageWatcher) build(buildCache *cache.Cache, srcpkg *fv1.Package) 
 		}
 	}
 	// build timeout
-	updatePackage(pkgw.logger, pkgw.fissionClient, pkg,
-		fv1.BuildStatusFailed, "Build timeout due to environment builder not ready", nil)
+	updatePackageStatus(pkgw.logger, pkgw.fissionClient, pkg,
+		fv1.BuildStatusFailed, "Build timeout due to environment builder not ready")
 
 	pkgw.logger.Error("max retries exceeded in building source package, timeout due to environment builder not ready",
 		zap.String("package", fmt.Sprintf("%s.%s", pkg.ObjectMeta.Name, pkg.ObjectMeta.Namespace)))
@@ -226,72 +252,58 @@ func (pkgw *packageWatcher) watchPackages() {
 	buildCache := cache.MakeCache(0, 0)
 	lw := k8sCache.NewListWatchFromClient(pkgw.fissionClient.CoreV1().RESTClient(), "packages", apiv1.NamespaceAll, fields.Everything())
 
-	processPkg := func(pkg *fv1.Package) {
-		var err error
-
-		if len(pkg.Status.BuildStatus) == 0 {
-			_, err = setInitialBuildStatus(pkgw.fissionClient, pkg)
-			if err != nil {
-				pkgw.logger.Error("error filling package status", zap.Error(err))
-			}
-			// once we update the package status, an update event
-			// will arrive and handle by UpdateFunc later. So we
-			// don't need to build the package at this moment.
-			return
-		}
-
-		// Only build pending state packages.
-		if pkg.Status.BuildStatus == fv1.BuildStatusPending {
-			go pkgw.build(buildCache, pkg)
-		}
-	}
-
 	pkgStore, controller := k8sCache.NewInformer(lw, &fv1.Package{}, 60*time.Minute, k8sCache.ResourceEventHandlerFuncs{
 		AddFunc: func(obj interface{}) {
 			pkg := obj.(*fv1.Package)
-			processPkg(pkg)
+			var err error
+
+			if len(pkg.Status.BuildStatus) == 0 {
+				pkg.Status.BuildStatus = fv1.BuildStatusPending
+				pkg, err = pkgw.fissionClient.CoreV1().Packages(pkg.Namespace).UpdateStatus(pkg)
+				if err != nil {
+					pkgw.logger.Error("error filling package status", zap.Error(err))
+					return
+				}
+				// once we update the package status, an update event
+				// will arrive and handle by UpdateFunc later. So we
+				// don't need to build the package at this moment.
+				return
+			}
+
+			if pkg.Status.BuildStatus == fv1.BuildStatusPending {
+				go pkgw.build(buildCache, pkg)
+			}
 		},
 		UpdateFunc: func(oldObj, newObj interface{}) {
 			oldPkg := oldObj.(*fv1.Package)
 			pkg := newObj.(*fv1.Package)
+			var err error
 
-			// TODO: Once enable "/status", check generation for spec changed instead.
-			//   Before "/status" is enabled, the generation and resource version will be changed
-			//   if we update the status of a package, hence we are not able to differentiate
-			//   the spec change or status change. So we only build package which's status
-			//   us "pending" and user have to use "kubectl replace" to update a package.
-			if oldPkg.ResourceVersion == pkg.ResourceVersion &&
-				pkg.Status.BuildStatus != fv1.BuildStatusPending {
-				return
+			if oldPkg.Generation == pkg.Generation {
+				// If both old and new package's spec and status are the same
+				// means this is an status update event and so we only need to
+				// handle package in "pending" state.
+				if pkg.Status.BuildStatus == fv1.BuildStatusPending {
+					go pkgw.build(buildCache, pkg)
+				}
+			} else if oldPkg.Generation != pkg.Generation {
+				// The buildermgr updates the deploy archive of spec when the package is "running" state.
+				// Hence, we ignore this event.
+				// TODO: handle the case that user updates the package
+				//  when the build is still in progress.
+				if pkg.Status.BuildStatus == fv1.BuildStatusRunning {
+					return
+				}
+
+				pkg.Status.BuildStatus = fv1.BuildStatusPending
+				pkg, err = pkgw.fissionClient.CoreV1().Packages(pkg.Namespace).UpdateStatus(pkg)
+				if err != nil {
+					pkgw.logger.Error("error filling package status", zap.Error(err))
+				}
 			}
-			processPkg(pkg)
 		},
 	})
 
 	pkgw.pkgStore = pkgStore
 	controller.Run(make(chan struct{}))
-}
-
-// setInitialBuildStatus sets initial build status to a package if it is empty.
-// This normally occurs when the user applies package YAML files that have no status field
-// through kubectl.
-func setInitialBuildStatus(fissionClient *crd.FissionClient, pkg *fv1.Package) (*fv1.Package, error) {
-	pkg.Status = fv1.PackageStatus{
-		LastUpdateTimestamp: metav1.Time{Time: time.Now().UTC()},
-	}
-	if !pkg.Spec.Deployment.IsEmpty() {
-		// if the deployment archive is not empty,
-		// we assume it's a deployable package no matter
-		// the source archive is empty or not.
-		pkg.Status.BuildStatus = fv1.BuildStatusNone
-	} else if !pkg.Spec.Source.IsEmpty() {
-		pkg.Status.BuildStatus = fv1.BuildStatusPending
-	} else {
-		// mark package failed since we cannot do anything with it.
-		pkg.Status.BuildStatus = fv1.BuildStatusFailed
-		pkg.Status.BuildLog = "Both deploy and source archive are empty"
-	}
-
-	// TODO: use UpdateStatus to update status
-	return fissionClient.CoreV1().Packages(pkg.Namespace).Update(pkg)
 }

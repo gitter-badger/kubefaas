@@ -92,7 +92,7 @@ func (opts *UpdateSubCommand) complete(input cli.Input) error {
 }
 
 func (opts *UpdateSubCommand) run(input cli.Input) error {
-	_, err := opts.Client().V1().CanaryConfig().Update(opts.canary)
+	_, err := opts.Client().V1().CanaryConfig().UpdateStatus(opts.canary)
 	if err != nil {
 		return errors.Wrap(err, "error updating canary config")
 	}

@@ -36,13 +36,10 @@ kubectl apply -f spec-yaml -R
 timeout 90 bash -c "wait_for_builder $name"
 timeout 90 bash -c "waitBuildExpectedStatus $pkgName failed"
 
-sed -i 's/gogo/go/g' spec-yaml/function-go.yaml
+cp spec-yaml/function-go.yaml $tmp_dir/function-go.yaml
+sed -i 's/gogo/go/g' $tmp_dir/function-go.yaml
 
-# before we enable "/status" this should be failed.
-kubectl apply -f spec-yaml/function-go.yaml
-timeout 90 bash -c "waitBuildExpectedStatus $pkgName failed"
-
-kubectl replace -f spec-yaml/function-go.yaml
+kubectl apply -f $tmp_dir/function-go.yaml
 timeout 90 bash -c "waitBuild $pkgName"
 
 fission fn test --name $name

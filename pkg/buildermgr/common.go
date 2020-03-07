@@ -125,12 +125,6 @@ func updatePackage(logger *zap.Logger, fissionClient *crd.FissionClient,
 	pkg *fv1.Package, status fv1.BuildStatus, buildLogs string,
 	uploadResp *fetcher.ArchiveUploadResponse) (*fv1.Package, error) {
 
-	pkg.Status = fv1.PackageStatus{
-		BuildStatus:         status,
-		BuildLog:            buildLogs,
-		LastUpdateTimestamp: metav1.Time{Time: time.Now().UTC()},
-	}
-
 	if uploadResp != nil {
 		pkg.Spec.Deployment = fv1.Archive{
 			Type:     fv1.ArchiveTypeUrl,
@@ -143,6 +137,27 @@ func updatePackage(logger *zap.Logger, fissionClient *crd.FissionClient,
 	pkg, err := fissionClient.CoreV1().Packages(pkg.ObjectMeta.Namespace).Update(pkg)
 	if err != nil {
 		e := "error updating package"
+		logger.Error(e, zap.Error(err))
+		return nil, errors.Wrap(err, e)
+	}
+
+	// return resource version for function to update function package ref
+	return updatePackageStatus(logger, fissionClient, pkg, status, buildLogs)
+}
+
+func updatePackageStatus(logger *zap.Logger, fissionClient *crd.FissionClient,
+	pkg *fv1.Package, status fv1.BuildStatus, buildLogs string) (*fv1.Package, error) {
+
+	pkg.Status = fv1.PackageStatus{
+		BuildStatus:         status,
+		BuildLog:            buildLogs,
+		LastUpdateTimestamp: metav1.Time{Time: time.Now().UTC()},
+	}
+
+	// update package spec
+	pkg, err := fissionClient.CoreV1().Packages(pkg.ObjectMeta.Namespace).UpdateStatus(pkg)
+	if err != nil {
+		e := "error updating package status"
 		logger.Error(e, zap.Error(err))
 		return nil, errors.Wrap(err, e)
 	}

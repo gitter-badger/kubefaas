@@ -236,6 +236,43 @@ func (a *API) PackageApiUpdate(w http.ResponseWriter, r *http.Request) {
 	a.respondWithSuccess(w, resp)
 }
 
+func (a *API) PackageApiUpdateStatus(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	name := vars["package"]
+
+	body, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
+	var f fv1.Package
+	err = json.Unmarshal(body, &f)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
+	if name != f.ObjectMeta.Name {
+		err = ferror.MakeError(ferror.ErrorInvalidArgument, "Package name doesn't match URL")
+		a.respondWithError(w, err)
+		return
+	}
+
+	fnew, err := a.fissionClient.CoreV1().Packages(f.ObjectMeta.Namespace).UpdateStatus(&f)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+
+	resp, err := json.Marshal(fnew.ObjectMeta)
+	if err != nil {
+		a.respondWithError(w, err)
+		return
+	}
+	a.respondWithSuccess(w, resp)
+}
+
 func (a *API) PackageApiDelete(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	name := vars["package"]
