@@ -21,7 +21,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/fission/fission/cmd/fetcher/app"
+	"github.com/srcmesh/kubefaas/cmd/fetcher/app"
 )
 
 // Usage: fetcher <shared volume path>

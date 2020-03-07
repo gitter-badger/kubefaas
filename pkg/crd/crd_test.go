@@ -27,8 +27,8 @@ import (
 	"k8s.io/api/core/v1"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	genInformerCoreV1 "github.com/fission/fission/pkg/apis/genclient/clientset/versioned/typed/core/v1"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	genInformerCoreV1 "github.com/srcmesh/kubefaas/pkg/apis/genclient/clientset/versioned/typed/core/v1"
 )
 
 var testNS = metav1.NamespaceDefault

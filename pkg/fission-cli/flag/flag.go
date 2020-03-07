@@ -22,8 +22,8 @@ import (
 
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	flagkey "github.com/fission/fission/pkg/fission-cli/flag/key"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	flagkey "github.com/srcmesh/kubefaas/pkg/fission-cli/flag/key"
 )
 
 type (

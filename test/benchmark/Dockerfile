@@ -8,6 +8,6 @@ FROM loadimpact/k6
 WORKDIR /fission-bench
 COPY --from=go-builder /go/picasso /usr/local/bin/picasso
 RUN apk --update add --no-cache bash curl
-RUN curl -Lo fission https://github.com/fission/fission/releases/download/$(curl --silent "https://api.github.com/repos/fission/fission/releases/latest" | grep "tag_name" |sed -E 's/.*"([^"]+)".*/\1/')/fission-cli-linux && chmod +x fission && mv fission /usr/local/bin/
+RUN curl -Lo fission https://github.com/srcmesh/kubefaas/releases/download/$(curl --silent "https://api.github.com/repos/srcmesh/kubefaas/releases/latest" | grep "tag_name" |sed -E 's/.*"([^"]+)".*/\1/')/fission-cli-linux && chmod +x fission && mv fission /usr/local/bin/
 
 ENTRYPOINT ["sh"]

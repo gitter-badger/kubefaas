@@ -1,7 +1,7 @@
 FROM golang:1.12-alpine as godep
 RUN apk add bash ca-certificates git gcc g++ libc-dev
 
-ARG GOPKG=github.com/fission/fission
+ARG GOPKG=github.com/srcmesh/kubefaas
 
 ENV GO111MODULE=on
 
@@ -35,7 +35,7 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build \
     -o /go/bin/builder \
     -gcflags=-trimpath=$GOPATH \
     -asmflags=-trimpath=$GOPATH \
-    -ldflags "-X github.com/fission/fission/pkg/info.GitCommit=${GITCOMMIT} -X github.com/fission/fission/pkg/info.BuildDate=${BUILDDATE} -X github.com/fission/fission/pkg/info.Version=${BUILDVERSION}"
+    -ldflags "-X github.com/srcmesh/kubefaas/pkg/info.GitCommit=${GITCOMMIT} -X github.com/srcmesh/kubefaas/pkg/info.BuildDate=${BUILDDATE} -X github.com/srcmesh/kubefaas/pkg/info.Version=${BUILDVERSION}"
 
 FROM alpine:3.10 as base
 RUN apk add --update ca-certificates

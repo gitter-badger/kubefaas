@@ -18,7 +18,7 @@ package util
 
 import (
 	"fmt"
-	"github.com/fission/fission/pkg/controller/client/rest"
+	"github.com/srcmesh/kubefaas/pkg/controller/client/rest"
 	"os"
 	"os/user"
 	"path/filepath"
@@ -35,13 +35,13 @@ import (
 	restclient "k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	"github.com/fission/fission/pkg/controller/client"
-	"github.com/fission/fission/pkg/fission-cli/cliwrapper/cli"
-	"github.com/fission/fission/pkg/fission-cli/console"
-	flagkey "github.com/fission/fission/pkg/fission-cli/flag/key"
-	"github.com/fission/fission/pkg/info"
-	"github.com/fission/fission/pkg/plugin"
-	"github.com/fission/fission/pkg/utils"
+	"github.com/srcmesh/kubefaas/pkg/controller/client"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/cliwrapper/cli"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/console"
+	flagkey "github.com/srcmesh/kubefaas/pkg/fission-cli/flag/key"
+	"github.com/srcmesh/kubefaas/pkg/info"
+	"github.com/srcmesh/kubefaas/pkg/plugin"
+	"github.com/srcmesh/kubefaas/pkg/utils"
 )
 
 func GetFissionNamespace() string {

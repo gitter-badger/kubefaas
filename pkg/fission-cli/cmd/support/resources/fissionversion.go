@@ -20,8 +20,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/fission/fission/pkg/controller/client"
-	"github.com/fission/fission/pkg/fission-cli/util"
+	"github.com/srcmesh/kubefaas/pkg/controller/client"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/util"
 )
 
 type FissionVersion struct {

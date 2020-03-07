@@ -1,4 +1,6 @@
-module github.com/fission/fission
+module github.com/srcmesh/kubefaas
+
+go 1.14
 
 require (
 	cloud.google.com/go v0.40.0 // indirect

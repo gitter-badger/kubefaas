@@ -6,7 +6,7 @@ RUN apt update && apt install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 FROM golang:${GO_VERSION} AS builder
 
 ENV GOPATH /usr
-ENV APP	   ${GOPATH}/src/github.com/fission/fission/environments/tensorflow-serving
+ENV APP	   ${GOPATH}/src/github.com/srcmesh/kubefaas/environments/tensorflow-serving
 
 WORKDIR ${APP}
 

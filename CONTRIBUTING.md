@@ -10,7 +10,7 @@ participating, you're expected to uphold this code.
 ### Choose something to work on
 
 The easiest way to start is to look at existing
-[issues](https://github.com/fission/fission/issues) and see if there's
+[issues](https://github.com/srcmesh/kubefaas/issues) and see if there's
 something there that you'd like to work on.
 
 Also, if you're familiar with a language that we don't support today,

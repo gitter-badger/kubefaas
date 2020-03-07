@@ -28,7 +28,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/fission/fission/pkg/fission-cli/console"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/console"
 )
 
 const (

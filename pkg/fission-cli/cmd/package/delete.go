@@ -22,10 +22,10 @@ import (
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	"github.com/fission/fission/pkg/controller/client"
-	"github.com/fission/fission/pkg/fission-cli/cliwrapper/cli"
-	"github.com/fission/fission/pkg/fission-cli/cmd"
-	flagkey "github.com/fission/fission/pkg/fission-cli/flag/key"
+	"github.com/srcmesh/kubefaas/pkg/controller/client"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/cliwrapper/cli"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/cmd"
+	flagkey "github.com/srcmesh/kubefaas/pkg/fission-cli/flag/key"
 )
 
 type DeleteSubCommand struct {

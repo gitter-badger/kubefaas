@@ -34,12 +34,12 @@ import (
 	"go.uber.org/zap"
 	k8stypes "k8s.io/apimachinery/pkg/types"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/crd"
-	ferror "github.com/fission/fission/pkg/error"
-	"github.com/fission/fission/pkg/error/network"
-	executorClient "github.com/fission/fission/pkg/executor/client"
-	"github.com/fission/fission/pkg/throttler"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
+	"github.com/srcmesh/kubefaas/pkg/error/network"
+	executorClient "github.com/srcmesh/kubefaas/pkg/executor/client"
+	"github.com/srcmesh/kubefaas/pkg/throttler"
 )
 
 const (

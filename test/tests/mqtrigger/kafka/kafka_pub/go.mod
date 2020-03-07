@@ -1,5 +1,7 @@
 module kafka_pub
 
+go 1.14
+
 require (
 	github.com/Shopify/sarama v1.18.0
 	github.com/davecgh/go-spew v1.1.1 // indirect

@@ -29,7 +29,7 @@ import (
 	"github.com/dchest/uniuri"
 	"go.uber.org/zap"
 
-	"github.com/fission/fission/pkg/storagesvc"
+	"github.com/srcmesh/kubefaas/pkg/storagesvc"
 )
 
 func panicIf(err error) {

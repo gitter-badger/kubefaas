@@ -19,7 +19,7 @@ package dummy
 import (
 	"time"
 
-	fCli "github.com/fission/fission/pkg/fission-cli/cliwrapper/cli"
+	fCli "github.com/srcmesh/kubefaas/pkg/fission-cli/cliwrapper/cli"
 )
 
 var _ fCli.Input = &Cli{}

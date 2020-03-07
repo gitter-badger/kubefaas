@@ -31,16 +31,16 @@ import (
 	"github.com/pkg/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/controller/client"
-	"github.com/fission/fission/pkg/fission-cli/cliwrapper/cli"
-	"github.com/fission/fission/pkg/fission-cli/cmd"
-	pkgutil "github.com/fission/fission/pkg/fission-cli/cmd/package/util"
-	spectypes "github.com/fission/fission/pkg/fission-cli/cmd/spec/types"
-	"github.com/fission/fission/pkg/fission-cli/console"
-	flagkey "github.com/fission/fission/pkg/fission-cli/flag/key"
-	"github.com/fission/fission/pkg/fission-cli/util"
-	"github.com/fission/fission/pkg/utils"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/controller/client"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/cliwrapper/cli"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/cmd"
+	pkgutil "github.com/srcmesh/kubefaas/pkg/fission-cli/cmd/package/util"
+	spectypes "github.com/srcmesh/kubefaas/pkg/fission-cli/cmd/spec/types"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/console"
+	flagkey "github.com/srcmesh/kubefaas/pkg/fission-cli/flag/key"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/util"
+	"github.com/srcmesh/kubefaas/pkg/utils"
 )
 
 type ApplySubCommand struct {

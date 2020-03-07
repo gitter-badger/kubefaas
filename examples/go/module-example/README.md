@@ -9,7 +9,7 @@ $ go mod init "<module>"
 For example,
 
 ```bash
-$ go mod init "github.com/fission/fission/examples/go/go-module-example"
+$ go mod init "github.com/srcmesh/kubefaas/examples/go/go-module-example"
 ```
 
 2. Add dependencies

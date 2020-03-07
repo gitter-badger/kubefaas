@@ -42,7 +42,7 @@ Parameter | Description | Default
 `serviceType` | Type of Fission Controller service to use. For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP. | `ClusterIP`
 `routerServiceType` | Type of Fission Router service to use. For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP. | `LoadBalancer`
 `repository` | Image base repository | `index.docker.io`
-`image` | Fission image repository | `fission/fission-bundle`
+`image` | Fission image repository | `srcmesh/kubefaas-bundle`
 `imageTag` | Fission image tag | `1.8.0`
 `pullPolicy` | Image pull policy | `IfNotPresent`
 `fetcher.image` | Fission fetcher repository | `fission/fetcher`

@@ -199,7 +199,7 @@ build_and_push_env_builder() {
 build_fission_cli() {
     travis_fold_start build_fission_cli "fission cli"
     pushd $ROOT/cmd/fission-cli
-    go build -ldflags "-X github.com/fission/fission/pkg/info.GitCommit=$(getGitCommit) -X github.com/fission/fission/pkg/info.BuildDate=$(getDate) -X github.com/fission/fission/pkg/info.Version=$(getVersion)" -o $HOME/tool/fission .
+    go build -ldflags "-X github.com/srcmesh/kubefaas/pkg/info.GitCommit=$(getGitCommit) -X github.com/srcmesh/kubefaas/pkg/info.BuildDate=$(getDate) -X github.com/srcmesh/kubefaas/pkg/info.Version=$(getVersion)" -o $HOME/tool/fission .
     popd
     travis_fold_end build_fission_cli
 }

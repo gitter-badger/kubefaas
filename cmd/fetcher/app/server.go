@@ -29,7 +29,7 @@ import (
 	"go.opencensus.io/trace"
 	"go.uber.org/zap"
 
-	"github.com/fission/fission/pkg/fetcher"
+	"github.com/srcmesh/kubefaas/pkg/fetcher"
 )
 
 func registerTraceExporter(collectorEndpoint string) error {

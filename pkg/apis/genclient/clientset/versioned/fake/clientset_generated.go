@@ -19,9 +19,9 @@ limitations under the License.
 package fake
 
 import (
-	clientset "github.com/fission/fission/pkg/apis/genclient/clientset/versioned"
-	corev1 "github.com/fission/fission/pkg/apis/genclient/clientset/versioned/typed/core/v1"
-	fakecorev1 "github.com/fission/fission/pkg/apis/genclient/clientset/versioned/typed/core/v1/fake"
+	clientset "github.com/srcmesh/kubefaas/pkg/apis/genclient/clientset/versioned"
+	corev1 "github.com/srcmesh/kubefaas/pkg/apis/genclient/clientset/versioned/typed/core/v1"
+	fakecorev1 "github.com/srcmesh/kubefaas/pkg/apis/genclient/clientset/versioned/typed/core/v1/fake"
 	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/discovery"

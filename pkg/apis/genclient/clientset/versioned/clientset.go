@@ -21,7 +21,7 @@ package versioned
 import (
 	"fmt"
 
-	corev1 "github.com/fission/fission/pkg/apis/genclient/clientset/versioned/typed/core/v1"
+	corev1 "github.com/srcmesh/kubefaas/pkg/apis/genclient/clientset/versioned/typed/core/v1"
 	discovery "k8s.io/client-go/discovery"
 	rest "k8s.io/client-go/rest"
 	flowcontrol "k8s.io/client-go/util/flowcontrol"

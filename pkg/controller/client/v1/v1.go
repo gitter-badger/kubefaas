@@ -20,9 +20,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	ferror "github.com/fission/fission/pkg/error"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
 
-	"github.com/fission/fission/pkg/controller/client/rest"
+	"github.com/srcmesh/kubefaas/pkg/controller/client/rest"
 )
 
 type (

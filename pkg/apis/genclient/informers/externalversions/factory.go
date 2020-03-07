@@ -23,9 +23,9 @@ import (
 	sync "sync"
 	time "time"
 
-	versioned "github.com/fission/fission/pkg/apis/genclient/clientset/versioned"
-	core "github.com/fission/fission/pkg/apis/genclient/informers/externalversions/core"
-	internalinterfaces "github.com/fission/fission/pkg/apis/genclient/informers/externalversions/internalinterfaces"
+	versioned "github.com/srcmesh/kubefaas/pkg/apis/genclient/clientset/versioned"
+	core "github.com/srcmesh/kubefaas/pkg/apis/genclient/informers/externalversions/core"
+	internalinterfaces "github.com/srcmesh/kubefaas/pkg/apis/genclient/informers/externalversions/internalinterfaces"
 	v1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	runtime "k8s.io/apimachinery/pkg/runtime"
 	schema "k8s.io/apimachinery/pkg/runtime/schema"

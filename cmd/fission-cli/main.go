@@ -19,8 +19,8 @@ package main
 import (
 	"os"
 
-	"github.com/fission/fission/cmd/fission-cli/app"
-	"github.com/fission/fission/pkg/fission-cli/console"
+	"github.com/srcmesh/kubefaas/cmd/fission-cli/app"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/console"
 )
 
 func main() {

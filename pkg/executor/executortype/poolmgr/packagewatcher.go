@@ -19,15 +19,15 @@ package poolmgr
 import (
 	"time"
 
-	"github.com/fission/fission/pkg/utils"
+	"github.com/srcmesh/kubefaas/pkg/utils"
 	"go.uber.org/zap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/fields"
 	"k8s.io/client-go/kubernetes"
 	k8sCache "k8s.io/client-go/tools/cache"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/crd"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/crd"
 )
 
 // TODO : It may make sense to make each of add, update, delete funcs run as separate go routines.

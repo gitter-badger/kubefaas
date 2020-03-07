@@ -20,10 +20,10 @@ import (
 	"github.com/robfig/cron"
 	"go.uber.org/zap"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/crd"
-	"github.com/fission/fission/pkg/publisher"
-	"github.com/fission/fission/pkg/utils"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	"github.com/srcmesh/kubefaas/pkg/publisher"
+	"github.com/srcmesh/kubefaas/pkg/utils"
 )
 
 type requestType int

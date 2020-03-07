@@ -17,7 +17,7 @@ import (
 	// import any external packages except the Fission or built-in
 	// packages.
 
-	"github.com/fission/fission/environments/go/context"
+	"github.com/srcmesh/kubefaas/environments/go/context"
 )
 
 const (

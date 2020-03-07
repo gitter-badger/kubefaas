@@ -14,7 +14,7 @@ routerServiceType: LoadBalancer
 repository: index.docker.io
 
 ## Fission image repository
-image: fission/fission-bundle
+image: srcmesh/kubefaas-bundle
 
 ## Fission image version
 imageTag: 1.8.0

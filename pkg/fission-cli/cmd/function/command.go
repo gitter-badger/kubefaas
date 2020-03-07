@@ -19,8 +19,8 @@ package function
 import (
 	"github.com/spf13/cobra"
 
-	wrapper "github.com/fission/fission/pkg/fission-cli/cliwrapper/driver/cobra"
-	"github.com/fission/fission/pkg/fission-cli/flag"
+	wrapper "github.com/srcmesh/kubefaas/pkg/fission-cli/cliwrapper/driver/cobra"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/flag"
 )
 
 func Commands() *cobra.Command {

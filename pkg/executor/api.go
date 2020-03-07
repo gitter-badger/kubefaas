@@ -31,9 +31,9 @@ import (
 	k8serrors "k8s.io/apimachinery/pkg/api/errors"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	ferror "github.com/fission/fission/pkg/error"
-	"github.com/fission/fission/pkg/executor/client"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
+	"github.com/srcmesh/kubefaas/pkg/executor/client"
 )
 
 func (executor *Executor) getServiceForFunctionApi(w http.ResponseWriter, r *http.Request) {

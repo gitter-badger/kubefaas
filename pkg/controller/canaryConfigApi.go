@@ -29,9 +29,9 @@ import (
 	"go.uber.org/zap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	ferror "github.com/fission/fission/pkg/error"
-	config "github.com/fission/fission/pkg/featureconfig"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
+	config "github.com/srcmesh/kubefaas/pkg/featureconfig"
 )
 
 func RegisterCanaryConfigRoute(ws *restful.WebService) {

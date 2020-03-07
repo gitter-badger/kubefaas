@@ -19,8 +19,8 @@ package cmd
 import (
 	"sync"
 
-	"github.com/fission/fission/pkg/controller/client"
-	"github.com/fission/fission/pkg/fission-cli/cliwrapper/cli"
+	"github.com/srcmesh/kubefaas/pkg/controller/client"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/cliwrapper/cli"
 )
 
 type (

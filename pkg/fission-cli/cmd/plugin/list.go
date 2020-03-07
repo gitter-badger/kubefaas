@@ -21,9 +21,9 @@ import (
 	"os"
 	"text/tabwriter"
 
-	"github.com/fission/fission/pkg/fission-cli/cliwrapper/cli"
-	"github.com/fission/fission/pkg/fission-cli/cmd"
-	"github.com/fission/fission/pkg/plugin"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/cliwrapper/cli"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/cmd"
+	"github.com/srcmesh/kubefaas/pkg/plugin"
 )
 
 type ListSubCommand struct {

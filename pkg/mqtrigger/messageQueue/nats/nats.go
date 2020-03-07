@@ -27,11 +27,11 @@ import (
 	ns "github.com/nats-io/stan.go"
 	"go.uber.org/zap"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/mqtrigger/factory"
-	"github.com/fission/fission/pkg/mqtrigger/messageQueue"
-	"github.com/fission/fission/pkg/mqtrigger/validator"
-	"github.com/fission/fission/pkg/utils"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/mqtrigger/factory"
+	"github.com/srcmesh/kubefaas/pkg/mqtrigger/messageQueue"
+	"github.com/srcmesh/kubefaas/pkg/mqtrigger/validator"
+	"github.com/srcmesh/kubefaas/pkg/utils"
 )
 
 func init() {

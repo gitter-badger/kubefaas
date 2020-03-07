@@ -27,8 +27,8 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	builder "github.com/fission/fission/pkg/builder"
-	ferror "github.com/fission/fission/pkg/error"
+	builder "github.com/srcmesh/kubefaas/pkg/builder"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
 )
 
 type (

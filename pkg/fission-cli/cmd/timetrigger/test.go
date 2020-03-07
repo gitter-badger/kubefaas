@@ -19,9 +19,9 @@ package timetrigger
 import (
 	"github.com/pkg/errors"
 
-	"github.com/fission/fission/pkg/fission-cli/cliwrapper/cli"
-	"github.com/fission/fission/pkg/fission-cli/cmd"
-	flagkey "github.com/fission/fission/pkg/fission-cli/flag/key"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/cliwrapper/cli"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/cmd"
+	flagkey "github.com/srcmesh/kubefaas/pkg/fission-cli/flag/key"
 )
 
 type ShowSubCommand struct {

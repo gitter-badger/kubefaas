@@ -22,7 +22,7 @@ import (
 
 	"go.uber.org/zap"
 
-	"github.com/fission/fission/cmd/builder/app"
+	"github.com/srcmesh/kubefaas/cmd/builder/app"
 )
 
 // Usage: builder <shared volume path>

@@ -7,9 +7,9 @@ Prerequisites
 
   Get access to:
   - The fission dockerhub account (https://hub.docker.com/r/fission/ if you have access, you will see Fission listed in your organizations: https://hub.docker.com/organizations/ )
-  - Fission-charts repo (https://github.com/fission/fission-charts)
+  - Fission-charts repo (https://github.com/srcmesh/kubefaas-charts)
   - Fission Documentation Repo (https://github.com/fission/docs.fission.io)
-  - Fission main repo (https://github.com/fission/fission)
+  - Fission main repo (https://github.com/srcmesh/kubefaas)
 
 2. Get a Github "personal access token":
    https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/
@@ -39,7 +39,7 @@ Check that the build is green!
 Fix the build if it is not green. DON'T proceed unless build is GREEN!
 
 
-Updating Fission Repo (https://github.com/fission/fission)
+Updating Fission Repo (https://github.com/srcmesh/kubefaas)
 ------------------------------
 
 1. cd to the top of the fission repo, create a branch:
@@ -57,7 +57,7 @@ Updating Fission Repo (https://github.com/fission/fission)
 
    This will take a while as it builds and pushes all images (Approx ~2-3 hours)
 
-4. After the build is successful, the charts will be in build/charts directory from root of Fission. Move these charts to fission/fission-charts repo. We will push them shortly after some changes to repo.
+4. After the build is successful, the charts will be in build/charts directory from root of Fission. Move these charts to srcmesh/kubefaas-charts repo. We will push them shortly after some changes to repo.
 
 5. As part of release script, changelog.md has been modified. Take a look at it, correct it if you want and then commit it, discard other directories etc. produced by builders after inspection.
 
@@ -69,9 +69,9 @@ Updating Fission Repo (https://github.com/fission/fission)
 
 8. Test build from master branch for sanity check and make sure the master build is green
 
-Updating Fission Charts (https://github.com/fission/fission-charts)
+Updating Fission Charts (https://github.com/srcmesh/kubefaas-charts)
 ------------------------------
-a. Switch to fission/fission-charts repo and run `index.sh` in that repo.  (Don't edit the index.yaml in this repo manually.  index.sh generates it, using the helm repo CLI.)
+a. Switch to srcmesh/kubefaas-charts repo and run `index.sh` in that repo.  (Don't edit the index.yaml in this repo manually.  index.sh generates it, using the helm repo CLI.)
 
 b. You should have index.yaml and fission-core-*, fission-all-* charts as change, add, commit and push it to repo.
 

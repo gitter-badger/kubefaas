@@ -29,7 +29,7 @@ import (
 	influxdbClient "github.com/influxdata/influxdb/client/v2"
 	"github.com/pkg/errors"
 
-	ferror "github.com/fission/fission/pkg/error"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
 )
 
 const (

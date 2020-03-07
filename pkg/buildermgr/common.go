@@ -28,13 +28,13 @@ import (
 	"go.uber.org/zap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/builder"
-	builderClient "github.com/fission/fission/pkg/builder/client"
-	"github.com/fission/fission/pkg/crd"
-	ferror "github.com/fission/fission/pkg/error"
-	"github.com/fission/fission/pkg/fetcher"
-	fetcherClient "github.com/fission/fission/pkg/fetcher/client"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/builder"
+	builderClient "github.com/srcmesh/kubefaas/pkg/builder/client"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
+	"github.com/srcmesh/kubefaas/pkg/fetcher"
+	fetcherClient "github.com/srcmesh/kubefaas/pkg/fetcher/client"
 )
 
 // buildPackage helps to build source package into deployment package.

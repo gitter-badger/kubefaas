@@ -28,7 +28,7 @@ import (
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 
-	genClientset "github.com/fission/fission/pkg/apis/genclient/clientset/versioned"
+	genClientset "github.com/srcmesh/kubefaas/pkg/apis/genclient/clientset/versioned"
 )
 
 type (

@@ -31,8 +31,8 @@ import (
 	"k8s.io/client-go/tools/portforward"
 	"k8s.io/client-go/transport/spdy"
 
-	"github.com/fission/fission/pkg/fission-cli/console"
-	"github.com/fission/fission/pkg/utils"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/console"
+	"github.com/srcmesh/kubefaas/pkg/utils"
 )
 
 // Port forward a free local port to a pod on the cluster. The pod is

@@ -17,8 +17,8 @@ limitations under the License.
 package client
 
 import (
-	"github.com/fission/fission/pkg/controller/client/rest"
-	v1 "github.com/fission/fission/pkg/controller/client/v1"
+	"github.com/srcmesh/kubefaas/pkg/controller/client/rest"
+	v1 "github.com/srcmesh/kubefaas/pkg/controller/client/v1"
 )
 
 type (

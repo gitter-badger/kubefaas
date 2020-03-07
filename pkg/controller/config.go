@@ -23,9 +23,9 @@ import (
 	"go.uber.org/zap"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/fission/fission/pkg/canaryconfigmgr"
-	"github.com/fission/fission/pkg/crd"
-	config "github.com/fission/fission/pkg/featureconfig"
+	"github.com/srcmesh/kubefaas/pkg/canaryconfigmgr"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	config "github.com/srcmesh/kubefaas/pkg/featureconfig"
 )
 
 func ConfigCanaryFeature(context context.Context, logger *zap.Logger, fissionClient *crd.FissionClient, kubeClient *kubernetes.Clientset, featureConfig *config.FeatureConfig, featureStatus map[string]string) error {

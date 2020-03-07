@@ -19,7 +19,7 @@ package controller
 import (
 	"go.uber.org/zap"
 
-	"github.com/fission/fission/pkg/crd"
+	"github.com/srcmesh/kubefaas/pkg/crd"
 )
 
 func makeCRDBackedAPI(logger *zap.Logger) (*API, error) {

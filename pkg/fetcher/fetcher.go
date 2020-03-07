@@ -36,13 +36,13 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/crd"
-	ferror "github.com/fission/fission/pkg/error"
-	"github.com/fission/fission/pkg/error/network"
-	"github.com/fission/fission/pkg/info"
-	storageSvcClient "github.com/fission/fission/pkg/storagesvc/client"
-	"github.com/fission/fission/pkg/utils"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
+	"github.com/srcmesh/kubefaas/pkg/error/network"
+	"github.com/srcmesh/kubefaas/pkg/info"
+	storageSvcClient "github.com/srcmesh/kubefaas/pkg/storagesvc/client"
+	"github.com/srcmesh/kubefaas/pkg/utils"
 )
 
 type (

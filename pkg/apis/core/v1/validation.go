@@ -27,7 +27,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/validation"
 
-	"github.com/fission/fission/pkg/mqtrigger/validator"
+	"github.com/srcmesh/kubefaas/pkg/mqtrigger/validator"
 )
 
 const (

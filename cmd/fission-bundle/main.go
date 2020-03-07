@@ -28,16 +28,16 @@ import (
 	"go.opencensus.io/trace"
 	"go.uber.org/zap"
 
-	"github.com/fission/fission/cmd/fission-bundle/mqtrigger"
-	"github.com/fission/fission/pkg/buildermgr"
-	"github.com/fission/fission/pkg/controller"
-	"github.com/fission/fission/pkg/executor"
-	"github.com/fission/fission/pkg/info"
-	"github.com/fission/fission/pkg/kubewatcher"
-	functionLogger "github.com/fission/fission/pkg/logger"
-	"github.com/fission/fission/pkg/router"
-	"github.com/fission/fission/pkg/storagesvc"
-	"github.com/fission/fission/pkg/timer"
+	"github.com/srcmesh/kubefaas/cmd/fission-bundle/mqtrigger"
+	"github.com/srcmesh/kubefaas/pkg/buildermgr"
+	"github.com/srcmesh/kubefaas/pkg/controller"
+	"github.com/srcmesh/kubefaas/pkg/executor"
+	"github.com/srcmesh/kubefaas/pkg/info"
+	"github.com/srcmesh/kubefaas/pkg/kubewatcher"
+	functionLogger "github.com/srcmesh/kubefaas/pkg/logger"
+	"github.com/srcmesh/kubefaas/pkg/router"
+	"github.com/srcmesh/kubefaas/pkg/storagesvc"
+	"github.com/srcmesh/kubefaas/pkg/timer"
 )
 
 func runController(logger *zap.Logger, port int) {

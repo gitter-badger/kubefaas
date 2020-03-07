@@ -32,11 +32,11 @@ import (
 	"k8s.io/apimachinery/pkg/watch"
 	"k8s.io/client-go/kubernetes"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/crd"
-	"github.com/fission/fission/pkg/executor/util"
-	fetcherConfig "github.com/fission/fission/pkg/fetcher/config"
-	"github.com/fission/fission/pkg/utils"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	"github.com/srcmesh/kubefaas/pkg/executor/util"
+	fetcherConfig "github.com/srcmesh/kubefaas/pkg/fetcher/config"
+	"github.com/srcmesh/kubefaas/pkg/utils"
 )
 
 type requestType int

@@ -39,8 +39,8 @@ import (
 	"k8s.io/apimachinery/pkg/labels"
 	"k8s.io/client-go/kubernetes"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	ferror "github.com/fission/fission/pkg/error"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
 )
 
 func RegisterFunctionRoute(ws *restful.WebService) {

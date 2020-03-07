@@ -34,7 +34,7 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	"github.com/fission/fission/pkg/info"
+	"github.com/srcmesh/kubefaas/pkg/info"
 )
 
 const (

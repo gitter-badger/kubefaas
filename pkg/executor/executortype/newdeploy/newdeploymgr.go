@@ -39,14 +39,14 @@ import (
 	"k8s.io/client-go/rest"
 	k8sCache "k8s.io/client-go/tools/cache"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/crd"
-	"github.com/fission/fission/pkg/executor/executortype"
-	"github.com/fission/fission/pkg/executor/fscache"
-	"github.com/fission/fission/pkg/executor/reaper"
-	fetcherConfig "github.com/fission/fission/pkg/fetcher/config"
-	"github.com/fission/fission/pkg/throttler"
-	"github.com/fission/fission/pkg/utils"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	"github.com/srcmesh/kubefaas/pkg/executor/executortype"
+	"github.com/srcmesh/kubefaas/pkg/executor/fscache"
+	"github.com/srcmesh/kubefaas/pkg/executor/reaper"
+	fetcherConfig "github.com/srcmesh/kubefaas/pkg/fetcher/config"
+	"github.com/srcmesh/kubefaas/pkg/throttler"
+	"github.com/srcmesh/kubefaas/pkg/utils"
 )
 
 var _ executortype.ExecutorType = &NewDeploy{}

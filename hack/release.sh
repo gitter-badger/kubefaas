@@ -31,7 +31,7 @@ check_clean() {
 # Push fission-bundle image
 push_fission_bundle_image() {
     local version=$1
-    local tag=fission/fission-bundle:$version
+    local tag=srcmesh/kubefaas-bundle:$version
     docker push $tag
 }
 
@@ -302,7 +302,7 @@ generate_changelog() {
 
 create_downloads_table () {
   local release_tag=$1
-  local url_prefix="https://github.com/fission/fission/releases/download"
+  local url_prefix="https://github.com/srcmesh/kubefaas/releases/download"
 
   echo "## Downloads for ${version}"
   echo
@@ -334,7 +334,7 @@ release_environment_check() {
 
   if [ ! -d $chartsrepo ]
   then
-     echo "Error finding chart repo at $GOPATH/src/github.com/fission/fission-charts"
+     echo "Error finding chart repo at $GOPATH/src/github.com/srcmesh/kubefaas-charts"
      exit 1
   fi
 }
@@ -352,13 +352,13 @@ fi
 release_environment_check $version $chartsrepo
 
 # Build release-builder image
-docker build -t fission-release-builder -f $GOPATH/src/github.com/fission/fission/hack/Dockerfile .
+docker build -t fission-release-builder -f $GOPATH/src/github.com/srcmesh/kubefaas/hack/Dockerfile .
 
 # Build all binaries & container images in docker
 # Here we mount docker.sock into container so that docker client can communicate with host docker daemon.
 # For more detail please visit https://docs.docker.com/machine/overview/
 docker run --rm -it -v $GOPATH/src:/go/src -v /var/run/docker.sock:/var/run/docker.sock \
-    -e VERSION=$version -w "/go/src/github.com/fission/fission/hack" fission-release-builder sh -c "./release-build.sh"
+    -e VERSION=$version -w "/go/src/github.com/srcmesh/kubefaas/hack" fission-release-builder sh -c "./release-build.sh"
 
 push_all $version
 push_all_envs $version

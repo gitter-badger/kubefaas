@@ -19,8 +19,8 @@ limitations under the License.
 package v1
 
 import (
-	v1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/apis/genclient/clientset/versioned/scheme"
+	v1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/apis/genclient/clientset/versioned/scheme"
 	rest "k8s.io/client-go/rest"
 )
 

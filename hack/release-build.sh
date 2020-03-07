@@ -36,7 +36,7 @@ build_cli() {
     fi
 
     GOOS=$os GOARCH=$arch go build -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH \
-        -ldflags "-X github.com/fission/fission/pkg/info.GitCommit=$gitcommit -X github.com/fission/fission/pkg/info.BuildDate=$date -X github.com/fission/fission/pkg/info.Version=$version" -o $binary .
+        -ldflags "-X github.com/srcmesh/kubefaas/pkg/info.GitCommit=$gitcommit -X github.com/srcmesh/kubefaas/pkg/info.BuildDate=$date -X github.com/srcmesh/kubefaas/pkg/info.Version=$version" -o $binary .
 
     outdir=$BUILDDIR/cli/$osName/
     mkdir -p $outdir
@@ -51,11 +51,11 @@ build_fission_bundle_image() {
     local date=$2
     local gitcommit=$3
 
-    local tag=fission/fission-bundle:$version
+    local tag=srcmesh/kubefaas-bundle:$version
 
     docker build -t $tag -f $DIR/cmd/fission-bundle/Dockerfile.fission-bundle --build-arg GITCOMMIT=$gitcommit \
         --build-arg BUILDDATE=$date --build-arg BUILDVERSION=$version $DIR
-    docker tag $tag fission/fission-bundle:latest
+    docker tag $tag srcmesh/kubefaas-bundle:latest
 }
 
 build_fetcher_image() {

@@ -1,7 +1,7 @@
 # Fission: Serverless Functions for Kubernetes
 
-[![Build Status](https://travis-ci.org/fission/fission.svg?branch=master)](https://travis-ci.org/fission/fission)
-[![Go Report Card](https://goreportcard.com/badge/github.com/fission/fission)](https://goreportcard.com/report/github.com/fission/fission)
+[![Build Status](https://travis-ci.org/srcmesh/kubefaas.svg?branch=master)](https://travis-ci.org/srcmesh/kubefaas)
+[![Go Report Card](https://goreportcard.com/badge/github.com/srcmesh/kubefaas)](https://goreportcard.com/report/github.com/srcmesh/kubefaas)
 
 [fission.io](http://fission.io) | [@fissionio](http://twitter.com/fissionio) | [Slack](https://join.slack.com/t/fissionio/shared_invite/enQtOTI3NjgyMjE5NzE3LTllODJiODBmYTBiYWUwMWQxZWRhNDhiZDMyN2EyNjAzMTFiYjE2Nzc1NzE0MTU4ZTg2MzVjMDQ1NWY3MGJhZmE)
 
@@ -55,7 +55,7 @@ You can learn more about Fission and get started from [Fission Docs](https://doc
   $ fission env create --name nodejs --image fission/node-env
 
   # A javascript one-liner that prints "hello world"
-  $ curl https://raw.githubusercontent.com/fission/fission/master/examples/nodejs/hello.js > hello.js
+  $ curl https://raw.githubusercontent.com/srcmesh/kubefaas/master/examples/nodejs/hello.js > hello.js
 
   # Upload your function code to fission
   $ fission function create --name hello --env nodejs --code hello.js
@@ -74,7 +74,7 @@ You can learn more about Fission and get started from [Fission Docs](https://doc
 See the [compilation guide](https://docs.fission.io/docs/contributing/).
 
 ## Contact
-Fission is a project by [many contributors](https://github.com/fission/fission/graphs/contributors).
+Fission is a project by [many contributors](https://github.com/srcmesh/kubefaas/graphs/contributors).
 Reach us on [slack](https://join.slack.com/t/fissionio/shared_invite/enQtOTI3NjgyMjE5NzE3LTllODJiODBmYTBiYWUwMWQxZWRhNDhiZDMyN2EyNjAzMTFiYjE2Nzc1NzE0MTU4ZTg2MzVjMDQ1NWY3MGJhZmE) or [twitter](https://twitter.com/fissionio).
 
 ## Community meeting 
@@ -83,7 +83,7 @@ A regular community meeting takes place every other Thursday at 08:30 AM PT (Pac
 
 # Official Releases
 
-Official releases of Fission can be found on [the releases page](https://github.com/fission/fission/releases). 
+Official releases of Fission can be found on [the releases page](https://github.com/srcmesh/kubefaas/releases). 
 Please note that it is strongly recommended that you use official releases of Fission, as unreleased versions from 
 the master branch are subject to changes and incompatibilities that will not be supported in the official releases. 
 Builds from the master branch can have functionality changed and even removed at any time without compatibility support 

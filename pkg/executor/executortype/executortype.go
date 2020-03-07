@@ -20,8 +20,8 @@ import (
 	"context"
 	"go.uber.org/zap"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/executor/fscache"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/executor/fscache"
 )
 
 type ExecutorType interface {

@@ -54,9 +54,9 @@ helm install \
 --timeout 540 \
 --set $helmVars \
 --namespace $ns \
-https://github.com/fission/fission/releases/download/${CURRENT_VERSION}/fission-all-${CURRENT_VERSION}.tgz
+https://github.com/srcmesh/kubefaas/releases/download/${CURRENT_VERSION}/fission-all-${CURRENT_VERSION}.tgz
 
-mkdir temp && cd temp && curl -Lo fission https://github.com/fission/fission/releases/download/${CURRENT_VERSION}/fission-cli-linux && chmod +x fission && sudo mv fission /usr/local/bin/ && cd .. && rm -rf temp
+mkdir temp && cd temp && curl -Lo fission https://github.com/srcmesh/kubefaas/releases/download/${CURRENT_VERSION}/fission-cli-linux && chmod +x fission && sudo mv fission /usr/local/bin/ && cd .. && rm -rf temp
 
 wait_for_service $id "router"
 export FISSION_ROUTER=$(kubectl -n $ns get svc router -o jsonpath='{...ip}')
@@ -86,7 +86,7 @@ build_and_push_fetcher $FETCHER_IMAGE:$TAG
 
 build_fission_cli
 
-sudo mv $ROOT/fission/fission /usr/local/bin/
+sudo mv $ROOT/srcmesh/kubefaas /usr/local/bin/
 
 ## Upgrade 
 

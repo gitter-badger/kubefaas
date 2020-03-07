@@ -29,10 +29,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 
-	"github.com/fission/fission/pkg/crd"
-	ferror "github.com/fission/fission/pkg/error"
-	"github.com/fission/fission/pkg/fission-cli/logdb"
-	"github.com/fission/fission/pkg/info"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
+	"github.com/srcmesh/kubefaas/pkg/fission-cli/logdb"
+	"github.com/srcmesh/kubefaas/pkg/info"
 )
 
 var podNamespace string

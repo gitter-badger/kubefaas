@@ -27,7 +27,7 @@ import (
 	"time"
 
 	"github.com/dchest/uniuri"
-	"github.com/fission/fission/pkg/utils"
+	"github.com/srcmesh/kubefaas/pkg/utils"
 	multierror "github.com/hashicorp/go-multierror"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
@@ -40,12 +40,12 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 	"k8s.io/client-go/kubernetes"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/crd"
-	"github.com/fission/fission/pkg/executor/fscache"
-	"github.com/fission/fission/pkg/executor/util"
-	fetcherClient "github.com/fission/fission/pkg/fetcher/client"
-	fetcherConfig "github.com/fission/fission/pkg/fetcher/config"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	"github.com/srcmesh/kubefaas/pkg/executor/fscache"
+	"github.com/srcmesh/kubefaas/pkg/executor/util"
+	fetcherClient "github.com/srcmesh/kubefaas/pkg/fetcher/client"
+	fetcherConfig "github.com/srcmesh/kubefaas/pkg/fetcher/config"
 )
 
 type (

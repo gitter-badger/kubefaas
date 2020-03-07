@@ -26,14 +26,14 @@ import (
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/crd"
-	"github.com/fission/fission/pkg/mqtrigger"
-	"github.com/fission/fission/pkg/mqtrigger/factory"
-	"github.com/fission/fission/pkg/mqtrigger/messageQueue"
-	_ "github.com/fission/fission/pkg/mqtrigger/messageQueue/azurequeuestorage"
-	_ "github.com/fission/fission/pkg/mqtrigger/messageQueue/kafka"
-	_ "github.com/fission/fission/pkg/mqtrigger/messageQueue/nats"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	"github.com/srcmesh/kubefaas/pkg/mqtrigger"
+	"github.com/srcmesh/kubefaas/pkg/mqtrigger/factory"
+	"github.com/srcmesh/kubefaas/pkg/mqtrigger/messageQueue"
+	_ "github.com/srcmesh/kubefaas/pkg/mqtrigger/messageQueue/azurequeuestorage"
+	_ "github.com/srcmesh/kubefaas/pkg/mqtrigger/messageQueue/kafka"
+	_ "github.com/srcmesh/kubefaas/pkg/mqtrigger/messageQueue/nats"
 )
 
 func Start(logger *zap.Logger, routerUrl string) error {

@@ -22,7 +22,7 @@ import (
 	"github.com/docopt/docopt-go"
 	"go.uber.org/zap"
 
-	"github.com/fission/fission/pkg/info"
+	"github.com/srcmesh/kubefaas/pkg/info"
 )
 
 func getStringArgWithDefault(arg interface{}, defaultValue string) string {

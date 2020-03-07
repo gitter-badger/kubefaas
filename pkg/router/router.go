@@ -54,9 +54,9 @@ import (
 	"go.opencensus.io/trace"
 	"go.uber.org/zap"
 
-	"github.com/fission/fission/pkg/crd"
-	executorClient "github.com/fission/fission/pkg/executor/client"
-	"github.com/fission/fission/pkg/throttler"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	executorClient "github.com/srcmesh/kubefaas/pkg/executor/client"
+	"github.com/srcmesh/kubefaas/pkg/throttler"
 )
 
 // request url ---[mux]---> Function(name,uid) ----[fmap]----> k8s service url

@@ -54,7 +54,7 @@ standard procedure.
 
 ### Setup fission environment
 First you need to setup the fission according to your cluster setup as 
-specified here: https://github.com/fission/fission
+specified here: https://github.com/srcmesh/kubefaas
 
 
 ### Create the class to run
@@ -92,7 +92,7 @@ $ curl http://$FISSION_ROUTER/echo?text=hello%20world!
 
 ### Setup fission environment
 First you need to setup the fission according to your cluster setup as 
-specified here: https://github.com/fission/fission
+specified here: https://github.com/srcmesh/kubefaas
 
 
 ### Create the class to run
@@ -131,7 +131,7 @@ $ curl "http://$FISSION_ROUTER/add?x=30&y=12"
 
 ### Setup fission environment
 First you need to setup the fission according to your cluster setup as 
-specified here: https://github.com/fission/fission
+specified here: https://github.com/srcmesh/kubefaas
 
 
 ### Create the class to run
@@ -184,7 +184,7 @@ Url: http://fissionserver:8888, method: GET
 
 ### Setup fission environment
 First you need to setup the fission according to your cluster setup as 
-specified here: https://github.com/fission/fission
+specified here: https://github.com/srcmesh/kubefaas
 
 
 ### Create the class to run

@@ -26,10 +26,10 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/types"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	"github.com/fission/fission/pkg/cache"
-	"github.com/fission/fission/pkg/crd"
-	ferror "github.com/fission/fission/pkg/error"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	"github.com/srcmesh/kubefaas/pkg/cache"
+	"github.com/srcmesh/kubefaas/pkg/crd"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
 )
 
 type fscRequestType int

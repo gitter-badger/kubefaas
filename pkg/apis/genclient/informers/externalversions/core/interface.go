@@ -19,8 +19,8 @@ limitations under the License.
 package core
 
 import (
-	v1 "github.com/fission/fission/pkg/apis/genclient/informers/externalversions/core/v1"
-	internalinterfaces "github.com/fission/fission/pkg/apis/genclient/informers/externalversions/internalinterfaces"
+	v1 "github.com/srcmesh/kubefaas/pkg/apis/genclient/informers/externalversions/core/v1"
+	internalinterfaces "github.com/srcmesh/kubefaas/pkg/apis/genclient/informers/externalversions/internalinterfaces"
 )
 
 // Interface provides access to each of this group's versions.

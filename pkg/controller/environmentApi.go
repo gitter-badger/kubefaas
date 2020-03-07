@@ -28,8 +28,8 @@ import (
 	"go.uber.org/zap"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
-	fv1 "github.com/fission/fission/pkg/apis/core/v1"
-	ferror "github.com/fission/fission/pkg/error"
+	fv1 "github.com/srcmesh/kubefaas/pkg/apis/core/v1"
+	ferror "github.com/srcmesh/kubefaas/pkg/error"
 )
 
 func RegisterEnvironmentRoute(ws *restful.WebService) {
