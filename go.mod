@@ -60,14 +60,14 @@ require (
 	go.uber.org/multierr v1.1.0 // indirect
 	go.uber.org/zap v1.9.1
 	golang.org/x/image v0.0.0-20190618124811-92942e4437e2 // indirect
-	golang.org/x/net v0.0.0-20190619014844-b5b0513f8c1b
+	golang.org/x/net v0.0.0-20190812203447-cdfb69ac37fc
 	golang.org/x/time v0.0.0-20190308202827-9d24e82272b4 // indirect
 	google.golang.org/appengine v1.6.1 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/inf.v0 v0.9.1 // indirect
-	k8s.io/api v0.0.0-20190620084959-7cf5895f2711
+	k8s.io/api v0.15.10
 	k8s.io/apiextensions-apiserver v0.0.0-20190620085554-14e95df34f1f
-	k8s.io/apimachinery v0.0.0-20190612205821-1799e75a0719
-	k8s.io/client-go v12.0.0+incompatible
+	k8s.io/apimachinery v0.15.10
+	k8s.io/client-go v0.15.10
 	k8s.io/klog v0.3.3
 )

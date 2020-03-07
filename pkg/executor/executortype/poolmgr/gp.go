@@ -27,8 +27,8 @@ import (
 	"time"
 
 	"github.com/dchest/uniuri"
-	"github.com/srcmesh/kubefaas/pkg/utils"
 	multierror "github.com/hashicorp/go-multierror"
+	"github.com/srcmesh/kubefaas/pkg/utils"
 	"github.com/pkg/errors"
 	"go.uber.org/zap"
 	appsv1 "k8s.io/api/apps/v1"

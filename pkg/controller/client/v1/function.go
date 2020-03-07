@@ -105,9 +105,7 @@ func (c *Function) Get(m *metav1.ObjectMeta) (*fv1.Function, error) {
 }
 
 func (c *Function) GetRawDeployment(m *metav1.ObjectMeta) ([]byte, error) {
-	relativeUrl := fmt.Sprintf("functions/%v", m.Name)
-	relativeUrl += fmt.Sprintf("?namespace=%v", m.Namespace)
-	relativeUrl += fmt.Sprintf("&deploymentraw=1")
+	relativeUrl := fmt.Sprintf("functions/%v?namespace=%v&deploymentraw=1", m.Name, m.Namespace)
 
 	resp, err := c.client.Get(relativeUrl)
 	if err != nil {
