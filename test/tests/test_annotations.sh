@@ -3,7 +3,7 @@
 set -euo pipefail
 source $(dirname $0)/../utils.sh
 
-# test_annotations.sh - tests whether a user is able to add pod annotations to a Fission environment deployment
+# test_annotations.sh - tests whether a user is able to add pod annotations to a Kubefaas environment deployment
 
 TEST_ID=$(generate_test_id)
 echo "TEST_ID = $TEST_ID"
@@ -13,8 +13,8 @@ mkdir -p $tmp_dir
 
 ENV=python-${TEST_ID}
 RESOURCE_NS=default # Change to test-specific namespace once we support namespaced CRDs
-FUNCTION_NS=${FUNCTION_NAMESPACE:-fission-function}
-BUILDER_NS=fission-builder
+FUNCTION_NS=${FUNCTION_NAMESPACE:-kubefaas-function}
+BUILDER_NS=kubefaas-builder
 LIST_ANNOTATIONS=go-template='{{range $key,$value := .metadata.annotations}}{{$key}}: {{$value}}{{"\n"}}{{end}}'
 
 # fs
@@ -70,7 +70,7 @@ function retry {
   done
 }
 
-# Deploy environment (using kubectl because the Fission cli does not support the container arguments)
+# Deploy environment (using kubectl because the Kubefaas cli does not support the container arguments)
 ANNOTATION_KEY="foo"
 ANNOTATION_VALUE="bar"
 echo "Writing environment config to $ENV_SPEC_FILE"

@@ -39,7 +39,7 @@ var (
 	ErrPluginNotFound = errors.New("plugin not found")
 	ErrPluginInvalid  = errors.New("invalid plugin")
 
-	Prefix = "fission-"
+	Prefix = "kubefaas-"
 )
 
 // ObjectMeta contains the metadata of a plugin.

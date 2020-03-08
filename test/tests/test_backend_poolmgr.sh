@@ -25,19 +25,19 @@ fi
 
 # Create a hello world function in nodejs, test it with an http trigger
 log "Creating nodejs env"
-fission env create --name $env --image $NODE_RUNTIME_IMAGE --mincpu 20 --maxcpu 100 --minmemory 128 --maxmemory 256
+kubefaas env create --name $env --image $NODE_RUNTIME_IMAGE --mincpu 20 --maxcpu 100 --minmemory 128 --maxmemory 256
 
 log "Creating function"
-fission fn create --name $fn --env $env --code $ROOT/examples/nodejs/hello.js --executortype poolmgr
+kubefaas fn create --name $fn --env $env --code $ROOT/examples/nodejs/hello.js --executortype poolmgr
 
 log "Creating route"
-fission route create --function $fn --url /$fn --method GET
+kubefaas route create --function $fn --url /$fn --method GET
 
 log "Waiting for router to catch up"
 sleep 5
 
 log "Doing an HTTP GET on the function's route"
-response=$(curl http://$FISSION_ROUTER/$fn)
+response=$(curl http://$KUBEFAAS_ROUTER/$fn)
 
 log "Checking for valid response"
 echo $response | grep -i hello

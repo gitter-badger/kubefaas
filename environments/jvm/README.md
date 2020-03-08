@@ -1,6 +1,6 @@
-# Fission: Java and JVM Environment
+# Kubefaas: Java and JVM Environment
 
-This is the JVM environment for Fission.
+This is the JVM environment for Kubefaas.
 
 It's a Docker image containing a OpenJDK8 runtime, along with a
 dynamic loader.  A few dependencies are included in the
@@ -24,22 +24,22 @@ called USER.  Build and push the image to the the registry:
    docker build -t USER/jvm-env . && docker push USER/jvm-env
 ```
 
-## Using the image in fission
+## Using the image in kubefaas
 
-You can add this customized image to fission with "fission env
+You can add this customized image to kubefaas with "kubefaas env
 create":
 
 ```
-   fission env create --name jvm --image USER/jvm-env
+   kubefaas env create --name jvm --image USER/jvm-env
 ```
 
 Or, if you already have an environment, you can update its image:
 
 ```
-   fission env update --name jvm --image USER/jvm-env   
+   kubefaas env update --name jvm --image USER/jvm-env   
 ```
 
-After this, fission functions that have the env parameter set to the
+After this, kubefaas functions that have the env parameter set to the
 same environment name as this command will use this environment.
 
 ## Web Server Framework

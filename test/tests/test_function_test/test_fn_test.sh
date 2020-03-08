@@ -29,18 +29,18 @@ else
 fi
 
 log "Creating env $env"
-fission env create --name $env --image $NODE_RUNTIME_IMAGE
+kubefaas env create --name $env --image $NODE_RUNTIME_IMAGE
 
 log "Creating valid function $valid_fn_name"
-fission fn create --name $valid_fn_name --env $env --code $(dirname $0)/hello.js
+kubefaas fn create --name $valid_fn_name --env $env --code $(dirname $0)/hello.js
 
 log "Testing valid function $valid_fn_name"
-fission fn test --name $valid_fn_name > $tmp_dir/valid.log
+kubefaas fn test --name $valid_fn_name > $tmp_dir/valid.log
 
 log "---Valid Function logs---"
 cat $tmp_dir/valid.log
 log "------"
-valid_num=$(grep 'Hello, Fission' $tmp_dir/valid.log | wc -l)
+valid_num=$(grep 'Hello, Kubefaas' $tmp_dir/valid.log | wc -l)
 
 if [ $valid_num -ne 1 ]
 then
@@ -49,17 +49,17 @@ then
 fi
 
 log "Creating function with an error $invalid_fn_name"
-fission fn create --name $invalid_fn_name --env $env --code $(dirname $0)/errhello.js
+kubefaas fn create --name $invalid_fn_name --env $env --code $(dirname $0)/errhello.js
 
 log "Testing invalid function $valid_fn_name"
-fission fn test --name $invalid_fn_name > $tmp_dir/invalid.log
+kubefaas fn test --name $invalid_fn_name > $tmp_dir/invalid.log
 
 for i in {1..10}
 do
     size=$(wc -c < $tmp_dir/invalid.log)
     if [ $size == 0 ]
     then
-        fission fn test --name $invalid_fn_name > $tmp_dir/invalid.log
+        kubefaas fn test --name $invalid_fn_name > $tmp_dir/invalid.log
     else
         break
     fi

@@ -23,13 +23,13 @@ else
 fi
 
 log "Creating Python env $env"
-fission env create --name $env --image $PYTHON_RUNTIME_IMAGE --mincpu 20 --maxcpu 100 --minmemory 128 --maxmemory 256
+kubefaas env create --name $env --image $PYTHON_RUNTIME_IMAGE --mincpu 20 --maxcpu 100 --minmemory 128 --maxmemory 256
 
 log "Creating function $fn"
-fission fn create --name $fn --env $env --code $ROOT/examples/python/hello.py
+kubefaas fn create --name $fn --env $env --code $ROOT/examples/python/hello.py
 
 log "Creating route"
-fission route create --function $fn --url /$fn --method GET
+kubefaas route create --function $fn --url /$fn --method GET
 
 log "Waiting for router to catch up"
 sleep 5
@@ -37,7 +37,7 @@ sleep 5
 timeout 60 bash -c "test_fn $fn 'world'"
 
 log "Updating function $fn executor type to new deployment"
-fission fn update --name $fn --code $ROOT/examples/python/hello.py --minscale 1 --maxscale 4 --executortype newdeploy
+kubefaas fn update --name $fn --code $ROOT/examples/python/hello.py --minscale 1 --maxscale 4 --executortype newdeploy
 
 log "Waiting for router to catch up"
 sleep 5
@@ -45,7 +45,7 @@ sleep 5
 timeout 60 bash -c "test_fn $fn 'world'"
 
 log "Updating function $fn executor type back to pool manager"
-fission fn update --name $fn --code $ROOT/examples/python/hello.py --executortype poolmgr
+kubefaas fn update --name $fn --code $ROOT/examples/python/hello.py --executortype poolmgr
 
 log "Waiting for router to catch up"
 sleep 5

@@ -38,7 +38,6 @@ run-test:
 	check_result && \
 	cleanup
 
-
 run-full-test:
 	source test/init_tools.sh && \
 	source test/test_utils.sh && \
@@ -55,23 +54,23 @@ run-full-test:
 
 # ensure the changes are buildable
 build:
-	go build -o cmd/fission-bundle/fission-bundle ./cmd/fission-bundle/
-	go build -o cmd/fission-cli/fission ./cmd/fission-cli/
+	go build -o cmd/bundle/bundle ./cmd/bundle/
+	go build -o cmd/cli/kubefaas ./cmd/cli/
 	go build -o cmd/fetcher/fetcher ./cmd/fetcher/
 	go build -o cmd/fetcher/builder ./cmd/builder/
 
 # install CLI binary to $PATH
 install: build
-	mv cmd/fission-cli/fission $(GOPATH)/bin
+	mv cmd/cli/kubefaas $(GOPATH)/bin
 
 # build images (environment images are not included)
 image:
-	docker build -t fission-bundle -f cmd/fission-bundle/Dockerfile.fission-bundle .
-	docker build -t fetcher -f cmd/fetcher/Dockerfile.fission-fetcher .
-	docker build -t builder -f cmd/builder/Dockerfile.fission-builder .
+	docker build -t bundle -f cmd/bundle/Dockerfile .
+	docker build -t fetcher -f cmd/fetcher/Dockerfile .
+	docker build -t builder -f cmd/builder/Dockerfile .
 
 clean:
-	@rm -f cmd/fission-bundle/fission-bundle
-	@rm -f cmd/fission-cli/fission
+	@rm -f cmd/bundle/bundle
+	@rm -f cmd/cli/kubefaas
 	@rm -f cmd/fetcher/fetcher
 	@rm -f cmd/fetcher/builder

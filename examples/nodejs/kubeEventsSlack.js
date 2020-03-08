@@ -6,13 +6,13 @@
 // webhook for your slack channel through Slack's UI, and populate the
 // relative path below.
 //
-// Create the function in fission:
+// Create the function in kubefaas:
 //
-//   fission fn create --name kubeEventsSlack --env nodejs --code kubeEventsSlack.js
+//   kubefaas fn create --name kubeEventsSlack --env nodejs --code kubeEventsSlack.js
 //
 // Then, watch all services in the default namespace:
 // 
-//   fission watch create --function kubeEventsSlack --type service --ns default
+//   kubefaas watch create --function kubeEventsSlack --type service --ns default
 //
 
 let https = require('https');

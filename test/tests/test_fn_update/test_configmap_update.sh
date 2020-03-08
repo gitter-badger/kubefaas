@@ -34,20 +34,20 @@ sed "s/{{ FN_CFGMAP }}/${old_cfgmap}/g" \
     > $tmp_dir/cfgmap.py
 
 log "Creating env $env"
-fission env create --name $env --image $PYTHON_RUNTIME_IMAGE
+kubefaas env create --name $env --image $PYTHON_RUNTIME_IMAGE
 
 log "Creating configmap $old_cfgmap"
 kubectl create configmap ${old_cfgmap} --from-literal=TEST_KEY="TESTVALUE" -n default
 
 log "Creating NewDeploy function spec: $fn_name"
 pushd $tmp_dir
-fission spec init
-fission fn create --spec --name $fn_name --env $env --code cfgmap.py --configmap $old_cfgmap --minscale 1 --maxscale 4 --executortype newdeploy
-fission spec apply
+kubefaas spec init
+kubefaas fn create --spec --name $fn_name --env $env --code cfgmap.py --configmap $old_cfgmap --minscale 1 --maxscale 4 --executortype newdeploy
+kubefaas spec apply
 popd
 
 log "Creating route"
-fission route create --name ${fn_name} --function ${fn_name} --url /${fn_name} --method GET
+kubefaas route create --name ${fn_name} --function ${fn_name} --url /${fn_name} --method GET
 
 log "Waiting for router to catch up"
 sleep 5
@@ -64,7 +64,7 @@ sed -i "s/${old_cfgmap}/${new_cfgmap}/g" $tmp_dir/specs/function-$fn_name.yaml
 
 log "Applying function changes"
 pushd $tmp_dir
-fission spec apply
+kubefaas spec apply
 popd
 
 log "Waiting for changes to take effect"

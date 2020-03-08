@@ -23,7 +23,7 @@ Looking for ready-to-run examples? See the [binary examples directory](../../exa
 To get started with the latest binary environment:
 
 ```bash
-fission env create --name binary --image fission/binary-env --builder fission/binary-builder
+kubefaas env create --name binary --image kubefaas/binary-env --builder kubefaas/binary-builder
 ```
 
 The interface to the executable used by this environment is somewhat similar to a [CGI interface](https://en.wikipedia.org/wiki/Common_Gateway_Interface).

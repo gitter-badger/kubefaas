@@ -133,8 +133,8 @@ const (
 )
 
 const (
-	FissionBuilderSA = "fission-builder"
-	FissionFetcherSA = "fission-fetcher"
+	BuilderSA = "kubefaas-builder"
+	FetcherSA = "kubefaas-fetcher"
 
 	SecretConfigMapGetterCR = "secret-configmap-getter"
 	SecretConfigMapGetterRB = "secret-configmap-getter-binding"

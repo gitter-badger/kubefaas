@@ -8,7 +8,7 @@ SLACK_WEBHOOK_PATH = 'YOUR RELATIVE PATH HERE' # Something like "/services/XXX/Y
 
 def send_slack_message(message)
 	uri = URI.join(SLACK_BASE_URL, SLACK_WEBHOOK_PATH)
-	data = "{'channel': '#hackdays-serverless', 'username': 'fissionbot', 'text': \"#{message}\", 'icon_emoji': ':fission:'}"
+	data = "{'channel': '#hackdays-serverless', 'username': 'kubefaasbot', 'text': \"#{message}\", 'icon_emoji': ':kubefaas:'}"
 	res = Net::HTTP.post_form(uri, payload: data)
 	res.success?
 end

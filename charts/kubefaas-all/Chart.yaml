@@ -1,0 +1,12 @@
+apiVersion: v1
+name: kubefaas-all
+version: 1.8.0
+description: "Kubefaas: A fast serverless framework for Kubernetes."
+keywords:
+  - kubefaas
+  - serverless
+maintainers:
+  - name: Ta Ching Chen
+    email: tachingchen@srcmesh.com
+engine: gotpl
+appVersion: 1.8.0

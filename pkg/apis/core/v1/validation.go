@@ -42,7 +42,7 @@ type (
 	ValidationErrorType int
 
 	// ValidationError is a custom error type for resource validation.
-	// It indicate which field is invalid or illegal in the fission resource.
+	// It indicate which field is invalid or illegal in the kubefaas resource.
 	// Also, it shows what kind of error type, bad value and detail error messages.
 	ValidationError struct {
 		// Type of validation error.
@@ -63,7 +63,7 @@ type (
 
 func (e ValidationError) Error() string {
 	// Example error message
-	// Failed to create HTTP trigger: Invalid fission HTTPTrigger object:
+	// Failed to create HTTP trigger: Invalid HTTPTrigger object:
 	// * FunctionReference.Name: Invalid value: findped.ts: [...]
 
 	errMsg := fmt.Sprintf("%v: ", e.Field)
@@ -92,7 +92,7 @@ func AggregateValidationErrors(objName string, err error) error {
 	result = multierror.Append(result, err)
 
 	result.ErrorFormat = func(errs []error) string {
-		errMsg := fmt.Sprintf("Invalid fission %v object:\n", objName)
+		errMsg := fmt.Sprintf("Invalid kubefaas %v object:\n", objName)
 		for _, err := range errs {
 			errMsg += fmt.Sprintf("* %v\n", err.Error())
 		}

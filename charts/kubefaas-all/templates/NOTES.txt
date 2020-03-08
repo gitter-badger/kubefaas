@@ -1,0 +1,25 @@
+1. Install the client CLI.
+
+Mac:
+  $ curl -Lo kubefaas https://github.com/srcmesh/kubefaas/releases/download/{{ .Chart.Version }}/kubefaas-cli-osx && chmod +x kubefaas && sudo mv kubefaas /usr/local/bin/
+
+Linux:
+  $ curl -Lo kubefaas https://github.com/srcmesh/kubefaas/releases/download/{{ .Chart.Version }}/kubefaas-cli-linux && chmod +x kubefaas && sudo mv kubefaas /usr/local/bin/
+
+Windows:
+  For Windows, you can use the linux binary on WSL. Or you can download this windows executable: https://github.com/srcmesh/kubefaas/releases/download/{{ .Chart.Version }}/kubefaas-cli-windows.exe
+
+2. You're ready to use Kubefaas!
+
+  # Create an environment
+  $ kubefaas env create --name nodejs --image kubefaas/node-env
+
+  # Get a hello world
+  $ curl https://raw.githubusercontent.com/srcmesh/kubefaas/master/examples/nodejs/hello.js > hello.js
+
+  # Register this function with Kubefaas
+  $ kubefaas function create --name hello --env nodejs --code hello.js
+
+  # Run this function
+  $ kubefaas function test --name hello
+  Hello, world!

@@ -4,7 +4,7 @@ files including some static data in text file.
 ### Create an environment
 
 ```
-fission env create --name python --image fission/python-env:0.4.0rc --version 2
+kubefaas env create --name python --image kubefaas/python-env:0.4.0rc --version 2
 ```
 
 ### Create a zip file with all your files
@@ -20,13 +20,13 @@ for the function.  Its format is `<file name>.<function name>`. In our
 example, that's `main.main`, to run function `main` in `main.py`.
 
 ```
-fission function create --name multifile --env python --code multifile.zip --entrypoint main.main
+kubefaas function create --name multifile --env python --code multifile.zip --entrypoint main.main
 ```
 
 ### Test it
 
 ```
-fission function test --name multifile
+kubefaas function test --name multifile
 ```
 
 You should see the "Hello, world" message.
@@ -49,13 +49,13 @@ zip -jr multifile.zip *.py *.txt
 ### Update the function
 
 ```
-fission function update --name multifile --code multifile.zip
+kubefaas function update --name multifile --code multifile.zip
 ```
 
 ### Test it
 
 ```
-fission function test --name multifile
+kubefaas function test --name multifile
 ```
 
 You should now see your new, edited message.

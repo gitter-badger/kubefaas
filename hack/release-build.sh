@@ -26,13 +26,13 @@ build_cli() {
     local gitcommit=$5
     arch="amd64" # parameterize if/when we need to
     
-    pushd $DIR/cmd/fission-cli
+    pushd $DIR/cmd/kubefaas-cli
 
     if [ "$osName" == "windows" ]
     then
-	binary=fission-cli-${osName}.exe
+	binary=kubefaas-cli-${osName}.exe
     else
-	binary=fission-cli-${osName}
+	binary=kubefaas-cli-${osName}
     fi
 
     GOOS=$os GOARCH=$arch go build -gcflags=-trimpath=$GOPATH -asmflags=-trimpath=$GOPATH \
@@ -45,15 +45,15 @@ build_cli() {
     popd
 }
 
-# Build fission-bundle image
-build_fission_bundle_image() {
+# Build kubefaas-bundle image
+build_kubefaas_bundle_image() {
     local version=$1
     local date=$2
     local gitcommit=$3
 
     local tag=srcmesh/kubefaas-bundle:$version
 
-    docker build -t $tag -f $DIR/cmd/fission-bundle/Dockerfile.fission-bundle --build-arg GITCOMMIT=$gitcommit \
+    docker build -t $tag -f $DIR/cmd/kubefaas-bundle/Dockerfile --build-arg GITCOMMIT=$gitcommit \
         --build-arg BUILDDATE=$date --build-arg BUILDVERSION=$version $DIR
     docker tag $tag srcmesh/kubefaas-bundle:latest
 }
@@ -62,27 +62,27 @@ build_fetcher_image() {
     local version=$1
     local date=$2
     local gitcommit=$3
-    local tag=fission/fetcher:$version
+    local tag=kubefaas/fetcher:$version
 
-    docker build -t $tag -f $DIR/cmd/fetcher/Dockerfile.fission-fetcher --build-arg GITCOMMIT=$gitcommit \
+    docker build -t $tag -f $DIR/cmd/fetcher/Dockerfile --build-arg GITCOMMIT=$gitcommit \
         --build-arg BUILDDATE=$date --build-arg BUILDVERSION=$version $DIR
-    docker tag $tag fission/fetcher:latest
+    docker tag $tag kubefaas/fetcher:latest
 }
 
 push_fetcher_image() {
     local version=$1
-    local tag=fission/fetcher:$version
+    local tag=kubefaas/fetcher:$version
 }
 
 build_builder_image() {
     local version=$1
     local date=$2
     local gitcommit=$3
-    local tag=fission/builder:$version
+    local tag=kubefaas/builder:$version
 
-    docker build -t $tag -f $DIR/cmd/builder/Dockerfile.fission-builder --build-arg GITCOMMIT=$gitcommit \
+    docker build -t $tag -f $DIR/cmd/builder/Dockerfile --build-arg GITCOMMIT=$gitcommit \
         --build-arg BUILDDATE=$date --build-arg BUILDVERSION=$version $DIR
-    docker tag $tag fission/builder:latest
+    docker tag $tag kubefaas/builder:latest
 }
 
 build_env_image() {
@@ -109,8 +109,8 @@ build_env_image() {
     then
        ./build.sh
     fi  
-    docker build -t fission/$imgname:$version -f $dockerfile .
-    docker tag fission/$imgname:$version fission/$imgname:latest
+    docker build -t kubefaas/$imgname:$version -f $dockerfile .
+    docker tag kubefaas/$imgname:$version kubefaas/$imgname:latest
     popd
 }
 
@@ -120,11 +120,11 @@ build_pre_upgrade_checks_image() {
     local date=$2
     local gitcommit=$3
 
-    local tag=fission/pre-upgrade-checks:$version
+    local tag=kubefaas/pre-upgrade-checks:$version
 
-    docker build -t $tag -f $DIR/cmd/preupgradechecks/Dockerfile.fission-preupgradechecks \
+    docker build -t $tag -f $DIR/cmd/preupgradechecks/Dockerfile \
         --build-arg GITCOMMIT=$gitcommit --build-arg BUILDDATE=$date --build-arg BUILDVERSION=$version $DIR
-    docker tag $tag fission/pre-upgrade-checks:latest
+    docker tag $tag kubefaas/pre-upgrade-checks:latest
 }
 
 build_all_envs() {
@@ -169,8 +169,8 @@ build_env_builder_image() {
     echo "Building $envdir -> $imgname:$version using $dockerfile"
 
     pushd $DIR/environments/$envdir/builder
-    docker build -t fission/$imgname:$version -f $dockerfile .
-    docker tag fission/$imgname:$version fission/$imgname:latest
+    docker build -t kubefaas/$imgname:$version -f $dockerfile .
+    docker tag kubefaas/$imgname:$version kubefaas/$imgname:latest
     popd
 }
 
@@ -196,7 +196,7 @@ build_charts() {
     mkdir -p $BUILDDIR/charts
     pushd $DIR/charts
     find . -iname *.~?~ | xargs -r rm
-    for c in fission-all fission-core
+    for c in kubefaas-all kubefaas-core
     do
     # https://github.com/kubernetes/helm/issues/1732
     helm init --client-only
@@ -213,11 +213,11 @@ build_yamls() {
     pushd ${DIR}/charts
     find . -iname *.~?~ | xargs -r rm
 
-    releaseName=fission-$(echo ${version} | sed 's/\./-/g')
+    releaseName=kubefaas-$(echo ${version} | sed 's/\./-/g')
 
     helm init --client-only
 
-    for c in fission-all fission-core
+    for c in kubefaas-all kubefaas-core
     do
         # fetch dependencies
         pushd ${c}
@@ -225,11 +225,11 @@ build_yamls() {
         popd
 
         # for minikube and other environments that don't support LoadBalancer
-        helm template ${c} -n ${releaseName} --namespace fission --set analytics=false,analyticsNonHelmInstall=true,serviceType=NodePort,routerServiceType=NodePort > ${c}-${version}-minikube.yaml
+        helm template ${c} -n ${releaseName} --namespace kubefaas --set analytics=false,analyticsNonHelmInstall=true,serviceType=NodePort,routerServiceType=NodePort > ${c}-${version}-minikube.yaml
         # for environments that support LoadBalancer
-        helm template ${c} -n ${releaseName} --namespace fission --set analytics=false,analyticsNonHelmInstall=true > ${c}-${version}.yaml
+        helm template ${c} -n ${releaseName} --namespace kubefaas --set analytics=false,analyticsNonHelmInstall=true > ${c}-${version}.yaml
         # for OpenShift
-        helm template ${c} -n ${releaseName} --namespace fission --set analytics=false,analyticsNonHelmInstall=true,logger.enableSecurityContext=true,prometheus.enabled=false > ${c}-${version}-openshift.yaml
+        helm template ${c} -n ${releaseName} --namespace kubefaas --set analytics=false,analyticsNonHelmInstall=true,logger.enableSecurityContext=true,prometheus.enabled=false > ${c}-${version}-openshift.yaml
 
         # copy yaml files to build directory
         mv *.yaml ${BUILDDIR}/yamls/
@@ -274,7 +274,7 @@ build_all() {
     # generate swagger (OpenApi 2.0) doc before building bundle image
     generate_swagger_doc
 
-    build_fission_bundle_image $version $date $gitcommit
+    build_kubefaas_bundle_image $version $date $gitcommit
     build_fetcher_image $version $date $gitcommit
     build_builder_image $version $date $gitcommit
     build_all_cli $version $date $gitcommit

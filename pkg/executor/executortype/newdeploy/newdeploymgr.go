@@ -447,7 +447,7 @@ func (deploy *NewDeploy) fnCreate(fn *fv1.Function) (*fscache.FuncSvc, error) {
 	deployAnnotations := deploy.getDeployAnnotations(fn.ObjectMeta)
 
 	// to support backward compatibility, if the function was created in default ns, we fall back to creating the
-	// deployment of the function in fission-function ns
+	// deployment of the function in kubefaas-function ns
 	ns := deploy.namespace
 	if fn.ObjectMeta.Namespace != metav1.NamespaceDefault {
 		ns = fn.ObjectMeta.Namespace
@@ -567,7 +567,7 @@ func (deploy *NewDeploy) updateFunction(oldFn *fv1.Function, newFn *fv1.Function
 	if oldFn.Spec.InvokeStrategy != newFn.Spec.InvokeStrategy {
 
 		// to support backward compatibility, if the function was created in default ns, we fall back to creating the
-		// deployment of the function in fission-function ns, so cleaning up resources there
+		// deployment of the function in kubefaas-function ns, so cleaning up resources there
 		ns := deploy.namespace
 		if newFn.ObjectMeta.Namespace != metav1.NamespaceDefault {
 			ns = newFn.ObjectMeta.Namespace
@@ -668,7 +668,7 @@ func (deploy *NewDeploy) updateFuncDeployment(fn *fv1.Function, env *fv1.Environ
 		zap.String("deployment", fnObjName), zap.Any("function", fn.ObjectMeta.Name))
 
 	// to support backward compatibility, if the function was created in default ns, we fall back to creating the
-	// deployment of the function in fission-function ns
+	// deployment of the function in kubefaas-function ns
 	ns := deploy.namespace
 	if fn.ObjectMeta.Namespace != metav1.NamespaceDefault {
 		ns = fn.ObjectMeta.Namespace
@@ -722,7 +722,7 @@ func (deploy *NewDeploy) fnDelete(fn *fv1.Function) error {
 	}
 
 	// to support backward compatibility, if the function was created in default ns, we fall back to creating the
-	// deployment of the function in fission-function ns, so cleaning up resources there
+	// deployment of the function in kubefaas-function ns, so cleaning up resources there
 	ns := deploy.namespace
 	if fn.ObjectMeta.Namespace != metav1.NamespaceDefault {
 		ns = fn.ObjectMeta.Namespace

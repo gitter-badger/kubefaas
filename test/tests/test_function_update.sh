@@ -31,20 +31,20 @@ fi
 # different from the previous one.
 
 log "Creating nodejs env"
-fission env create --name $env --image $NODE_RUNTIME_IMAGE
+kubefaas env create --name $env --image $NODE_RUNTIME_IMAGE
 
 log "Creating function"
 echo 'module.exports = function(context, callback) { callback(200, "foo!\n"); }' > $tmp_dir/foo.js
-fission fn create --name $fn --env $env --code $tmp_dir/foo.js
+kubefaas fn create --name $fn --env $env --code $tmp_dir/foo.js
 
 log "Creating route"
-fission route create --function $fn --url /$fn --method GET
+kubefaas route create --function $fn --url /$fn --method GET
 
 log "Waiting for router to catch up"
 sleep 10
 
 log "Doing an HTTP GET on the function's route"
-response=$(curl http://$FISSION_ROUTER/$fn)
+response=$(curl http://$KUBEFAAS_ROUTER/$fn)
 
 log "Checking for valid response"
 echo $response | grep -i foo
@@ -52,18 +52,18 @@ echo $response | grep -i foo
 # Running a background process to keep access the
 # function to emulate real online traffic. The router
 # should be able to update cache under this situation.
-( watch -n1 curl http://$FISSION_ROUTER/$fn ) > /dev/null 2>&1 &
+( watch -n1 curl http://$KUBEFAAS_ROUTER/$fn ) > /dev/null 2>&1 &
 pid=$!
 
 log "Updating function"
 echo 'module.exports = function(context, callback) { callback(200, "bar!\n"); }' > $tmp_dir/bar.js
-fission fn update --name $fn --code $tmp_dir/bar.js
+kubefaas fn update --name $fn --code $tmp_dir/bar.js
 
 log "Waiting for router to update cache"
 sleep 10
 
 log "Doing an HTTP GET on the function's route"
-response=$(curl http://$FISSION_ROUTER/$fn)
+response=$(curl http://$KUBEFAAS_ROUTER/$fn)
 
 log "Checking for valid response again"
 echo $response | grep -i bar

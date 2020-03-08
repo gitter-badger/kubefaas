@@ -33,27 +33,27 @@ log "Creating zip from source code"
 zip -r $tmp_dir/java-src-pkg.zip *
 
 log "Creating Java environment with Java Builder"
-fission env create --name $env --image $JVM_RUNTIME_IMAGE --version 2 --keeparchive --builder $JVM_BUILDER_IMAGE
+kubefaas env create --name $env --image $JVM_RUNTIME_IMAGE --version 2 --keeparchive --builder $JVM_BUILDER_IMAGE
 
 timeout 90 bash -c "wait_for_builder $env"
 
 log "Creating package from the source archive"
 pkg_name=$(generate_test_id)
-fission package create --name $pkg_name --sourcearchive $tmp_dir/java-src-pkg.zip --env $env
+kubefaas package create --name $pkg_name --sourcearchive $tmp_dir/java-src-pkg.zip --env $env
 log "Created package $pkg_name"
 
 log "Checking the status of package"
 timeout 400 bash -c "waitBuild $pkg_name"
 
 log "Creating pool manager & new deployment function for Java"
-fission fn create --name $fn_n --pkg $pkg_name --env $env --entrypoint io.fission.HelloWorld --executortype newdeploy --minscale 1 --maxscale 1
-fission fn create --name $fn_p --pkg $pkg_name --env $env --entrypoint io.fission.HelloWorld
+kubefaas fn create --name $fn_n --pkg $pkg_name --env $env --entrypoint io.fission.HelloWorld --executortype newdeploy --minscale 1 --maxscale 1
+kubefaas fn create --name $fn_p --pkg $pkg_name --env $env --entrypoint io.fission.HelloWorld
 
 log "Creating route for pool manager function"
-fission route create --function $fn_p --url /$fn_p --method GET
+kubefaas route create --function $fn_p --url /$fn_p --method GET
 
 log "Creating route for new deployment function"
-fission route create --function $fn_n --url /$fn_n --method GET
+kubefaas route create --function $fn_n --url /$fn_n --method GET
 
 log "Waiting for router & pools to catch up"
 sleep 5

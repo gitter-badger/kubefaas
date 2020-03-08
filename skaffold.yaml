@@ -17,16 +17,16 @@ apiVersion: skaffold/v1beta9
 kind: Config
 build:
   artifacts:
-    - image: <DOCKERHUB_REPO>/fission
+    - image: <DOCKERHUB_REPO>/kubefaas
       context: .
       docker:
-        dockerfile: cmd/fission-bundle/Dockerfile.fission-bundle
+        dockerfile: cmd/bundle/Dockerfile
     - image: <DOCKERHUB_REPO>/fetcher
       docker:
-        dockerfile: cmd/fetcher/Dockerfile.fission-fetcher
+        dockerfile: cmd/fetcher/Dockerfile
     - image: <DOCKERHUB_REPO>/preupgradechecks
       docker:
-        dockerfile: cmd/preupgradechecks/Dockerfile.fission-preupgradechecks
+        dockerfile: cmd/preupgradechecks/Dockerfile
   tagPolicy:
     envTemplate:
       template: "{{.IMAGE_NAME}}:skaffold-test"
@@ -35,17 +35,17 @@ deploy:
   helm:
     releases:
       - name: fission
-        chartPath: ./charts/fission-all
+        chartPath: ./charts/kubefaas-all
         valuesFiles:
-          - ./charts/fission-all/values.yaml
-        namespace: "fission"
+          - ./charts/kubefaas-all/values.yaml
+        namespace: "kubefaas"
         setValues:
-          image: <DOCKERHUB_REPO>/fission
+          image: <DOCKERHUB_REPO>/kubefaas
           imageTag: skaffold-test
           fetcher:
             image: <DOCKERHUB_REPO>/fetcher
             imageTag: skaffold-test
-          namespace: fission
+          namespace: kubefaas
           preUpgradeChecksImage: <DOCKERHUB_REPO>/preupgradechecks
           repository: index.docker.io
         setValueTemplates: {}

@@ -1,4 +1,4 @@
-ARG BUILDER_IMAGE=fission/builder:latest
+ARG BUILDER_IMAGE=kubefaas/builder:latest
 FROM ${BUILDER_IMAGE}
 
 FROM ruby:2.6.1-alpine3.9

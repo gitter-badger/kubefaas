@@ -31,5 +31,5 @@ $ zip -r go.zip .
     adding: README.md (deflated 37%)
     adding: main.go (deflated 30%)
     
-$ fission pkg create --env go --src go.zip
+$ kubefaas pkg create --env go --src go.zip
 ```

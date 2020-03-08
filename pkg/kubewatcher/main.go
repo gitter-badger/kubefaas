@@ -27,7 +27,7 @@ import (
 func Start(logger *zap.Logger, routerUrl string) error {
 	fissionClient, kubeClient, _, err := crd.MakeFissionClient()
 	if err != nil {
-		return errors.Wrap(err, "failed to get fission or kubernetes client")
+		return errors.Wrap(err, "failed to get kubefaas or kubernetes client")
 	}
 
 	err = fissionClient.WaitForCRDs()

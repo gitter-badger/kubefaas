@@ -55,7 +55,7 @@ type (
 		replicas               int32                         // num idle pods
 		deployment             *appsv1.Deployment            // kubernetes deployment
 		namespace              string                        // namespace to keep our resources
-		functionNamespace      string                        // fallback namespace for fission functions
+		functionNamespace      string                        // fallback namespace for kubefaas functions
 		podReadyTimeout        time.Duration                 // timeout for generic pods to become ready
 		fsCache                *fscache.FunctionServiceCache // cache funcSvc's by function, address and podname
 		useSvc                 bool                          // create k8s service for specialized pods
@@ -447,7 +447,7 @@ func (gp *GenericPool) createPool() error {
 		},
 		Spec: apiv1.PodSpec{
 			Containers:         []apiv1.Container{*container},
-			ServiceAccountName: "fission-fetcher",
+			ServiceAccountName: "kubefaas-fetcher",
 			// TerminationGracePeriodSeconds should be equal to the
 			// sleep time of preStop to make sure that SIGTERM is sent
 			// to pod after 6 mins.
@@ -651,7 +651,7 @@ func (gp *GenericPool) getFuncSvc(ctx context.Context, fn *fv1.Function) (*fscac
 			return nil, errors.Errorf("sanity check failed for svc %v", svc.ObjectMeta.Name)
 		}
 
-		// the fission router isn't in the same namespace, so return a
+		// the kubefaas router isn't in the same namespace, so return a
 		// namespace-qualified hostname
 		svcHost = fmt.Sprintf("%v.%v:8888", svcName, gp.namespace)
 	} else if gp.useIstio {

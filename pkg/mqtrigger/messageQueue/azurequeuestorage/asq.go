@@ -333,12 +333,12 @@ func invokeTriggeredFunction(conn AzureStorageConnection, sub *AzureQueueSubscri
 			continue
 		}
 
-		request.Header.Set("X-Fission-MQTrigger-Topic", sub.queueName)
+		request.Header.Set("X-Kubefaas-MQTrigger-Topic", sub.queueName)
 		if len(sub.outputQueueName) > 0 {
-			request.Header.Set("X-Fission-MQTrigger-RespTopic", sub.outputQueueName)
+			request.Header.Set("X-Kubefaas-MQTrigger-RespTopic", sub.outputQueueName)
 		}
 		if i > 0 {
-			request.Header.Set("X-Fission-MQTrigger-RetryCount", strconv.Itoa(i))
+			request.Header.Set("X-Kubefaas-MQTrigger-RetryCount", strconv.Itoa(i))
 		}
 		request.Header.Set("Content-Type", sub.contentType)
 

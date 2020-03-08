@@ -27,7 +27,7 @@ import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 
 	"github.com/srcmesh/kubefaas/pkg/controller/client/rest"
-	"github.com/srcmesh/kubefaas/pkg/fission-cli/console"
+	"github.com/srcmesh/kubefaas/pkg/cli/console"
 	"github.com/srcmesh/kubefaas/pkg/info"
 )
 

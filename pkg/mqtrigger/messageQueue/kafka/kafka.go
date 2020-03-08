@@ -227,9 +227,9 @@ func kafkaMsgHandler(kafka *Kafka, producer sarama.SyncProducer, trigger *fv1.Me
 
 	// Generate the Headers
 	fissionHeaders := map[string]string{
-		"X-Fission-MQTrigger-Topic":      trigger.Spec.Topic,
-		"X-Fission-MQTrigger-RespTopic":  trigger.Spec.ResponseTopic,
-		"X-Fission-MQTrigger-ErrorTopic": trigger.Spec.ErrorTopic,
+		"X-Kubefaas-MQTrigger-Topic":      trigger.Spec.Topic,
+		"X-Kubefaas-MQTrigger-RespTopic":  trigger.Spec.ResponseTopic,
+		"X-Kubefaas-MQTrigger-ErrorTopic": trigger.Spec.ErrorTopic,
 		"Content-Type":                   trigger.Spec.ContentType,
 	}
 

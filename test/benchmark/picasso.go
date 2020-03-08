@@ -55,7 +55,7 @@ type (
 )
 
 func init() {
-	title = flag.String("title", "Fission Benchmark", "Chart title")
+	title = flag.String("title", "Benchmark", "Chart title")
 	file = flag.String("file", "", "Metric json file")
 	outputFile = flag.String("o", "chart.png", "Output file name")
 	outputFormat = flag.String("format", PNG, "Format of output file (png or svg)")

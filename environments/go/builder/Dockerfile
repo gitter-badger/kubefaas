@@ -1,4 +1,4 @@
-ARG BUILDER_IMAGE=fission/builder
+ARG BUILDER_IMAGE=kubefaas/builder
 ARG GO_VERSION=1.9.2
 
 FROM ${BUILDER_IMAGE}

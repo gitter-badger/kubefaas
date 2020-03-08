@@ -1,6 +1,6 @@
-# Fission: PHP Environment
+# Kubefaas: PHP Environment
 
-This is the PHP environment for Fission.
+This is the PHP environment for Kubefaas.
 
 It's a Docker image containing a PHP 7.3 runtime. This image use php:7.3-cli base image with the built-in PHP server
 
@@ -39,20 +39,20 @@ called USER.  Build and push the image to the the registry:
    docker build -t USER/php7-env . && docker push USER/php7-env
 ```
 
-## Using the image in fission
+## Using the image in kubefaas
 
-You can add this customized image to fission with "fission env
+You can add this customized image to kubefaas with "kubefaas env
 create":
 
 ```
-   fission env create --name php7 --image USER/php7-env
+   kubefaas env create --name php7 --image USER/php7-env
 ```
 
 Or, if you already have an environment, you can update its image:
 
 ```
-   fission env update --name php7 --image USER/php7-env
+   kubefaas env update --name php7 --image USER/php7-env
 ```
 
-After this, fission functions that have the env parmeter set to the
+After this, kubefaas functions that have the env parmeter set to the
 same environment name as this command will use this environment.

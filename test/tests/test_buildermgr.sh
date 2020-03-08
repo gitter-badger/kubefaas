@@ -22,7 +22,7 @@ fn=python-srcbuild-$TEST_ID
 
 checkFunctionResponse() {
     log "Doing an HTTP GET on the function's route"
-    response=$(curl http://$FISSION_ROUTER/$1)
+    response=$(curl http://$KUBEFAAS_ROUTER/$1)
 
     log "Checking for valid response"
     log $response
@@ -42,7 +42,7 @@ else
 fi
 
 log "Creating python env"
-fission env create --name $env --image $PYTHON_RUNTIME_IMAGE --builder $PYTHON_BUILDER_IMAGE
+kubefaas env create --name $env --image $PYTHON_RUNTIME_IMAGE --builder $PYTHON_BUILDER_IMAGE
 
 timeout 180s bash -c "wait_for_builder $env"
 
@@ -50,10 +50,10 @@ log "Creating source pacakage"
 zip -jr $tmp_dir/demo-src-pkg.zip $ROOT/examples/python/sourcepkg/
 
 log "Creating function " $fn
-fission fn create --name $fn --env $env --src $tmp_dir/demo-src-pkg.zip --entrypoint "user.main" --buildcmd "./build.sh"
+kubefaas fn create --name $fn --env $env --src $tmp_dir/demo-src-pkg.zip --entrypoint "user.main" --buildcmd "./build.sh"
 
 log "Creating route"
-fission route create --function $fn --url /$fn --method GET
+kubefaas route create --function $fn --url /$fn --method GET
 
 log "Waiting for router to catch up"
 sleep 3
@@ -66,7 +66,7 @@ timeout 60s bash -c "waitBuild $pkg"
 checkFunctionResponse $fn
 
 log "Updating function " $fn
-fission fn update --name $fn --src $tmp_dir/demo-src-pkg.zip
+kubefaas fn update --name $fn --src $tmp_dir/demo-src-pkg.zip
 
 pkg=$(kubectl --namespace default get functions $fn -o jsonpath='{.spec.package.packageref.name}')
 

@@ -78,7 +78,7 @@ func MakeFetcher(logger *zap.Logger, sharedVolumePath string, sharedSecretPath s
 
 	fissionClient, kubeClient, _, err := crd.MakeFissionClient()
 	if err != nil {
-		return nil, errors.Wrap(err, "error making the fission / kube client")
+		return nil, errors.Wrap(err, "error making the kubefaas / kube client")
 	}
 	return &Fetcher{
 		logger:           fLogger,

@@ -1,20 +1,20 @@
 terraform {
   backend "gcs" {
-    bucket = "fission-terraform-state"
-    prefix = "fission-ci-cluster"
+    bucket = "kubefaas-terraform-state"
+    prefix = "kubefaas-ci-cluster"
   }
 }
 
 provider "google" {
   version = "~> 2.7"
-  project = "infracloud-fission-infra"
+  project = "infracloud-kubefaas-infra"
 }
 
-resource "google_container_cluster" "fission-ci" {
-  name                     = "fission-ci"
+resource "google_container_cluster" "kubefaas-ci" {
+  name                     = "kubefaas-ci"
   description              = ""
   min_master_version       = "1.13.6-gke.0"
-  network                  = "projects/fission-ci/global/networks/default"
+  network                  = "projects/kubefaas-ci/global/networks/default"
   location                 = "us-central1-a"
   remove_default_node_pool = true
   initial_node_count       = 0
@@ -26,7 +26,7 @@ resource "google_container_cluster" "fission-ci" {
 resource "google_container_node_pool" "pool-v1" {
   name     = "pool-v1"
   location = "us-central1-a"
-  cluster  = google_container_cluster.fission-ci.name
+  cluster  = google_container_cluster.kubefaas-ci.name
 
   node_config {
     machine_type = "n1-standard-2"

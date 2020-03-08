@@ -149,7 +149,7 @@ func TestExecutor(t *testing.T) {
 		Spec: fv1.EnvironmentSpec{
 			Version: 1,
 			Runtime: fv1.Runtime{
-				Image: "fission/node-env",
+				Image: "kubefaas/node-env",
 			},
 			Builder: fv1.Builder{},
 		},
@@ -160,7 +160,7 @@ func TestExecutor(t *testing.T) {
 
 	// create poolmgr
 	port := 9999
-	err = StartExecutor(logger, functionNs, "fission-builder", port)
+	err = StartExecutor(logger, functionNs, "kubefaas-builder", port)
 	if err != nil {
 		log.Panicf("failed to start poolmgr: %v", err)
 	}

@@ -1,6 +1,6 @@
-# Fission: NodeJS Environment
+# Kubefaas: NodeJS Environment
 
-This is the NodeJS environment for Fission.
+This is the NodeJS environment for Kubefaas.
 
 It's a Docker image containing a NodeJS runtime, along with a dynamic
 loader.  A few common dependencies are included in the package.json
@@ -28,20 +28,20 @@ called USER.  Build and push the image to the the registry:
    docker build -t USER/nodejs-env . && docker push USER/nodejs-env
 ```
 
-## Using the image in fission
+## Using the image in kubefaas
 
-You can add this customized image to fission with "fission env
+You can add this customized image to kubefaas with "kubefaas env
 create":
 
 ```
-   fission env create --name nodejs --image USER/nodejs-env
+   kubefaas env create --name nodejs --image USER/nodejs-env
 ```
 
 Or, if you already have an environment, you can update its image:
 
 ```
-   fission env update --name nodejs --image USER/nodejs-env   
+   kubefaas env update --name nodejs --image USER/nodejs-env   
 ```
 
-After this, fission functions that have the env parameter set to the
+After this, kubefaas functions that have the env parameter set to the
 same environment name as this command will use this environment.

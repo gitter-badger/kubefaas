@@ -2,7 +2,7 @@
 
 require_relative 'context'
 
-module Fission
+module Kubefaas
   module Handler
     def self.call(env)
       context = Context.new(env)

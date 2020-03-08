@@ -31,17 +31,17 @@ log "Creating the jar from application"
 docker run -it --rm  -v "$(pwd)":/usr/src/mymaven -w /usr/src/mymaven maven:3.5-jdk-8 mvn clean package -q
 
 log "Creating environment for Java"
-fission env create --name $env --image $JVM_RUNTIME_IMAGE --version 2 --keeparchive=true
+kubefaas env create --name $env --image $JVM_RUNTIME_IMAGE --version 2 --keeparchive=true
 
 log "Creating pool manager & new deployment function for Java"
-fission fn create --name $fn_p --deploy target/hello-world-1.0-SNAPSHOT-jar-with-dependencies.jar --env $env --entrypoint io.fission.HelloWorld
-fission fn create --name $fn_n --deploy target/hello-world-1.0-SNAPSHOT-jar-with-dependencies.jar --env $env --executortype newdeploy --entrypoint io.fission.HelloWorld
+kubefaas fn create --name $fn_p --deploy target/hello-world-1.0-SNAPSHOT-jar-with-dependencies.jar --env $env --entrypoint io.fission.HelloWorld
+kubefaas fn create --name $fn_n --deploy target/hello-world-1.0-SNAPSHOT-jar-with-dependencies.jar --env $env --executortype newdeploy --entrypoint io.fission.HelloWorld
 
 log "Creating route for pool manager function"
-fission route create --name $fn_p --function $fn_p --url /$fn_p --method GET
+kubefaas route create --name $fn_p --function $fn_p --url /$fn_p --method GET
 
 log "Creating route for new deployment function"
-fission route create --name $fn_n --function $fn_n --url /$fn_n --method GET
+kubefaas route create --name $fn_n --function $fn_n --url /$fn_n --method GET
 
 log "Waiting for router & pools to catch up"
 sleep 5

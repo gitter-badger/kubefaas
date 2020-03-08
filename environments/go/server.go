@@ -14,7 +14,7 @@ import (
 	// The 3rd party package version used by go server may be
 	// different from the one in user's source code and will
 	// cause plugin version mismatched. Hence, we should never
-	// import any external packages except the Fission or built-in
+	// import any external packages except the Kubefaas or built-in
 	// packages.
 
 	"github.com/srcmesh/kubefaas/environments/go/context"

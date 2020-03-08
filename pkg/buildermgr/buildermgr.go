@@ -30,7 +30,7 @@ func Start(logger *zap.Logger, storageSvcUrl string, envBuilderNamespace string)
 
 	fissionClient, kubernetesClient, _, err := crd.MakeFissionClient()
 	if err != nil {
-		return errors.Wrap(err, "failed to get fission or kubernetes client")
+		return errors.Wrap(err, "failed to get kubefaas or kubernetes client")
 	}
 
 	err = fissionClient.WaitForCRDs()

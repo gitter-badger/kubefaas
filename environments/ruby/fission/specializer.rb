@@ -3,7 +3,7 @@
 require 'benchmark'
 require 'json'
 
-module Fission
+module Kubefaas
   module Specializer
     
     CODE_PATH = '/userfunc/user'

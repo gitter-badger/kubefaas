@@ -2,7 +2,7 @@
 #test:disabled
 
 # Create a function and trigger it using Kafka
-# This test requires Kafka & MQ-Kafka component of Fission installed in the cluster
+# This test requires Kafka & MQ-Kafka component of Kubefaas installed in the cluster
 set -euo pipefail
 source $(dirname $0)/../../../utils.sh
 set +x
@@ -28,7 +28,7 @@ test_mqmessage() {
 
     set +e
     while true; do
-      response0=$(kubectl -nfission logs -l=messagequeue=kafka)
+      response0=$(kubectl -n kubefaas logs -l=messagequeue=kafka)
       echo $response0 | grep -i $1
       if [[ $? -eq 0 ]]; then
         break
@@ -47,7 +47,7 @@ test_fnmessage() {
 
     set +e
     while true; do
-	response0=$(kubectl -nfission-function logs -l=functionName=$1 -c $2)
+	response0=$(kubectl -n kubefaas-function logs -l=functionName=$1 -c $2)
 	echo $response0 | grep -i "$3"
 	if [[ $? -eq 0 ]]; then
 	    break
@@ -73,17 +73,17 @@ fi
 DIR=$(dirname $0)
 
 log "Creating ${nodeenv} environment"
-fission env create --name ${nodeenv} --image ${NODE_RUNTIME_IMAGE}
+kubefaas env create --name ${nodeenv} --image ${NODE_RUNTIME_IMAGE}
 
 log "Creating ${goenv} environment"
-fission env create --name ${goenv} --image ${GO_RUNTIME_IMAGE} --builder ${GO_BUILDER_IMAGE}
+kubefaas env create --name ${goenv} --image ${GO_RUNTIME_IMAGE} --builder ${GO_BUILDER_IMAGE}
 
 log "Creating package for Kafka producer"
 cp -r $DIR/kafka_pub $tmp_dir/
 pushd $tmp_dir/kafka_pub
 go mod vendor
 zip -qr kafka.zip * 
-pkgName=$(fission package create --env ${goenv} --src kafka.zip|cut -f2 -d' '| tr -d \')
+pkgName=$(kubefaas package create --env ${goenv} --src kafka.zip|cut -f2 -d' '| tr -d \')
 
 log "pkgName=${pkgName}"
 popd
@@ -92,21 +92,21 @@ timeout 120s bash -c "waitBuild $pkgName"
 log "Package ${pkgName} created"
 
 log "Creating function ${consumerfunc}"
-fission fn create --name ${consumerfunc} --env ${nodeenv} --code $DIR/hellokafka.js 
+kubefaas fn create --name ${consumerfunc} --env ${nodeenv} --code $DIR/hellokafka.js
 
 log "Creating function ${consumerfunc2}"
-fission fn create --name ${consumerfunc2} --env ${nodeenv} --code $DIR/hellokafka.js
+kubefaas fn create --name ${consumerfunc2} --env ${nodeenv} --code $DIR/hellokafka.js
 
 log "Creating function ${producerfunc}"
-fission fn create --name ${producerfunc} --env ${goenv} --pkg ${pkgName} --entrypoint Handler
+kubefaas fn create --name ${producerfunc} --env ${goenv} --pkg ${pkgName} --entrypoint Handler
 
 log "Creating trigger $mqt"
-fission mqt create --name ${mqt} --function ${consumerfunc} --mqtype kafka --topic $topic --resptopic $resptopic
+kubefaas mqt create --name ${mqt} --function ${consumerfunc} --mqtype kafka --topic $topic --resptopic $resptopic
 
 log "Creating trigger $mqt2"
-fission mqt create --name ${mqt2} --function ${consumerfunc2} --mqtype kafka --topic $resptopic
+kubefaas mqt create --name ${mqt2} --function ${consumerfunc2} --mqtype kafka --topic $resptopic
 
-fission fn test --name ${producerfunc}
+kubefaas fn test --name ${producerfunc}
 
 log "Testing pool manager function"
 timeout 60 bash -c "test_mqmessage 'testvalue'"
@@ -116,7 +116,7 @@ timeout 60 bash -c "test_fnmessage '${consumerfunc}' '${nodeenv}' 'z-custom-name
 
 log "Testing the header value in ${consumerfunc2}"
 timeout 60 bash -c "test_fnmessage '${consumerfunc2}' '${nodeenv}' 'z-custom-name: Kafka-Header-test'"
-# test if the Fission specific headers are overwritten
-timeout 60 bash -c "test_fnmessage '${consumerfunc2}' '${nodeenv}' 'x-fission-function-name: consumer-func2'"
+# test if the Kubefaas specific headers are overwritten
+timeout 60 bash -c "test_fnmessage '${consumerfunc2}' '${nodeenv}' 'x-kubefaas-function-name: consumer-func2'"
 
 log "Test PASSED"

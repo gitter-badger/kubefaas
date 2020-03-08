@@ -34,20 +34,20 @@ sed "s/{{ FN_SECRET }}/${old_secret}/g" \
     > $tmp_dir/secret.py
 
 log "Creating env $env"
-fission env create --name $env --image $PYTHON_RUNTIME_IMAGE
+kubefaas env create --name $env --image $PYTHON_RUNTIME_IMAGE
 
 log "Creating secret $old_secret"
 kubectl create secret generic ${old_secret} --from-literal=TEST_KEY="TESTVALUE" -n default
 
 log "Creating NewDeploy function spec: $fn_name"
 pushd $tmp_dir
-fission spec init
-fission fn create --spec --name $fn_name --env $env --code secret.py --secret $old_secret --minscale 1 --maxscale 4 --executortype newdeploy
-fission spec apply
+kubefaas spec init
+kubefaas fn create --spec --name $fn_name --env $env --code secret.py --secret $old_secret --minscale 1 --maxscale 4 --executortype newdeploy
+kubefaas spec apply
 popd
 
 log "Creating route"
-fission route create --function ${fn_name} --url /${fn_name} --method GET
+kubefaas route create --function ${fn_name} --url /${fn_name} --method GET
 
 log "Waiting for router to catch up"
 sleep 5
@@ -64,7 +64,7 @@ sed -i "s/${old_secret}/${new_secret}/g" $tmp_dir/specs/function-$fn_name.yaml
 
 log "Applying function changes"
 pushd $tmp_dir
-fission spec apply
+kubefaas spec apply
 popd
 
 log "Waiting for changes to take effect"

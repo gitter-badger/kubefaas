@@ -75,14 +75,14 @@ func (promApiClient *PrometheusApiClient) GetFunctionFailurePercentage(path, met
 }
 
 func (promApiClient *PrometheusApiClient) GetRequestsToFuncInWindow(path string, method string, funcName string, funcNs string, window string) (float64, error) {
-	queryString := fmt.Sprintf("fission_function_calls_total{path=\"%s\",method=\"%s\",name=\"%s\",namespace=\"%s\"}[%v]", path, method, funcName, funcNs, window)
+	queryString := fmt.Sprintf("kubefaas_function_calls_total{path=\"%s\",method=\"%s\",name=\"%s\",namespace=\"%s\"}[%v]", path, method, funcName, funcNs, window)
 
 	reqs, err := promApiClient.executeQuery(queryString)
 	if err != nil {
 		return 0, errors.Wrapf(err, "error executing query: %s", queryString)
 	}
 
-	queryString = fmt.Sprintf("fission_function_calls_total{path=\"%s\",method=\"%s\",name=\"%s\",namespace=\"%s\"} offset %v", path, method, funcName, funcNs, window)
+	queryString = fmt.Sprintf("kubefaas_function_calls_total{path=\"%s\",method=\"%s\",name=\"%s\",namespace=\"%s\"} offset %v", path, method, funcName, funcNs, window)
 
 	reqsInPrevWindow, err := promApiClient.executeQuery(queryString)
 	if err != nil {
@@ -100,14 +100,14 @@ func (promApiClient *PrometheusApiClient) GetRequestsToFuncInWindow(path string,
 }
 
 func (promApiClient *PrometheusApiClient) GetTotalFailedRequestsToFuncInWindow(funcName string, funcNs string, path string, method string, window string) (float64, error) {
-	queryString := fmt.Sprintf("fission_function_errors_total{name=\"%s\",namespace=\"%s\",path=\"%s\", method=\"%s\"}[%v]", funcName, funcNs, path, method, window)
+	queryString := fmt.Sprintf("kubefaas_function_errors_total{name=\"%s\",namespace=\"%s\",path=\"%s\", method=\"%s\"}[%v]", funcName, funcNs, path, method, window)
 
 	failedRequests, err := promApiClient.executeQuery(queryString)
 	if err != nil {
 		return 0, errors.Wrapf(err, "error executing query: %s", queryString)
 	}
 
-	queryString = fmt.Sprintf("fission_function_errors_total{name=\"%s\",namespace=\"%s\",path=\"%s\", method=\"%s\"} offset %v", funcName, funcNs, path, method, window)
+	queryString = fmt.Sprintf("kubefaas_function_errors_total{name=\"%s\",namespace=\"%s\",path=\"%s\", method=\"%s\"} offset %v", funcName, funcNs, path, method, window)
 
 	failedReqsInPrevWindow, err := promApiClient.executeQuery(queryString)
 	if err != nil {

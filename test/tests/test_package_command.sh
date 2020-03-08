@@ -33,7 +33,7 @@ fn5=python-deploy5-$TEST_ID
 
 checkFunctionResponse() {
     log "Doing an HTTP GET on the function's route"
-    response=$(curl --retry 5 http://$FISSION_ROUTER/$1)
+    response=$(curl --retry 5 http://$KUBEFAAS_ROUTER/$1)
 
     log "Checking for valid response"
     log $response
@@ -53,22 +53,22 @@ else
 fi
 
 log "Creating python env"
-fission env create --name $env --image $PYTHON_RUNTIME_IMAGE --builder $PYTHON_BUILDER_IMAGE
+kubefaas env create --name $env --image $PYTHON_RUNTIME_IMAGE --builder $PYTHON_BUILDER_IMAGE
 
 timeout 180s bash -c "wait_for_builder $env"
 # 1) Multiple source files (multiple inputs, Using * expression, from a directory)
 # Currently only * expression implemented as a test
 pushd $ROOT/examples/python/
 pkg1="pkg1-${TEST_ID}"
-fission package create --name $pkg1 --src "sourcepkg/*" --env $env --buildcmd "./build.sh"
+kubefaas package create --name $pkg1 --src "sourcepkg/*" --env $env --buildcmd "./build.sh"
 popd
 # wait for build to finish at most 60s
 timeout 60s bash -c "waitBuild $pkg1"
 log "Creating function " $fn1
-fission fn create --name $fn1 --pkg $pkg1 --entrypoint "user.main"
+kubefaas fn create --name $fn1 --pkg $pkg1 --entrypoint "user.main"
 
 log "Creating route"
-fission route create --function $fn1 --url /$fn1 --method GET
+kubefaas route create --function $fn1 --url /$fn1 --method GET
 
 log "Waiting for router to catch up"
 sleep 3
@@ -79,16 +79,16 @@ checkFunctionResponse $fn1 'a: 1 b: {c: 3, d: 4}'
 log "Creating pacakage with source archive"
 zip -jr $tmp_dir/demo-src-pkg.zip $ROOT/examples/python/sourcepkg/
 pkg2="pkg2-${TEST_ID}"
-fission package create --name $pkg2 --src $tmp_dir/demo-src-pkg.zip --env $env --buildcmd "./build.sh"
+kubefaas package create --name $pkg2 --src $tmp_dir/demo-src-pkg.zip --env $env --buildcmd "./build.sh"
 
 # wait for build to finish at most 60s
 timeout 60s bash -c "waitBuild $pkg2"
 
 log "Creating function " $fn2
-fission fn create --name $fn2 --pkg $pkg2 --entrypoint "user.main"
+kubefaas fn create --name $fn2 --pkg $pkg2 --entrypoint "user.main"
 
 log "Creating route"
-fission route create --function $fn2 --url /$fn2 --method GET
+kubefaas route create --function $fn2 --url /$fn2 --method GET
 
 log "Waiting for router to catch up"
 sleep 3
@@ -101,13 +101,13 @@ checkFunctionResponse $fn2 'a: 1 b: {c: 3, d: 4}'
 # 4) Deployment files from a directory
 pushd $ROOT/examples/python/
 pkg4="pkg4-${TEST_ID}"
-fission package create --name $pkg4 --deploy "multifile/*" --env $env
+kubefaas package create --name $pkg4 --deploy "multifile/*" --env $env
 popd
 log "Creating function " $fn4
-fission fn create --name $fn4 --pkg $pkg4 --entrypoint "main.main"
+kubefaas fn create --name $fn4 --pkg $pkg4 --entrypoint "main.main"
 
 log "Creating route"
-fission route create --function $fn4 --url /$fn4 --method GET
+kubefaas route create --function $fn4 --url /$fn4 --method GET
 
 log "Waiting for router to catch up"
 sleep 3
@@ -122,14 +122,14 @@ touch $tmp_dir/deploypkg/__init__.py
 printf 'def main():\n    return "Hello, world!"' > $tmp_dir/deploypkg/hello.py
 zip -jr $tmp_dir/demo-deploy-pkg.zip $tmp_dir/deploypkg/
 pkg5="pkg5-${TEST_ID}"
-fission package create --name $pkg5 --deploy $tmp_dir/demo-deploy-pkg.zip --env $env
+kubefaas package create --name $pkg5 --deploy $tmp_dir/demo-deploy-pkg.zip --env $env
 
 
 log "Updating function " $fn5
-fission fn create --name $fn5 --pkg $pkg5 --entrypoint "hello.main"
+kubefaas fn create --name $fn5 --pkg $pkg5 --entrypoint "hello.main"
 
 log "Creating route"
-fission route create --function $fn5 --url /$fn5 --method GET
+kubefaas route create --function $fn5 --url /$fn5 --method GET
 
 log "Waiting for router to update cache"
 sleep 3

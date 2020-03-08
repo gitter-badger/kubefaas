@@ -129,7 +129,7 @@ func (timer *Timer) newCron(t fv1.TimeTrigger) *cron.Cron {
 	c := cron.New()
 	c.AddFunc(t.Spec.Cron, func() {
 		headers := map[string]string{
-			"X-Fission-Timer-Name": t.ObjectMeta.Name,
+			"X-Kubefaas-Timer-Name": t.ObjectMeta.Name,
 		}
 
 		// with the addition of multi-tenancy, the users can create functions in any namespace. however,

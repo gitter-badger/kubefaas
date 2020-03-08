@@ -4,8 +4,8 @@ require 'rack'
 require 'thin'
 require 'logger'
 
-require_relative 'fission/specializer'
-require_relative 'fission/handler'
+require_relative 'kubefaas/specializer'
+require_relative 'kubefaas/handler'
 
 $handler = nil
 
@@ -14,11 +14,11 @@ app = Rack::Builder.new do
   use Rack::CommonLogger
 
   map "/specialize" do
-    run Fission::Specializer
+    run Kubefaas::Specializer
   end
 
   map '/v2/specialize' do
-    run Fission::V2::Specializer
+    run Kubefaas::V2::Specializer
   end
 
   map "/healthz" do
@@ -26,7 +26,7 @@ app = Rack::Builder.new do
   end
 
   map '/' do
-    run Fission::Handler
+    run Kubefaas::Handler
   end
 end
 

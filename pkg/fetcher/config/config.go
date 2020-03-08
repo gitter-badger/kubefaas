@@ -72,7 +72,7 @@ func MakeFetcherConfig(sharedMountPath string) (*Config, error) {
 
 	fetcherImage := os.Getenv("FETCHER_IMAGE")
 	if len(fetcherImage) == 0 {
-		fetcherImage = "fission/fetcher"
+		fetcherImage = "kubefaas/fetcher"
 	}
 
 	fetcherImagePullPolicy := os.Getenv("FETCHER_IMAGE_PULL_POLICY")
@@ -88,14 +88,14 @@ func MakeFetcherConfig(sharedMountPath string) (*Config, error) {
 		sharedSecretPath:        "/secrets",
 		sharedCfgMapPath:        "/configs",
 		jaegerCollectorEndpoint: os.Getenv("TRACE_JAEGER_COLLECTOR_ENDPOINT"),
-		serviceAccount:          fv1.FissionFetcherSA,
+		serviceAccount:          fv1.FetcherSA,
 	}, nil
 }
 
 func (cfg *Config) SetupServiceAccount(kubernetesClient *kubernetes.Clientset, namespace string, context interface{}) error {
-	_, err := utils.SetupSA(kubernetesClient, fv1.FissionFetcherSA, namespace)
+	_, err := utils.SetupSA(kubernetesClient, fv1.FetcherSA, namespace)
 	if err != nil {
-		log.Printf("Error : %v creating %s in ns : %s for: %#v", err, fv1.FissionFetcherSA, namespace, context)
+		log.Printf("Error : %v creating %s in ns : %s for: %#v", err, fv1.FetcherSA, namespace, context)
 		return err
 	}
 
@@ -295,7 +295,7 @@ func (cfg *Config) addFetcherToPodSpecWithCommand(podSpec *apiv1.PodSpec, mainCo
 	podSpec.Volumes = append(podSpec.Volumes, volumes...)
 	podSpec.Containers = append(podSpec.Containers, c)
 	if podSpec.ServiceAccountName == "" {
-		podSpec.ServiceAccountName = fv1.FissionFetcherSA
+		podSpec.ServiceAccountName = fv1.FetcherSA
 	}
 
 	return nil

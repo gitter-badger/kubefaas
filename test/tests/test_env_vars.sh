@@ -3,7 +3,7 @@
 set -euo pipefail
 source $(dirname $0)/../utils.sh
 
-# test_env_vars.sh - tests whether a user is able to add environment variables to a Fission environment deployment
+# test_env_vars.sh - tests whether a user is able to add environment variables to a Kubefaas environment deployment
 
 TEST_ID=$(generate_test_id)
 echo "TEST_ID = $TEST_ID"
@@ -14,8 +14,8 @@ mkdir -p $tmp_dir
 ENV=python-${TEST_ID}
 FN=foo-${TEST_ID}
 RESOURCE_NS=default # Change to test-specific namespace once we support namespaced CRDs
-FUNCTION_NS=${FUNCTION_NAMESPACE:-fission-function}
-BUILDER_NS=fission-builder
+FUNCTION_NS=${FUNCTION_NAMESPACE:-kubefaas-function}
+BUILDER_NS=kubefaas-builder
 
 # fs
 ENV_SPEC_FILE=${tmp_dir}/${ENV}.yaml
@@ -71,7 +71,7 @@ function retry {
   done
 }
 
-# Deploy environment (using kubectl because the Fission cli does not support the container arguments)
+# Deploy environment (using kubectl because the Kubefaas cli does not support the container arguments)
 echo "Writing environment config to $ENV_SPEC_FILE"
 cat > $ENV_SPEC_FILE <<- EOM
 apiVersion: fission.io/v1

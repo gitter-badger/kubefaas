@@ -71,14 +71,14 @@ checkIngress() {
 createFn() {
     # Create a hello world function in nodejs, test it with an http trigger
     log "Creating nodejs env"
-    fission env create --name $env --image $NODE_RUNTIME_IMAGE
+    kubefaas env create --name $env --image $NODE_RUNTIME_IMAGE
 
     log "Creating function"
-    fission fn create --name $functionName --env $env --code $ROOT/examples/nodejs/hello.js
+    kubefaas fn create --name $functionName --env $env --code $ROOT/examples/nodejs/hello.js
     sleep 3
 
     log "Doing an HTTP GET on the function's route"
-    response=$(fission fn test --name $functionName)
+    response=$(kubefaas fn test --name $functionName)
     echo $response
 
     log "Checking for valid response"
@@ -94,24 +94,24 @@ fi
 createFn
 
 log "Creating route for URL $relativeUrl"
-fission route create --name $routeName --url $relativeUrl --function $functionName --createingress
+kubefaas route create --name $routeName --url $relativeUrl --function $functionName --createingress
 
 sleep 3
 checkIngress $routeName "" $relativeUrl "" ""
 
 log "Modifying the route by adding host, path, annotations, tls"
-fission route update --name $routeName --function $functionName --ingressannotation "foo=bar" --ingressrule "$hostName=/foo/bar" --ingresstls "dummy"
+kubefaas route update --name $routeName --function $functionName --ingressannotation "foo=bar" --ingressrule "$hostName=/foo/bar" --ingresstls "dummy"
 
 sleep 3
 checkIngress $routeName $hostName "/foo/bar" "map[foo:bar]" "dummy"
 
 log "Remove ingress annotations, host, rule and tls"
-fission route update --name $routeName --function $functionName --ingressannotation "-" --ingressrule "-" --ingresstls "-"
+kubefaas route update --name $routeName --function $functionName --ingressannotation "-" --ingressrule "-" --ingresstls "-"
 
 sleep 3
 checkIngress $routeName "" $relativeUrl "" ""
 
-fission route delete --name $routeName
+kubefaas route delete --name $routeName
 
 TEST_ID=$(generate_test_id)
 
@@ -121,7 +121,7 @@ wildcardPath="/itest-$TEST_ID/*"
 realPath="itest-$TEST_ID/test"
 
 log "Creating route for wildcard URL $relativeUrl"
-fission route create --name $routeName --url $relativeUrl --function $functionName --createingress \
+kubefaas route create --name $routeName --url $relativeUrl --function $functionName --createingress \
     --ingressannotation "nginx.ingress.kubernetes.io/ssl-redirect=false" \
     --ingressannotation "nginx.ingress.kubernetes.io/use-regex=true" \
     --ingressrule "*=$wildcardPath"

@@ -34,13 +34,13 @@ printf 'def main():\n    return "Hello, world!"' > $tmp_dir/test_dir/hello.py
 zip -jr $tmp_dir/test-deploy-pkg.zip $tmp_dir/test_dir/
 
 log "Creating environment"
-fission env create --name $env --image $PYTHON_RUNTIME_IMAGE --builder $PYTHON_BUILDER_IMAGE --mincpu 40 --maxcpu 80 --minmemory 64 --maxmemory 128 --poolsize 2
+kubefaas env create --name $env --image $PYTHON_RUNTIME_IMAGE --builder $PYTHON_BUILDER_IMAGE --mincpu 40 --maxcpu 80 --minmemory 64 --maxmemory 128 --poolsize 2
 
 log "Creating functiom"
-fission fn create --name $fn_name --env $env --deploy $tmp_dir/test-deploy-pkg.zip --entrypoint "hello.main" --executortype newdeploy --minscale 1 --maxscale 4 --targetcpu 50
+kubefaas fn create --name $fn_name --env $env --deploy $tmp_dir/test-deploy-pkg.zip --entrypoint "hello.main" --executortype newdeploy --minscale 1 --maxscale 4 --targetcpu 50
 
 log "Creating route"
-fission route create --function $fn_name --url /$fn_name --method GET
+kubefaas route create --function $fn_name --url /$fn_name --method GET
 
 log "Waiting for router & newdeploy deployment creation"
 sleep 5
@@ -48,15 +48,15 @@ sleep 5
 timeout 60 bash -c "test_fn $fn_name 'world'"
 
 log "Updating the archive"
-sed -i 's/world/fission/' $tmp_dir/test_dir/hello.py
+sed -i 's/world/kubefaas/' $tmp_dir/test_dir/hello.py
 zip -jr $tmp_dir/test-deploy-pkg.zip $tmp_dir/test_dir/
 
 log "Updating function with updated package"
-fission fn update --name $fn_name --deploy $tmp_dir/test-deploy-pkg.zip --entrypoint "hello.main" --executortype newdeploy --minscale 1 --maxscale 4 --targetcpu 50
+kubefaas fn update --name $fn_name --deploy $tmp_dir/test-deploy-pkg.zip --entrypoint "hello.main" --executortype newdeploy --minscale 1 --maxscale 4 --targetcpu 50
 
 log "Waiting for deployment to update"
 sleep 5
 
-timeout 60 bash -c "test_fn $fn_name 'fission'"
+timeout 60 bash -c "test_fn $fn_name 'kubefaas'"
 
 log "Update function for new deployment executor passed"

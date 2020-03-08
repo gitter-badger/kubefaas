@@ -38,7 +38,7 @@ import (
 	"github.com/srcmesh/kubefaas/pkg/controller/client/rest"
 	"github.com/srcmesh/kubefaas/pkg/crd"
 	ferror "github.com/srcmesh/kubefaas/pkg/error"
-	"github.com/srcmesh/kubefaas/pkg/fission-cli/cmd"
+	"github.com/srcmesh/kubefaas/pkg/cli/cmd"
 )
 
 var (
@@ -63,14 +63,14 @@ func assert(c bool, msg string) {
 func assertNameReuseFailure(err error, name string) {
 	assert(err != nil, "recreating "+name+" with same name must fail")
 	fe, ok := err.(ferror.Error)
-	assert(ok, "error must be a fission Error")
+	assert(ok, "error must be a kubefaas Error")
 	assert(fe.Code == ferror.ErrorNameExists, "error must be a name exists error")
 }
 
 func assertNotFoundFailure(err error, name string) {
 	assert(err != nil, "requesting a non-existent "+name+" must fail")
 	fe, ok := err.(ferror.Error)
-	assert(ok, "error must be a fission Error")
+	assert(ok, "error must be a kubefaas Error")
 	if fe.Code != ferror.ErrorNotFound {
 		log.Fatalf("error must be a not found error: %v", fe)
 	}

@@ -1,5 +1,5 @@
-## Fission builder base image
-ARG BUILDER_IMAGE=fission/builder:latest
+## Kubefaas builder base image
+ARG BUILDER_IMAGE=kubefaas/builder:latest
 FROM ${BUILDER_IMAGE}
 
 ## Section copied from the openjdk:8-jdk-alpine Dockerfile - (https://github.com/docker-library/openjdk/blob/47a6539cd18023dafb45db9013455136cc0bca07/8/jdk/alpine/Dockerfile)
@@ -43,6 +43,6 @@ RUN mkdir -p /usr/share/maven /usr/share/maven/ref \
 ENV MAVEN_HOME /usr/share/maven
 ENV MAVEN_CONFIG "$USER_HOME_DIR/.m2"
 
-## Fission builder specific section
+## Kubefaas builder specific section
 ADD build.sh /usr/local/bin/build
 EXPOSE 8001

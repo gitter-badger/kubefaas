@@ -37,13 +37,13 @@ func registerTraceExporter(collectorEndpoint string) error {
 		return nil
 	}
 
-	serviceName := "Fission-Fetcher"
+	serviceName := "Kubefaas-Fetcher"
 	exporter, err := jaeger.NewExporter(jaeger.Options{
 		CollectorEndpoint: collectorEndpoint,
 		Process: jaeger.Process{
 			ServiceName: serviceName,
 			Tags: []jaeger.Tag{
-				jaeger.BoolTag("fission", true),
+				jaeger.BoolTag("kubefaas", true),
 			},
 		},
 	})

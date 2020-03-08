@@ -28,23 +28,23 @@ fn_nd=hello-ts-nd-$TEST_ID
 cd $ROOT/examples/tensorflow-serving
 
 log "Creating environment for Tensorflow Serving"
-fission env create --name $env --image $TS_RUNTIME_IMAGE --version 2 --period 5
+kubefaas env create --name $env --image $TS_RUNTIME_IMAGE --version 2 --period 5
 
 zip -r ${tmp_dir}/half_plus_two.zip ./half_plus_two
 
 pkgName=$(generate_test_id)
-fission package create --name $pkgName --deploy ${tmp_dir}/half_plus_two.zip --env $env
+kubefaas package create --name $pkgName --deploy ${tmp_dir}/half_plus_two.zip --env $env
 
 # wait for build to finish at most 90s
 timeout 90 bash -c "waitBuildExpectedStatus $pkgName 'none'"
 
 log "Creating pool manager & new deployment function for Tensorflow Serving"
-fission fn create --name $fn_poolmgr --env $env --pkg $pkgName --entrypoint "half_plus_two"
-fission fn create --name $fn_nd      --env $env --pkg $pkgName --entrypoint "half_plus_two" --executortype newdeploy
+kubefaas fn create --name $fn_poolmgr --env $env --pkg $pkgName --entrypoint "half_plus_two"
+kubefaas fn create --name $fn_nd      --env $env --pkg $pkgName --entrypoint "half_plus_two" --executortype newdeploy
 
 log "Creating route for new deployment function"
-fission route create --function $fn_poolmgr --url /$fn_poolmgr --method POST
-fission route create --function $fn_nd      --url /$fn_nd      --method POST
+kubefaas route create --function $fn_poolmgr --url /$fn_poolmgr --method POST
+kubefaas route create --function $fn_nd      --url /$fn_nd      --method POST
 
 log "Waiting for router & pools to catch up"
 sleep 5

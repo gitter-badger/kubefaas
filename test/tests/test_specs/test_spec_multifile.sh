@@ -29,25 +29,25 @@ fi
 cp -r $ROOT/examples/python/multifile $tmp_dir/
 pushd $tmp_dir
 
-fission spec init
+kubefaas spec init
 
 log "Creating environment spec"
-fission env create --spec --name $env --image $PYTHON_RUNTIME_IMAGE --builder $PYTHON_BUILDER_IMAGE
+kubefaas env create --spec --name $env --image $PYTHON_RUNTIME_IMAGE --builder $PYTHON_BUILDER_IMAGE
 
 log "Creating function spec"
-fission fn create --spec --name $fn --env $env --deploy "multifile/*" --entrypoint main.main
+kubefaas fn create --spec --name $fn --env $env --deploy "multifile/*" --entrypoint main.main
 
 log "Applying specs"
-fission spec apply
+kubefaas spec apply
 
 log "Checking function's existance"
-fission fn list | grep $fn
+kubefaas fn list | grep $fn
 
 log "Testing function"
-fission fn test --name $fn | grep -i hello
+kubefaas fn test --name $fn | grep -i hello
 
 log "Destroying spec objects"
-fission spec destroy
+kubefaas spec destroy
 popd
 
 log "Test PASSED"

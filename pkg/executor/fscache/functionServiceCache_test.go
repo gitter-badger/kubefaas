@@ -35,13 +35,13 @@ func TestFunctionServiceCache(t *testing.T) {
 			Kind:       "pod",
 			Name:       "xxx",
 			APIVersion: "v1",
-			Namespace:  "fission-function",
+			Namespace:  "kubefaas-function",
 		},
 		{
 			Kind:       "pod",
 			Name:       "xxx2",
 			APIVersion: "v1",
-			Namespace:  "fission-function",
+			Namespace:  "kubefaas-function",
 		},
 	}
 
@@ -58,7 +58,7 @@ func TestFunctionServiceCache(t *testing.T) {
 			Spec: fv1.EnvironmentSpec{
 				Version: 1,
 				Runtime: fv1.Runtime{
-					Image: "fission/foo-env",
+					Image: "kubefaas/foo-env",
 				},
 				Builder: fv1.Builder{},
 			},

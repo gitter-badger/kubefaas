@@ -31,7 +31,7 @@ import (
 
 	"github.com/srcmesh/kubefaas/pkg/crd"
 	ferror "github.com/srcmesh/kubefaas/pkg/error"
-	"github.com/srcmesh/kubefaas/pkg/fission-cli/logdb"
+	"github.com/srcmesh/kubefaas/pkg/cli/logdb"
 	"github.com/srcmesh/kubefaas/pkg/info"
 )
 
@@ -40,7 +40,7 @@ var podNamespace string
 func init() {
 	podNamespace = os.Getenv("POD_NAMESPACE")
 	if podNamespace == "" {
-		podNamespace = "fission"
+		podNamespace = "kubefaas"
 	}
 }
 
@@ -52,7 +52,6 @@ type (
 		storageServiceUrl string
 		builderManagerUrl string
 		workflowApiUrl    string
-		functionNamespace string
 		featureStatus     map[string]string
 	}
 
@@ -85,13 +84,6 @@ func MakeAPI(logger *zap.Logger, featureStatus map[string]string) (*API, error) 
 		api.workflowApiUrl = strings.TrimSuffix(wfEnv, "/")
 	} else {
 		api.workflowApiUrl = "http://workflows-apiserver"
-	}
-
-	fnNs := os.Getenv("FISSION_FUNCTION_NAMESPACE")
-	if len(fnNs) > 0 {
-		api.functionNamespace = fnNs
-	} else {
-		api.functionNamespace = "fission-function"
 	}
 
 	api.featureStatus = featureStatus

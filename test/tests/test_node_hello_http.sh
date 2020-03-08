@@ -24,19 +24,19 @@ fi
 
 # Create a hello world function in nodejs, test it with an http trigger
 log "Creating nodejs env"
-fission env create --name $env --image $NODE_RUNTIME_IMAGE
+kubefaas env create --name $env --image $NODE_RUNTIME_IMAGE
 
 log "Creating function"
-fission fn create --name $fn --env $env --code $ROOT/examples/nodejs/hello.js
+kubefaas fn create --name $fn --env $env --code $ROOT/examples/nodejs/hello.js
 
 log "Creating route"
-fission route create --function $fn --url /$fn --method GET
+kubefaas route create --function $fn --url /$fn --method GET
 
 log "Waiting for router to catch up"
 sleep 3
 
 log "Doing an HTTP GET on the function's route"
-response=$(curl --retry 5 http://$FISSION_ROUTER/$fn)
+response=$(curl --retry 5 http://$KUBEFAAS_ROUTER/$fn)
 
 log "Checking for valid response"
 echo $response | grep -i hello

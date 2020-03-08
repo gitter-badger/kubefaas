@@ -34,7 +34,7 @@ var podNamespace string
 func init() {
 	podNamespace = os.Getenv("POD_NAMESPACE")
 	if podNamespace == "" {
-		podNamespace = "fission"
+		podNamespace = "kubefaas"
 	}
 }
 

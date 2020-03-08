@@ -10,9 +10,9 @@ import (
 )
 
 const (
-	authToken = "defaultFissionAuthToken"
-	host      = "nats-streaming.fission"
-	clusterID = "fissionMQTrigger"
+	authToken = "defaultKubefaasAuthToken"
+	host      = "nats-streaming.kubefaas"
+	clusterID = "kubefaasMQTrigger"
 	topic     = "foobar"
 )
 

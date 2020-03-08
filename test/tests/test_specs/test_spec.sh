@@ -30,23 +30,23 @@ cp $ROOT/test/tests/test_specs/hello.py $tmp_dir
 pushd $tmp_dir
 
 # init
-fission spec init
+kubefaas spec init
 
 # verify init
 [ -d specs ]
 [ -f specs/README ]
-[ -f specs/fission-deployment-config.yaml ]
+[ -f specs/kubefaas-deployment-config.yaml ]
 
-fission env create --spec --name $env --image $PYTHON_RUNTIME_IMAGE
+kubefaas env create --spec --name $env --image $PYTHON_RUNTIME_IMAGE
 
 log "create env spec"
-fission spec apply
+kubefaas spec apply
 
 log "verify env created"
-fission env list | grep $env
+kubefaas env list | grep $env
 
 log "generate function spec"
-fission fn create --spec --name $fn --env $env --code hello.py
+kubefaas fn create --spec --name $fn --env $env --code hello.py
 
 
 [ -f specs/function-$fn.yaml ]
@@ -55,14 +55,14 @@ grep Package specs/*.yaml
 grep Function specs/*.yaml
 
 log "Apply specs"
-fission spec apply
+kubefaas spec apply
 
 log "verify function exists"
-fission fn list | grep $fn
+kubefaas fn list | grep $fn
 
 sleep 3
 
 log "Test the function"
-fission fn test --name $fn | grep -i hello
+kubefaas fn test --name $fn | grep -i hello
 
 log "Test PASSED"

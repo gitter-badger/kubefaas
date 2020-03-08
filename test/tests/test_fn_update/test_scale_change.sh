@@ -26,13 +26,13 @@ else
 fi
 
 log "Creating Python env $env"
-fission env create --name $env --image $PYTHON_RUNTIME_IMAGE --mincpu 20 --maxcpu 100 --minmemory 128 --maxmemory 256
+kubefaas env create --name $env --image $PYTHON_RUNTIME_IMAGE --mincpu 20 --maxcpu 100 --minmemory 128 --maxmemory 256
 
 log "Creating function $fn"
-fission fn create --name $fn --env $env --code $ROOT/examples/python/hello.py --minscale 1 --maxscale 4 --executortype newdeploy --mincpu 20 --maxcpu 100 --minmemory 128 --maxmemory 256
+kubefaas fn create --name $fn --env $env --code $ROOT/examples/python/hello.py --minscale 1 --maxscale 4 --executortype newdeploy --mincpu 20 --maxcpu 100 --minmemory 128 --maxmemory 256
 
 log "Creating route for function $fn"
-fission route create --function ${fn} --url /${fn} --method GET
+kubefaas route create --function ${fn} --url /${fn} --method GET
 
 log "Waiting for update to catch up"
 sleep 5
@@ -40,7 +40,7 @@ sleep 5
 timeout 60 bash -c "test_fn $fn 'world'"
 
 log "Updating function scale and target CPU percent for $fn"
-fission fn update --name $fn --code $ROOT/examples/python/hello.py --minscale $targetMinScale --maxscale $targetMaxScale --targetcpu $targetCpuPercent --executortype newdeploy --mincpu 20 --maxcpu 100 --minmemory 128 --maxmemory 256
+kubefaas fn update --name $fn --code $ROOT/examples/python/hello.py --minscale $targetMinScale --maxscale $targetMaxScale --targetcpu $targetCpuPercent --executortype newdeploy --mincpu 20 --maxcpu 100 --minmemory 128 --maxmemory 256
 
 log "Waiting for update to catch up"
 sleep 5

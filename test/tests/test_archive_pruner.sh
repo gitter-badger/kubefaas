@@ -36,12 +36,12 @@ create_archive() {
 
 create_package() {
     log "Creating package"
-    fission package create --name $1 --deploy "$tmp_dir/test-deploy-pkg.zip" --env $env
+    kubefaas package create --name $1 --deploy "$tmp_dir/test-deploy-pkg.zip" --env $env
 }
 
 delete_package() {
     log "Deleting package: $1"
-    fission package delete --name $1
+    kubefaas package delete --name $1
 }
 
 get_archive_url_from_package() {
@@ -52,11 +52,11 @@ get_archive_url_from_package() {
 get_archive_from_storage() {
     storage_service_url=$1
     if [ "${LB_SUPPORT}" == true ]; then
-        controller_ip=$(kubectl -n $FISSION_NAMESPACE get svc controller -o jsonpath='{...ip}')
-        controller_proxy_url=`echo $storage_service_url | sed -e "s/storagesvc.$FISSION_NAMESPACE/$controller_ip\/proxy\/storage/"`
+        controller_ip=$(kubectl -n $KUBEFAAS_NAMESPACE get svc controller -o jsonpath='{...ip}')
+        controller_proxy_url=`echo $storage_service_url | sed -e "s/storagesvc.$KUBEFAAS_NAMESPACE/$controller_ip\/proxy\/storage/"`
     else
-        controller_address=${NODE_IP}:$(kubectl -n $FISSION_NAMESPACE get svc controller -o jsonpath="{.spec.ports[0].nodePort}")
-        controller_proxy_url=`echo $storage_service_url | sed -e "s/storagesvc.$FISSION_NAMESPACE/$controller_address\/proxy\/storage/"`
+        controller_address=${NODE_IP}:$(kubectl -n $KUBEFAAS_NAMESPACE get svc controller -o jsonpath="{.spec.ports[0].nodePort}")
+        controller_proxy_url=`echo $storage_service_url | sed -e "s/storagesvc.$KUBEFAAS_NAMESPACE/$controller_address\/proxy\/storage/"`
     fi
     log "controller_proxy_url=$controller_proxy_url"
     http_status=`curl --retry 5 -sw "%{http_code}" $controller_proxy_url -o /dev/null`
@@ -72,7 +72,7 @@ get_archive_from_storage() {
 #7. now verify that both got deleted.
 main() {
     log "Creating python env"
-    fission env create --name $env --image $PYTHON_RUNTIME_IMAGE --builder $PYTHON_BUILDER_IMAGE
+    kubefaas env create --name $env --image $PYTHON_RUNTIME_IMAGE --builder $PYTHON_BUILDER_IMAGE
 
     # create a huge archive
     create_archive

@@ -1,6 +1,6 @@
-# Fission: Go Environment
+# Kubefaas: Go Environment
 
-This is the Go environment for Fission.
+This is the Go environment for Kubefaas.
 
 It's a Docker image containing a Go runtime, along with a dynamic loader.
 
@@ -19,20 +19,20 @@ image, to ensure that it's at the same version of go:
 cd builder && docker build -t USER/go-builder . && docker push USER/go-builder
 ```
 
-## Using the image in fission
+## Using the image in kubefaas
 
-You can add this customized image to fission with "fission env
+You can add this customized image to kubefaas with "kubefaas env
 create":
 
 ```
-fission env create --name go --image USER/go-runtime --builder USER/go-builder --version 2
+kubefaas env create --name go --image USER/go-runtime --builder USER/go-builder --version 2
 ```
 
 Or, if you already have an environment, you can update its image:
 
 ```
-fission env update --name go --image USER/go-runtime --builder USER/go-builder
+kubefaas env update --name go --image USER/go-runtime --builder USER/go-builder
 ```
 
-After this, fission functions that have the env parameter set to the
+After this, kubefaas functions that have the env parameter set to the
 same environment name as this command will use this environment.

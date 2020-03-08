@@ -22,15 +22,15 @@ else
 fi
 
 log "Creating Python env $env"
-fission env create --name $env --image $PYTHON_RUNTIME_IMAGE --period 5
+kubefaas env create --name $env --image $PYTHON_RUNTIME_IMAGE --period 5
 
 log "Creating function ${fn}-nd, ${fn}-gpm"
-fission fn create --name ${fn}-nd --env $env --code $ROOT/examples/python/hello.py --minscale 0 --maxscale 2 --executortype newdeploy
-fission fn create --name ${fn}-gpm --env $env --code $ROOT/examples/python/hello.py
+kubefaas fn create --name ${fn}-nd --env $env --code $ROOT/examples/python/hello.py --minscale 0 --maxscale 2 --executortype newdeploy
+kubefaas fn create --name ${fn}-gpm --env $env --code $ROOT/examples/python/hello.py
 
 log "Creating route for function $fn"
-fission route create --function ${fn}-nd --url /${fn}-nd --method GET
-fission route create --function ${fn}-gpm --url /${fn}-gpm --method GET
+kubefaas route create --function ${fn}-nd --url /${fn}-nd --method GET
+kubefaas route create --function ${fn}-gpm --url /${fn}-gpm --method GET
 
 log "Waiting for update to catch up"
 sleep 5

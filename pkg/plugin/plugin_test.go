@@ -30,7 +30,7 @@ import (
 
 func TestFind(t *testing.T) {
 	os.Clearenv()
-	testDir := path.Join(os.TempDir(), fmt.Sprintf("fission-test-plugins-%v", time.Now().UnixNano()))
+	testDir := path.Join(os.TempDir(), fmt.Sprintf("kubefaas-test-plugins-%v", time.Now().UnixNano()))
 	err := os.MkdirAll(testDir, os.ModePerm)
 	if err != nil {
 		t.FailNow()
@@ -71,7 +71,7 @@ func TestFind(t *testing.T) {
 
 func TestExec(t *testing.T) {
 	os.Clearenv()
-	testDir := path.Join(os.TempDir(), fmt.Sprintf("fission-test-plugins-%v", time.Now().UnixNano()))
+	testDir := path.Join(os.TempDir(), fmt.Sprintf("kubefaas-test-plugins-%v", time.Now().UnixNano()))
 	err := os.MkdirAll(testDir, os.ModePerm)
 	if err != nil {
 		t.FailNow()

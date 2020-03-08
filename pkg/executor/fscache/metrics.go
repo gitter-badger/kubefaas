@@ -9,14 +9,14 @@ var (
 	// funcuid: the function's version id
 	coldStarts = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "fission_cold_starts_total",
+			Name: "kubefaas_cold_starts_total",
 			Help: "How many cold starts are made by funcname, funcuid.",
 		},
 		[]string{"funcname", "funcuid"},
 	)
 	funcRunningSummary = prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{
-			Name:       "fission_func_running_seconds_summary",
+			Name:       "kubefaas_func_running_seconds_summary",
 			Help:       "The running time (last access - create) in seconds of the function.",
 			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 		},
@@ -24,7 +24,7 @@ var (
 	)
 	funcAliveSummary = prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{
-			Name:       "fission_func_alive_seconds_summary",
+			Name:       "kubefaas_func_alive_seconds_summary",
 			Help:       "The alive time in seconds of the function.",
 			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 		},
@@ -32,7 +32,7 @@ var (
 	)
 	funcIsAlive = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
-			Name: "fission_func_is_alive",
+			Name: "kubefaas_func_is_alive",
 			Help: "A binary value indicating is the funcname, funcuid alive",
 		},
 		[]string{"funcname", "funcuid"},

@@ -42,6 +42,6 @@ sed -i 's/gogo/go/g' $tmp_dir/function-go.yaml
 kubectl apply -f $tmp_dir/function-go.yaml
 timeout 90 bash -c "waitBuild $pkgName"
 
-fission fn test --name $name
+kubefaas fn test --name $name
 
 log "Test PASSED"

@@ -4,7 +4,7 @@ files including external libraries via composer.
 ### Create an environment
 
 ```
-fission env create --name php --image fission/php-env:latest --builder fission/php-builder:latest --version 2
+kubefaas env create --name php --image kubefaas/php-env:latest --builder kubefaas/php-builder:latest --version 2
 ```
 
 ### Create a zip file with all your files
@@ -15,7 +15,7 @@ zip -r multifile.zip . -i *.php *.txt composer.json
 
 ### Create a package
 ```
-fission package create --sourcearchive multifile.zip --env php
+kubefaas package create --sourcearchive multifile.zip --env php
 ```
 This command will print the created package. We will use it in the next step.
 
@@ -27,13 +27,13 @@ for the function.  Its format is `<file path>::<function name>`. In our
 example, that's `handlers/FileReader.php::execute`, to run function `execute` in `handlers/FileReader.php`.
 
 ```
-fission function create --name multifile --env php --pkg <created-pkg-name> --entrypoint "handlers/FileReader.php::execute"
+kubefaas function create --name multifile --env php --pkg <created-pkg-name> --entrypoint "handlers/FileReader.php::execute"
 ```
 
 ### Test it
 
 ```
-fission function test --name multifile
+kubefaas function test --name multifile
 ```
 
 You should see the "Hello, world" message.
@@ -56,13 +56,13 @@ zip -r multifile.zip . -i *.php *.txt composer.json
 ### Update the package
 
 ```
-fission package update --name <created-pkg-name> --sourcearchive multifile.zip --env php
+kubefaas package update --name <created-pkg-name> --sourcearchive multifile.zip --env php
 ```
 
 ### Test it
 
 ```
-fission function test --name multifile
+kubefaas function test --name multifile
 ```
 
 You should now see your new, edited message.

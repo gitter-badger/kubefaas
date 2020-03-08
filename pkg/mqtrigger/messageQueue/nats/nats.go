@@ -40,10 +40,10 @@ func init() {
 }
 
 const (
-	natsClusterID  = "fissionMQTrigger"
+	natsClusterID  = "kubefaasMQTrigger"
 	natsProtocol   = "nats://"
-	natsClientID   = "fission"
-	natsQueueGroup = "fission-messageQueueNatsTrigger"
+	natsClientID   = "kubefaas"
+	natsQueueGroup = "kubefaas-messageQueueNatsTrigger"
 )
 
 type (
@@ -127,9 +127,9 @@ func msgHandler(nats *Nats, trigger *fv1.MessageQueueTrigger) func(*ns.Msg) {
 		nats.logger.Debug("making HTTP request", zap.String("url", url))
 
 		headers := map[string]string{
-			"X-Fission-MQTrigger-Topic":      trigger.Spec.Topic,
-			"X-Fission-MQTrigger-RespTopic":  trigger.Spec.ResponseTopic,
-			"X-Fission-MQTrigger-ErrorTopic": trigger.Spec.ErrorTopic,
+			"X-Kubefaas-MQTrigger-Topic":      trigger.Spec.Topic,
+			"X-Kubefaas-MQTrigger-RespTopic":  trigger.Spec.ResponseTopic,
+			"X-Kubefaas-MQTrigger-ErrorTopic": trigger.Spec.ErrorTopic,
 			"Content-Type":                   trigger.Spec.ContentType,
 		}
 

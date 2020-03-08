@@ -40,7 +40,7 @@ var nodeName = os.Getenv("NODE_NAME")
 
 const (
 	originalContainerLogPath = "/var/log/containers"
-	fissionSymlinkPath       = "/var/log/fission"
+	symlinkPath              = "/var/log/kubefaas"
 )
 
 func makePodLoggerController(zapLogger *zap.Logger, k8sClientSet *kubernetes.Clientset) k8sCache.Controller {
@@ -91,7 +91,7 @@ func createLogSymlinks(zapLogger *zap.Logger, pod *corev1.Pod) error {
 			continue
 		}
 		containerLogPath := getLogPath(originalContainerLogPath, pod.Name, pod.Namespace, container.Name, containerUID)
-		symlinkLogPath := getLogPath(fissionSymlinkPath, pod.Name, pod.Namespace, container.Name, containerUID)
+		symlinkLogPath := getLogPath(symlinkPath, pod.Name, pod.Namespace, container.Name, containerUID)
 
 		// check whether a symlink exists, if yes then ignore it
 		if _, err := os.Stat(symlinkLogPath); os.IsNotExist(err) {
@@ -147,7 +147,7 @@ func getLogPath(pathPrefix, podName, podNamespace, containerName, containerID st
 func symlinkReaper(zapLogger *zap.Logger) {
 	ticker := time.NewTicker(5 * time.Minute)
 	for range ticker.C {
-		err := filepath.Walk(fissionSymlinkPath, func(path string, info os.FileInfo, err error) error {
+		err := filepath.Walk(symlinkPath, func(path string, info os.FileInfo, err error) error {
 			if target, e := os.Readlink(path); e == nil {
 				if _, pathErr := os.Stat(target); os.IsNotExist(pathErr) {
 					zapLogger.Debug("remove symlink file", zap.String("filepath", path))
@@ -169,12 +169,12 @@ func Start() {
 	}
 	defer zapLogger.Sync()
 
-	if _, err := os.Stat(fissionSymlinkPath); os.IsNotExist(err) {
+	if _, err := os.Stat(symlinkPath); os.IsNotExist(err) {
 		zapLogger.Info("symlink path not exist, create it",
-			zap.String("fissionSymlinkPath", fissionSymlinkPath))
-		err = os.Mkdir(fissionSymlinkPath, 0755)
+			zap.String("symlinkPath", symlinkPath))
+		err = os.Mkdir(symlinkPath, 0755)
 		if err != nil {
-			zapLogger.Fatal("error creating fissionSymlinkPath", zap.Error(err))
+			zapLogger.Fatal("error creating symlinkPath", zap.Error(err))
 		}
 	}
 	go symlinkReaper(zapLogger)

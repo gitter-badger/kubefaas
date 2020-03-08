@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-// Handler is the entry point for this fission function
+// Handler is the entry point for this function
 func Handler(w http.ResponseWriter, r *http.Request) {
 	bytes, err := ioutil.ReadAll(r.Body)
 	if err != nil {

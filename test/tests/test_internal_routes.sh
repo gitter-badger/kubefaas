@@ -34,7 +34,7 @@ else
 fi
 
 log "Creating nodejs env"
-fission env create --name $env --image $NODE_RUNTIME_IMAGE
+kubefaas env create --name $env --image $NODE_RUNTIME_IMAGE
 
 
 
@@ -46,7 +46,7 @@ done
 log "Creating functions"
 for f in $f1 $f2
 do
-    fission fn create --name $f --env $env --code $tmp_dir/$f.js
+    kubefaas fn create --name $f --env $env --code $tmp_dir/$f.js
 done
 
 log "Waiting for router to catch up"
@@ -55,7 +55,7 @@ sleep 2
 log "Testing internal routes"
 for f in $f1 $f2
 do
-    response=$(curl http://$FISSION_ROUTER/fission-function/$f)
+    response=$(curl http://$KUBEFAAS_ROUTER/kubefaas-function/$f)
     echo $response | grep $f
 done
 

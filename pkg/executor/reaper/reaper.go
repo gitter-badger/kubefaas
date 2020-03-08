@@ -197,7 +197,7 @@ func CleanupRoleBindings(logger *zap.Logger, client *kubernetes.Clientset, fissi
 				continue
 			}
 
-			// ignore role-bindings not created by fission
+			// ignore role-bindings not created by kubefaas
 			if roleBinding.Name != fv1.PackageGetterRB && roleBinding.Name != fv1.SecretConfigMapGetterRB {
 				continue
 			}
@@ -225,7 +225,7 @@ func CleanupRoleBindings(logger *zap.Logger, client *kubernetes.Clientset, fissi
 				funcEnvReference = false
 
 				// this is the reverse of what we're doing in setting up of role-bindings. if objects are created in default ns,
-				// the SA namespace will have the value of "fission-function"/"fission-builder" depending on the SA.
+				// the SA namespace will have the value of "kubefaas-function"/"kubefaas-builder" depending on the SA.
 				// so now we need to look for the objects in default namespace.
 				saNs := subj.Namespace
 				isInReservedNS := false
@@ -252,7 +252,7 @@ func CleanupRoleBindings(logger *zap.Logger, client *kubernetes.Clientset, fissi
 				}
 
 				// if its a package-getter-rb, we have 2 kinds of SAs and each of them is handled differently
-				// else if its a secret-configmap-rb, we have only one SA which is fission-fetcher
+				// else if its a secret-configmap-rb, we have only one SA which is kubefaas-fetcher
 				if roleBinding.Name == fv1.PackageGetterRB {
 					// check if there is an env obj in saNs
 					envList, err := fissionClient.CoreV1().Environments(saNs).List(meta_v1.ListOptions{})
@@ -261,22 +261,22 @@ func CleanupRoleBindings(logger *zap.Logger, client *kubernetes.Clientset, fissi
 						continue
 					}
 
-					// if the SA in this iteration is fission-builder, then we need to only check
+					// if the SA in this iteration is kubefaas-builder, then we need to only check
 					// if either there's at least one env object in the SA's namespace, or,
 					// if there's at least one function in the role-binding namespace with env reference
 					// to the SA's namespace.
 					// if neither, then we can remove this SA from this role-binding
-					if subj.Name == fv1.FissionBuilderSA {
+					if subj.Name == fv1.BuilderSA {
 						if len(envList.Items) == 0 && !funcEnvReference {
 							saToRemove[utils.MakeSAMapKey(subj.Name, subj.Namespace)] = true
 						}
 					}
 
-					// if the SA in this iteration is fission-fetcher, then in addition to above checks,
+					// if the SA in this iteration is kubefaas-fetcher, then in addition to above checks,
 					// we also need to check if there's at least one function with executor type New deploy
 					// in the rolebinding's namespace.
 					// if none of them are true, then remove this SA from this role-binding
-					if subj.Name == fv1.FissionFetcherSA {
+					if subj.Name == fv1.FetcherSA {
 						if len(envList.Items) == 0 && !ndmFunc && !funcEnvReference {
 							// remove SA from rolebinding
 							saToRemove[utils.MakeSAMapKey(subj.Name, subj.Namespace)] = true

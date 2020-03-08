@@ -7,11 +7,11 @@ metadata:
 spec:
   builder:
     command: build
-    image: fission/go-builder-1.12:1.7.1
+    image: kubefaas/go-builder-1.12:1.7.1
   imagepullsecret: ""
   keeparchive: false
   poolsize: 3
   resources: {}
   runtime:
-    image: fission/go-env-1.12:1.7.1
+    image: kubefaas/go-env-1.12:1.7.1
   version: 2

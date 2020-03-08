@@ -1,4 +1,4 @@
-# Fission CRD generation
+# Kubefaas CRD generation
 
 * Clone https://github.com/fission/code-generator to generate fission CRD object deepcopy and client methods.
 * MUST run code-generator in the fission root directory.

@@ -18,20 +18,20 @@ clean_resource_by_id() {
     KUBECTL="kubectl --namespace default"
     set +e
 
-    fn_list=$(fission function list | grep $test_id | awk '{print $1}')
+    fn_list=$(kubefaas function list | grep $test_id | awk '{print $1}')
     for fn in $fn_list; do
-        fission fn delete --name $fn
+        kubefaas fn delete --name $fn
     done
 
-    pkg_list=$(fission package list | grep $test_id | awk '{print $1}')
+    pkg_list=$(kubefaas package list | grep $test_id | awk '{print $1}')
     for pkg in $pkg_list; do
-        fission pkg info --name $pkg
-        fission pkg delete -f --name $pkg
+        kubefaas pkg info --name $pkg
+        kubefaas pkg delete -f --name $pkg
     done
 
-    route_list=$(fission route list | grep $test_id | awk '{print $1}')
+    route_list=$(kubefaas route list | grep $test_id | awk '{print $1}')
     for route in $route_list; do
-        fission route delete --name $route
+        kubefaas route delete --name $route
     done
 
     crds=$($KUBECTL get crd | grep "fission.io" | awk '{print $1}')
@@ -44,11 +44,11 @@ clean_resource_by_id() {
 }
 
 test_fn() {
-    if [ -z $FISSION_ROUTER ]; then
-        log "Environment FISSION_ROUTER not set"
+    if [ -z $KUBEFAAS_ROUTER ]; then
+        log "Environment KUBEFAAS_ROUTER not set"
         exit 1
     fi
-    url="http://$FISSION_ROUTER/$1"
+    url="http://$KUBEFAAS_ROUTER/$1"
     expect=$2
     test_response $url $expect
 }
@@ -94,7 +94,7 @@ export -f test_response
 test_post_route() {
     # Doing an HTTP POST on the function's route
     # Checking for valid response
-    url="http://$FISSION_ROUTER/$1"
+    url="http://$KUBEFAAS_ROUTER/$1"
     body=$2
     expect=$3
 
@@ -127,7 +127,7 @@ wait_for_builder() {
     # wait for tiller ready
     set +e
     while true; do
-      kubectl --namespace fission-builder get pod -l envName=$env -o jsonpath="$JSONPATH" | grep "Ready=True"
+      kubectl --namespace kubefaas-builder get pod -l envName=$env -o jsonpath="$JSONPATH" | grep "Ready=True"
       if [[ $? -eq 0 ]]; then
           break
       fi
@@ -172,12 +172,13 @@ export -f waitBuildExpectedStatus
 
 ## Parameters used by some specific test cases
 ## To change the environment image setting for CI test, please refer run_all_tests() in test_utils.sh.
-export PYTHON_RUNTIME_IMAGE=${PYTHON_RUNTIME_IMAGE:-fission/python-env}
-export PYTHON_BUILDER_IMAGE=${PYTHON_BUILDER_IMAGE:-fission/python-builder}
-export GO_RUNTIME_IMAGE=${GO_RUNTIME_IMAGE:-fission/go-env-1.12}
-export GO_BUILDER_IMAGE=${GO_BUILDER_IMAGE:-fission/go-builder-1.12}
-export JVM_RUNTIME_IMAGE=${JVM_RUNTIME_IMAGE:-fission/jvm-env}
-export JVM_BUILDER_IMAGE=${JVM_BUILDER_IMAGE:-fission/jvm-builder}
-export NODE_RUNTIME_IMAGE=${NODE_RUNTIME_IMAGE:-fission/node-env}
-export TS_RUNTIME_IMAGE=${TS_RUNTIME_IMAGE:-fission/tensorflow-serving-env}
+export PYTHON_RUNTIME_IMAGE=${PYTHON_RUNTIME_IMAGE:-kubefaas/python-env}
+export PYTHON_BUILDER_IMAGE=${PYTHON_BUILDER_IMAGE:-kubefaas/python-builder}
+export GO_RUNTIME_IMAGE=${GO_RUNTIME_IMAGE:-kubefaas/go-env-1.12}
+export GO_BUILDER_IMAGE=${GO_BUILDER_IMAGE:-kubefaas/go-builder-1.12}
+export JVM_RUNTIME_IMAGE=${JVM_RUNTIME_IMAGE:-kubefaas/jvm-env}
+export JVM_BUILDER_IMAGE=${JVM_BUILDER_IMAGE:-kubefaas/jvm-builder}
+export NODE_RUNTIME_IMAGE=${NODE_RUNTIME_IMAGE:-kubefaas/node-env}
+export NODE_BUILDER_IMAGE=${NODE_BUILDER_IMAGE:-kubefaas/node-builder}
+export TS_RUNTIME_IMAGE=${TS_RUNTIME_IMAGE:-kubefaas/tensorflow-serving-env}
 

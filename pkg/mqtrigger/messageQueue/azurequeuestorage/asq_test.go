@@ -326,16 +326,16 @@ func TestAzureStorageQueuePoisonMessage(t *testing.T) {
 }
 
 func httpRequestMatcher(t *testing.T, queue string, responseQueue string, retry string, contentType string, functionName string, body string) func(*http.Request) bool {
-	expectedURL := fmt.Sprintf("%s/fission-function/%s", DummyRouterURL, functionName)
+	expectedURL := fmt.Sprintf("%s/kubefaas-function/%s", DummyRouterURL, functionName)
 	return func(req *http.Request) bool {
 		requestBody, err := ioutil.ReadAll(req.Body)
 		require.NoError(t, err)
 
 		req.Body = ioutil.NopCloser(strings.NewReader(string(requestBody)))
 
-		return queue == req.Header.Get("X-Fission-MQTrigger-Topic") &&
-			responseQueue == req.Header.Get("X-Fission-MQTrigger-RespTopic") &&
-			retry == req.Header.Get("X-Fission-MQTrigger-RetryCount") &&
+		return queue == req.Header.Get("X-Kubefaas-MQTrigger-Topic") &&
+			responseQueue == req.Header.Get("X-Kubefaas-MQTrigger-RespTopic") &&
+			retry == req.Header.Get("X-Kubefaas-MQTrigger-RetryCount") &&
 			contentType == req.Header.Get("Content-Type") &&
 			req.URL.String() == expectedURL &&
 			string(requestBody) == body

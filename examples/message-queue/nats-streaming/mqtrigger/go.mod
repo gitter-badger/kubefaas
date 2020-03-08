@@ -1,4 +1,4 @@
-module github.com/fission/mqtrigger
+module github.com/kubefaas/mqtrigger
 
 go 1.12
 

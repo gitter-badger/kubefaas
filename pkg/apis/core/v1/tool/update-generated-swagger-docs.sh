@@ -28,12 +28,12 @@ set -o errexit
 set -o nounset
 set -o pipefail
 
-FISSION_CRD_VERSION=v1
+KUBEFAAS_CRD_VERSION=v1
 
 source "swagger.sh"
 
 # To avoid compile errors, remove the currently existing files.
 
-for group_version in "${FISSION_CRD_VERSION}"; do
-  kube::swagger::gen_types_swagger_doc "${group_version}" ../../${FISSION_CRD_VERSION}
+for group_version in "${KUBEFAAS_CRD_VERSION}"; do
+  kube::swagger::gen_types_swagger_doc "${group_version}" ../../${KUBEFAAS_CRD_VERSION}
 done

@@ -1,5 +1,5 @@
 {
-  "name": "fission-nodejs-runtime",
+  "name": "nodejs-runtime",
   "version": "0.1.0",
   "author": "Soam Vasani",
   "contributors": [
@@ -12,7 +12,7 @@
       "email": "contact@garyyeap.com"
     }
   ],
-  "description": "NodeJS run container for the fission framework",
+  "description": "NodeJS run container for the kubefaas framework",
   "engines": {
     "node": ">=7.6.0"
   },

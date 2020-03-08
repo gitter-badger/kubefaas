@@ -1,17 +1,17 @@
-# Fission Node.js Examples
+# Kubefaas Node.js Examples
 
-This directory contains several examples to get you started using Node.js with Fission.
+This directory contains several examples to get you started using Node.js with Kubefaas.
 
 ## Environment
 
-Before running any of these functions, make sure you have created a `nodejs` Fission environment:
+Before running any of these functions, make sure you have created a `nodejs` Kubefaas environment:
 
 ```
-$ fission env create --name nodejs --image fission/node-env
+$ kubefaas env create --name nodejs --image kubefaas/node-env
 ```
 
-Note: The default `fission/node-env` image is based on Alpine, which is much smaller than the main Debian Node image (65MB vs 680MB) while still being suitable for most use cases.
-If you need to use the full Debian image use the `fission/node-env-debian` image instead.
+Note: The default `kubefaas/node-env` image is based on Alpine, which is much smaller than the main Debian Node image (65MB vs 680MB) while still being suitable for most use cases.
+If you need to use the full Debian image use the `kubefaas/node-env-debian` image instead.
 See the [official Node docker hub repo](https://hub.docker.com/_/node/) for considerations
 relating to this choice.
 
@@ -40,14 +40,14 @@ This is a basic "Hello, World!" example. It simply returns a status of `200` and
 ### Usage
 
 ```bash
-# Upload your function code to fission
-$ fission function create --name hello --env nodejs --code hello.js
+# Upload your function code to kubefaas
+$ kubefaas function create --name hello --env nodejs --code hello.js
 
 # Map GET /hello to your new function
-$ fission route create --method GET --url /hello --function hello
+$ kubefaas route create --method GET --url /hello --function hello
 
 # Run the function.
-$ curl http://$FISSION_ROUTER/hello
+$ curl http://$KUBEFAAS_ROUTER/hello
 Hello, world!
 ```
 
@@ -60,14 +60,14 @@ This is a basic "Hello, World!" example implemented with the legacy callback imp
 ### Usage
 
 ```bash
-# Upload your function code to fission
-$ fission function create --name hello-callback --env nodejs --code hello-callback.js
+# Upload your function code to kubefaas
+$ kubefaas function create --name hello-callback --env nodejs --code hello-callback.js
 
 # Map GET /hello-callback to your new function
-$ fission route create --method GET --url /hello-callback --function hello-callback
+$ kubefaas route create --method GET --url /hello-callback --function hello-callback
 
 # Run the function.
-$ curl http://$FISSION_ROUTER/hello-callback
+$ curl http://$KUBEFAAS_ROUTER/hello-callback
 Hello, world!
 ```
 
@@ -78,11 +78,11 @@ This example watches Kubernetes events and sends them to a Slack channel. To use
 ### Usage
 
 ```bash
-# Upload your function code to fission
-$ fission fn create --name kubeEventsSlack --env nodejs --code kubeEventsSlack.js
+# Upload your function code to kubefaas
+$ kubefaas fn create --name kubeEventsSlack --env nodejs --code kubeEventsSlack.js
 
 # Watch all services in the default namespace:
-$ fission watch create --function kubeEventsSlack --type service --ns default
+$ kubefaas watch create --function kubeEventsSlack --type service --ns default
 ```
 
 ## weather.js
@@ -92,14 +92,14 @@ In this example, the Yahoo Weather API is used to current weather at a given loc
 ### Usage
 
 ```bash
-# Upload your function code to fission
-$ fission function create --name weather --env nodejs --code weather.js
+# Upload your function code to kubefaas
+$ kubefaas function create --name weather --env nodejs --code weather.js
 
 # Map GET /stock to your new function
-$ fission route create --method POST --url /weather --function weather
+$ kubefaas route create --method POST --url /weather --function weather
 
 # Run the function.
-$ curl -H "Content-Type: application/json" -X POST -d '{"location":"Sieteiglesias, Spain"}' http://$FISSION_ROUTER/weather
+$ curl -H "Content-Type: application/json" -X POST -d '{"location":"Sieteiglesias, Spain"}' http://$KUBEFAAS_ROUTER/weather
 
 {"text":"It is 2 celsius degrees in Sieteiglesias, Spain and Mostly Clear"}
 ```

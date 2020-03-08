@@ -145,7 +145,7 @@ func (w *fakeCloseReadCloser) RealClose() error {
 //
 // If GetServiceForFunction returns an error or if RoundTripper exits with an error, it get's translated into 502
 // inside ServeHttp function of the reverseProxy.
-// Earlier, GetServiceForFunction was called inside handler function and fission explicitly set http status code to 500
+// Earlier, GetServiceForFunction was called inside handler function and kubefaas explicitly set http status code to 500
 // if it returned an error.
 func (roundTripper *RetryingRoundTripper) RoundTrip(req *http.Request) (*http.Response, error) {
 	// Set forwarded host header if not exists
@@ -192,7 +192,7 @@ func (roundTripper *RetryingRoundTripper) RoundTrip(req *http.Request) (*http.Re
 			// get function service url from cache or executor
 			roundTripper.serviceUrl, roundTripper.urlFromCache, err = roundTripper.funcHandler.getServiceEntry()
 			if err != nil {
-				// We might want a specific error code or header for fission failures as opposed to
+				// We might want a specific error code or header for kubefaas failures as opposed to
 				// user function bugs.
 				statusCode, errMsg := ferror.GetHTTPError(err)
 				if roundTripper.funcHandler.isDebugEnv {

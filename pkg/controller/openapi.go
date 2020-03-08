@@ -61,7 +61,7 @@ func openAPIWebService() *restful.WebService {
 func enrichSwaggerObject(swo *spec.Swagger) {
 	swo.Info = &spec.Info{
 		InfoProps: spec.InfoProps{
-			Title:       "Fission OpenAPI 2.0",
+			Title:       "Kubefaas OpenAPI 2.0",
 			Description: openapiDescription,
 			Version:     "v1",
 		},
@@ -70,7 +70,7 @@ func enrichSwaggerObject(swo *spec.Swagger) {
 }
 
 var openapiDescription = `
-OpenAPI 2.0 document for fission controller
+OpenAPI 2.0 document for kubefaas controller
 * ObjectMeta (v1.ObjectMeta) should be empty when creating a CRD resource. Kubernetes will assign it automatically.
 * Following semantic errors are known issues and won't affect the API accessibility.
   - Operations must have unique operationIds.

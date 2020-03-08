@@ -286,13 +286,13 @@ func (a *API) FunctionPodLogs(w http.ResponseWriter, r *http.Request) {
 	fnName := vars["function"]
 
 	ns := a.extractQueryParamFromRequest(r, "namespace")
-	podNs := "fission-function"
+	podNs := "kubefaas-function"
 
 	if len(ns) == 0 {
 		ns = metav1.NamespaceDefault
 	} else if ns != metav1.NamespaceDefault {
 		// If the function namespace is "default", executor
-		// will create function pods under "fission-function".
+		// will create function pods under "kubefaas-function".
 		// Otherwise, the function pod will be created under
 		// the same namespace of function.
 		podNs = ns

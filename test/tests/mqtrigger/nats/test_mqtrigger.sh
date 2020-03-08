@@ -14,12 +14,12 @@ echo "TEST_ID = $TEST_ID"
 ROOT=$(dirname $0)/../../..
 DIR=$(dirname $0)
 
-clusterID="fissionMQTrigger"
+clusterID="kubefaasMQTrigger"
 pubClientID="clientPub-$TEST_ID"
 subClientID="clientSub-$TEST_ID"
 topic="foo.bar$TEST_ID"
 resptopic="foo.foo$TEST_ID"
-#FISSION_NATS_STREAMING_URL="http://defaultFissionAuthToken@$(minikube ip):4222"
+#KUBEFAAS_NATS_STREAMING_URL="http://defaultKubefaasAuthToken@$(minikube ip):4222"
 expectedRespOutput="subject:\"$resptopic\" data:\"Hello, World!\""
 
 env=nodejs-$TEST_ID
@@ -38,13 +38,13 @@ else
 fi
 
 log "Creating nodejs env"
-fission env create --name $env --image $NODE_RUNTIME_IMAGE
+kubefaas env create --name $env --image $NODE_RUNTIME_IMAGE
 
 log "Creating function"
-fission fn create --name $fn --env $env --code $DIR/main.js --method GET
+kubefaas fn create --name $fn --env $env --code $DIR/main.js --method GET
 
 log "Creating message queue trigger"
-fission mqtrigger create --name $mqt --function $fn --mqtype "nats-streaming" --topic $topic --resptopic $resptopic
+kubefaas mqtrigger create --name $mqt --function $fn --mqtype "nats-streaming" --topic $topic --resptopic $resptopic
 
 # wait until nats trigger is created
 sleep 5
@@ -53,17 +53,17 @@ sleep 5
 # Send a message
 #
 log "Sending message"
-go run $DIR/stan-pub/main.go -s $FISSION_NATS_STREAMING_URL -c $clusterID -id $pubClientID $topic ""
+go run $DIR/stan-pub/main.go -s $KUBEFAAS_NATS_STREAMING_URL -c $clusterID -id $pubClientID $topic ""
 
 #
 # Wait for message on response topic 
 #
 log "Waiting for response"
-response=$(timeout 30s go run $DIR/stan-sub/main.go --last -s $FISSION_NATS_STREAMING_URL -c $clusterID -id $subClientID $resptopic 2>&1 || true)
+response=$(timeout 30s go run $DIR/stan-sub/main.go --last -s $KUBEFAAS_NATS_STREAMING_URL -c $clusterID -id $subClientID $resptopic 2>&1 || true)
 echo "$response"
 echo "$response" | grep "$expectedRespOutput"
 
 log "Deleting message queue trigger"
-fission mqtrigger delete --name $mqt
+kubefaas mqtrigger delete --name $mqt
 
 log "Test PASSED"

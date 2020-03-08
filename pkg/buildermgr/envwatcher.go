@@ -217,7 +217,7 @@ func (envw *environmentWatcher) service() {
 		switch req.requestType {
 		case GET_BUILDER:
 			// In order to support backward compatibility, for all environments with builder image created in default env,
-			// the pods will be created in fission-builder namespace
+			// the pods will be created in kubefaas-builder namespace
 			ns := envw.builderNamespace
 			if req.env.ObjectMeta.Namespace != metav1.NamespaceDefault {
 				ns = req.env.ObjectMeta.Namespace
@@ -240,7 +240,7 @@ func (envw *environmentWatcher) service() {
 			for i := range req.envList {
 				env := req.envList[i]
 				// In order to support backward compatibility, for all builder images created in default
-				// env, the pods are created in fission-builder namespace
+				// env, the pods are created in kubefaas-builder namespace
 				ns := envw.builderNamespace
 				if env.ObjectMeta.Namespace != metav1.NamespaceDefault {
 					ns = env.ObjectMeta.Namespace
@@ -345,9 +345,9 @@ func (envw *environmentWatcher) createBuilder(env *fv1.Environment, ns string) (
 	// there should be only one deploy in deployList
 	if len(deployList) == 0 {
 		// create builder SA in this ns, if not already created
-		_, err := utils.SetupSA(envw.kubernetesClient, fv1.FissionBuilderSA, ns)
+		_, err := utils.SetupSA(envw.kubernetesClient, fv1.BuilderSA, ns)
 		if err != nil {
-			return nil, errors.Wrapf(err, "error creating %q in ns: %s", fv1.FissionBuilderSA, ns)
+			return nil, errors.Wrapf(err, "error creating %q in ns: %s", fv1.BuilderSA, ns)
 		}
 
 		deploy, err = envw.createBuilderDeployment(env, ns)
@@ -495,7 +495,7 @@ func (envw *environmentWatcher) createBuilderDeployment(env *fv1.Environment, ns
 		},
 		Spec: apiv1.PodSpec{
 			Containers:         []apiv1.Container{*container},
-			ServiceAccountName: "fission-builder",
+			ServiceAccountName: "kubefaas-builder",
 		},
 	}
 

@@ -3,7 +3,7 @@
 If you see the files in the `specs` directory you will get to know that we have just generated the 
 environment spec using the command 
 ```
-fission env create --name python --image fission/python-env --builder fission/python-builder --spec
+kubefaas env create --name python --image kubefaas/python-env --builder kubefaas/python-builder --spec
 ```
 and changed the env-python.yaml file to have below `podspec` for builder for the environment.
 

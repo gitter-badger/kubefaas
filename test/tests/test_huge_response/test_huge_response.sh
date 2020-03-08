@@ -22,7 +22,7 @@ retryPost() {
 
     set +e
     while true; do
-        curl -X POST http://$FISSION_ROUTER/$fn \
+        curl -X POST http://$KUBEFAAS_ROUTER/$fn \
             -H "Content-Type: application/json" \
             --data-binary "@generated.json" > response.json
 
@@ -48,21 +48,21 @@ env=go-$TEST_ID
 fn_poolmgr=hello-go-poolmgr-$TEST_ID
 
 log "Creating environment for Golang"
-fission env create --name $env --image $GO_RUNTIME_IMAGE --builder $GO_BUILDER_IMAGE --period 5
+kubefaas env create --name $env --image $GO_RUNTIME_IMAGE --builder $GO_BUILDER_IMAGE --period 5
 
 timeout 90 bash -c "wait_for_builder $env"
 
 pkgName=$(generate_test_id)
-fission package create --name $pkgName --src hello.go --env $env
+kubefaas package create --name $pkgName --src hello.go --env $env
 
 # wait for build to finish at most 90s
 timeout 90 bash -c "waitBuild $pkgName"
 
 log "Creating function for Golang"
-fission fn create --name $fn_poolmgr --env $env --pkg $pkgName --entrypoint Handler
+kubefaas fn create --name $fn_poolmgr --env $env --pkg $pkgName --entrypoint Handler
 
 log "Creating route for function"
-fission route create --name $fn_poolmgr --function $fn_poolmgr --url /$fn_poolmgr --method POST
+kubefaas route create --name $fn_poolmgr --function $fn_poolmgr --url /$fn_poolmgr --method POST
 
 log "Waiting for router & pools to catch up"
 sleep 5

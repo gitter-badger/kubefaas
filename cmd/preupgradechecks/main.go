@@ -40,7 +40,7 @@ func main() {
 	}
 	defer logger.Sync()
 
-	usage := `Package to perform operations needed prior to fission installation
+	usage := `Package to perform operations needed prior to kubefaas installation
 Usage:
   pre-upgrade-checks --fn-pod-namespace=<podNamespace> --envbuilder-namespace=<envBuilderNamespace>
 Options:
@@ -52,8 +52,8 @@ Options:
 		logger.Fatal("Could not parse command line arguments", zap.Error(err))
 	}
 
-	functionPodNs := getStringArgWithDefault(arguments["--fn-pod-namespace"], "fission-function")
-	envBuilderNs := getStringArgWithDefault(arguments["--envbuilder-namespace"], "fission-builder")
+	functionPodNs := getStringArgWithDefault(arguments["--fn-pod-namespace"], "kubefaas-function")
+	envBuilderNs := getStringArgWithDefault(arguments["--envbuilder-namespace"], "kubefaas-builder")
 
 	crdBackedClient, err := makePreUpgradeTaskClient(logger, functionPodNs, envBuilderNs)
 	if err != nil {

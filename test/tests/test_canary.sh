@@ -36,20 +36,20 @@ fi
 
 success_scenario() {
     log "Creating function version-1"
-    fission fn create --name $fn_v1 --env $env --code $ROOT/examples/nodejs/hello.js
+    kubefaas fn create --name $fn_v1 --env $env --code $ROOT/examples/nodejs/hello.js
 
     log "Creating function version-1"
-    fission fn create --name $fn_v2 --env $env --code $ROOT/examples/nodejs/hello.js
+    kubefaas fn create --name $fn_v2 --env $env --code $ROOT/examples/nodejs/hello.js
 
     log "Create a route for the version-1 of the function with weight 100% and version-2 with weight 0%"
-    fission route create --name $route_succ --method GET --url /$route_succ --function $fn_v1 --weight 100 --function $fn_v2 --weight 0
+    kubefaas route create --name $route_succ --method GET --url /$route_succ --function $fn_v1 --weight 100 --function $fn_v2 --weight 0
     sleep 5
 
     log "Create a canary config to gradually increment the weight of version-2 by a step of 50 every 1m"
-    fission canary-config create --name $canary_1 --newfunction $fn_v2 --oldfunction $fn_v1 --httptrigger $route_succ --increment-step 50 --increment-interval 3s --failure-threshold 10
+    kubefaas canary-config create --name $canary_1 --newfunction $fn_v2 --oldfunction $fn_v1 --httptrigger $route_succ --increment-step 50 --increment-interval 3s --failure-threshold 10
 
     log "Fire requests to the route"
-    hey -z 15s -c 1 http://$FISSION_ROUTER/$route_succ
+    hey -z 15s -c 1 http://$KUBEFAAS_ROUTER/$route_succ
 
     log "verify that version-2 of the function is receiving 100% traffic"
     weight=`kubectl -n default get httptrigger $route_succ -o jsonpath='{.spec.functionref.functionweights.'$fn_v2'}'`
@@ -66,17 +66,17 @@ failure_scenario() {
     sed 's/200/400/' $ROOT/examples/nodejs/hello.js > $tmp_dir/hello_400.js
 
     log "Creating function version-3"
-    fission fn create --name $fn_v3 --env $env --code $tmp_dir/hello_400.js
+    kubefaas fn create --name $fn_v3 --env $env --code $tmp_dir/hello_400.js
 
     log "Create a route for the version-1 of the function with weight 100% and version-3 with weight 0%"
-    fission route create --name $route_fail --method GET --url /$route_fail --function $fn_v1 --weight 100 --function $fn_v3 --weight 0
+    kubefaas route create --name $route_fail --method GET --url /$route_fail --function $fn_v1 --weight 100 --function $fn_v3 --weight 0
     sleep 5
 
     log "Create a canary config to gradually increment the weight of version-2 by a step of 50 every 1m"
-    fission canary-config create --name $canary_2 --newfunction $fn_v3 --oldfunction $fn_v1 --httptrigger $route_fail --increment-step 50 --increment-interval 3s --failure-threshold 10
+    kubefaas canary-config create --name $canary_2 --newfunction $fn_v3 --oldfunction $fn_v1 --httptrigger $route_fail --increment-step 50 --increment-interval 3s --failure-threshold 10
 
     log "Fire requests to the route"
-    hey -z 15s -c 1 http://$FISSION_ROUTER/$route_fail
+    hey -z 15s -c 1 http://$KUBEFAAS_ROUTER/$route_fail
 
     log "verify that version-3 of the function is receiving 0% traffic because of rollback"
     weight=`kubectl -n default get httptrigger $route_fail -o jsonpath='{.spec.functionref.functionweights.'$fn_v3'}'`
@@ -91,7 +91,7 @@ failure_scenario() {
 
 main() {
     log "Creating nodejs env"
-    fission env create --name $env --image $NODE_RUNTIME_IMAGE --graceperiod 1
+    kubefaas env create --name $env --image $NODE_RUNTIME_IMAGE --graceperiod 1
     sleep 15
 
     # v2 of a function starts with receiving 0% of the traffic with a gradual increase all the way up to 100% of the traffic

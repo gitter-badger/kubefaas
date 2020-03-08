@@ -2,6 +2,6 @@
 module.exports = aasync function(context) {
     return {
         status: 200,
-        body: "Hello, Fission!\n"
+        body: "Hello, Kubefaas!\n"
     };
 }

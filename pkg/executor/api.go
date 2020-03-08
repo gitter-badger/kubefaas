@@ -67,7 +67,7 @@ func (executor *Executor) getServiceForFunctionApi(w http.ResponseWriter, r *htt
 		executor.logger.Error("error getting service for function",
 			zap.Error(err),
 			zap.String("function", m.Name),
-			zap.String("fission_http_error", msg))
+			zap.String("kubefaas_http_error", msg))
 		http.Error(w, msg, code)
 		return
 	}

@@ -418,7 +418,7 @@ func (gpm *GenericPoolManager) service() {
 				}
 
 				// To support backward compatibility, if envs are created in default ns, we go ahead
-				// and create pools in fission-function ns as earlier.
+				// and create pools in kubefaas-function ns as earlier.
 				ns := gpm.namespace
 				if req.env.ObjectMeta.Namespace != metav1.NamespaceDefault {
 					ns = req.env.ObjectMeta.Namespace

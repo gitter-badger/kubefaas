@@ -1,13 +1,13 @@
 # Ruby examples
 
 This directory contains several examples to get you started using Ruby
-with Fission.
+with Kubefaas.
 
 Before running any of these functions, make sure you have created a
-`ruby` Fission environment:
+`ruby` Kubefaas environment:
 
 ```
-$ fission env create --name ruby --image USER/ruby-env
+$ kubefaas env create --name ruby --image USER/ruby-env
 ```
 
 ## Method signature
@@ -20,7 +20,7 @@ def handler(context)
 end
 ```
 
-If the fission context is not required, the function can be simplified:
+If the kubefaas context is not required, the function can be simplified:
 
 ```ruby
 def handler
@@ -44,27 +44,27 @@ This example is the simplest possible Ruby function, as described above.
 To run the example:
 
 ```
-$ fission function create --name hello --env ruby --code examples/ruby/hello.rb
+$ kubefaas function create --name hello --env ruby --code examples/ruby/hello.rb
 
-$ fission route create --method GET --url /hello --function hello
+$ kubefaas route create --method GET --url /hello --function hello
 
-$ curl http://$FISSION_ROUTER/hello
+$ curl http://$KUBEFAAS_ROUTER/hello
   Hello, world!
 ```
 
 ## Request data example (`request_data.rb`)
 
-This example shows basic use of the `Fission::Context` and
-`Fission::Request` objects.
+This example shows basic use of the `Kubefaas::Context` and
+`Kubefaas::Request` objects.
 
 To run the example:
 
 ```
-$ fission function create --name request --env ruby --code examples/ruby/request_data.rb
+$ kubefaas function create --name request --env ruby --code examples/ruby/request_data.rb
 
-$ fission route create --method GET --url /request/{id} --function request
+$ kubefaas route create --method GET --url /request/{id} --function request
 
-$ curl http://$FISSION_ROUTER/request/123?key=abc
+$ curl http://$KUBEFAAS_ROUTER/request/123?key=abc
   ---ENV---
   GATEWAY_INTERFACE=CGI/1.1
   PATH_INFO=/
@@ -81,7 +81,7 @@ $ curl http://$FISSION_ROUTER/request/123?key=abc
   HTTP_HOST=192.168.64.200:31314
   HTTP_USER_AGENT=curl/7.52.1
   HTTP_ACCEPT=*/*
-  HTTP_X_FISSION_PARAMS_ID=123
+  HTTP_X_KUBEFAAS_PARAMS_ID=123
   HTTP_X_FORWARDED_FOR=172.17.0.1
   HTTP_ACCEPT_ENCODING=gzip
   rack.version=1=3
@@ -95,7 +95,7 @@ $ curl http://$FISSION_ROUTER/request/123?key=abc
   Host: 192.168.64.200:31314
   User-Agent: curl/7.52.1
   Version: HTTP/1.1
-  X-Fission-Params-Id: 123
+  X-Kubefaas-Params-Id: 123
   X-Forwarded-For: 172.17.0.1
 
   ---PARAMS---
@@ -109,7 +109,7 @@ $ curl http://$FISSION_ROUTER/request/123?key=abc
 ## V2 Specification Example (with builder support)
 
 ```
-$ fission function create --name parse --env ruby --src "parse/*" --entrypoint handler 
-$ fission fn test --name parse --body '<message>This is my message</message>'
+$ kubefaas function create --name parse --env ruby --src "parse/*" --entrypoint handler 
+$ kubefaas fn test --name parse --body '<message>This is my message</message>'
   This is my message
 ```

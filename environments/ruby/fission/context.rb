@@ -3,7 +3,7 @@
 require_relative 'request'
 require 'forwardable'
 
-module Fission
+module Kubefaas
   class Context
     extend Forwardable
 

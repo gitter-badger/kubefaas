@@ -23,7 +23,7 @@ process.on('uncaughtException', (err) => {
 let userFunction;
 
 function loadFunction(modulepath, funcname) {
-    // Read and load the code. It's placed there securely by the fission runtime.
+    // Read and load the code. It's placed there securely by the kubefaas runtime.
     try {
         let startTime = process.hrtime();
         // support v1 codepath and v2 entrypoint like 'foo', '', 'index.hello'
@@ -72,7 +72,7 @@ function specializeV2(req, res) {
 function specialize(req, res) {
     // Specialize this server to a given user function.  The user function
     // is read from argv.codepath; it's expected to be placed there by the
-    // fission runtime.
+    // kubefaas runtime.
     //
     const modulepath = argv.codepath || '/userfunc/user';
 

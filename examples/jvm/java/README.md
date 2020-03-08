@@ -1,17 +1,17 @@
-# Hello World in JVM/Java on Fission
+# Hello World in JVM/Java on Kubefaas
 
-The `io.fission.HelloWorld.java` class is a very simple fission function that implements `io.fission.Function` and says "Hello, World!" .
+The `io.fission.HelloWorld.java` class is a very simple kubefaas function that implements `io.fission.Function` and says "Hello, World!" .
 
-## Building and deploying using Fission
+## Building and deploying using Kubefaas
 
-Fission's builder can be used to create the binary artifact from source code. Create an environment with builder image and then create a package. 
+Kubefaas's builder can be used to create the binary artifact from source code. Create an environment with builder image and then create a package. 
 
 ```
 $ zip -r java-src-pkg.zip *
-$ fission env create --name java --image fission/jvm-env --version 2 --keeparchive --builder fission/jvm-builder
-$ fission package create --sourcearchive java-src-pkg.zip --env java
+$ kubefaas env create --name java --image kubefaas/jvm-env --version 2 --keeparchive --builder kubefaas/jvm-builder
+$ kubefaas package create --sourcearchive java-src-pkg.zip --env java
 java-src-pkg-zip-tvd0
-$ fission package info --name java-src-pkg-zip-tvd0
+$ kubefaas package info --name java-src-pkg-zip-tvd0
 Name:        java-src-pkg-zip-tvd0
 Environment: java
 Status:      succeeded
@@ -26,12 +26,12 @@ Build Logs:
 Once package's status is `succeeded` then that package can be used to create and execute a function.
 
 ```
-$ fission fn create --name hello --pkg java-src-pkg-zip-tvd0 --env java --entrypoint io.fission.HelloWorld
-$ fission fn test --name hello
+$ kubefaas fn create --name hello --pkg java-src-pkg-zip-tvd0 --env java --entrypoint io.fission.HelloWorld
+$ kubefaas fn test --name hello
 Hello World!
 ```
 
-## Building locally and deploying with Fission
+## Building locally and deploying with Kubefaas
 
 You can build the jar file in one of the two ways below based on your setup:
 
@@ -52,9 +52,9 @@ Both of above steps will generate a target subdirectory which has the archive `t
 - The archive created above will be used as a deploy package when creating the function.
 
 ```
-$ fission env create --name jvm --image fission/jvm-env --version 2 --keeparchive=true
-$ fission fn create --name hello --deploy target/hello-world-1.0-SNAPSHOT-jar-with-dependencies.jar --env jvm --entrypoint io.fission.HelloWorld
-$ fission route create --function hello --url /hellop --method GET
-$ fission fn test --name hello
+$ kubefaas env create --name jvm --image kubefaas/jvm-env --version 2 --keeparchive=true
+$ kubefaas fn create --name hello --deploy target/hello-world-1.0-SNAPSHOT-jar-with-dependencies.jar --env jvm --entrypoint io.fission.HelloWorld
+$ kubefaas route create --function hello --url /hellop --method GET
+$ kubefaas fn test --name hello
 Hello World!
 ```

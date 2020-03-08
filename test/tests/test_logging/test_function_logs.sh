@@ -28,13 +28,13 @@ fi
 
 # Create a hello world function in nodejs, test it with an http trigger
 log "Creating nodejs env"
-fission env create --name $env --image $NODE_RUNTIME_IMAGE
+kubefaas env create --name $env --image $NODE_RUNTIME_IMAGE
 
 log "Creating function"
-fission fn create --name $fn --env $env --code $(dirname $0)/log.js
+kubefaas fn create --name $fn --env $env --code $(dirname $0)/log.js
 
 log "Creating route"
-fission route create --function $fn --url /$fn --method GET
+kubefaas route create --function $fn --url /$fn --method GET
 
 log "Waiting for router to catch up"
 sleep 3
@@ -42,19 +42,19 @@ sleep 3
 log "Doing 4 HTTP GETs on the function's route"
 for i in 1 2 3 4
 do
-    curl -s http://$FISSION_ROUTER/$fn
+    curl -s http://$KUBEFAAS_ROUTER/$fn
 done
 
 log "Grabbing logs, should have 4 calls in logs"
 
 sleep 60
 
-fission function logs --name $fn --detail > $tmp_dir/logfile
+kubefaas function logs --name $fn --detail > $tmp_dir/logfile
 
 size=$(wc -c < $tmp_dir/logfile)
 if [ $size == 0 ]
 then
-    fission function logs --name $fn --detail > $tmp_dir/logfile
+    kubefaas function logs --name $fn --detail > $tmp_dir/logfile
 fi
 
 log "---function logs---"

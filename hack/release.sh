@@ -28,8 +28,8 @@ check_clean() {
     fi
 }
 
-# Push fission-bundle image
-push_fission_bundle_image() {
+# Push kubefaas-bundle image
+push_kubefaas_bundle_image() {
     local version=$1
     local tag=srcmesh/kubefaas-bundle:$version
     docker push $tag
@@ -37,14 +37,14 @@ push_fission_bundle_image() {
 
 push_fetcher_image() {
     local version=$1
-    local tag=fission/fetcher:$version
+    local tag=kubefaas/fetcher:$version
     docker push $tag
 }
 
 
 push_builder_image() {
     local version=$1
-    local tag=fission/builder:$version
+    local tag=kubefaas/builder:$version
     docker push $tag
 }
 
@@ -65,8 +65,8 @@ push_env_image() {
     fi
     echo "Pushing $envdir -> $imgname:$version"
 
-    docker push fission/$imgname:$version
-    docker push fission/$imgname:latest
+    docker push kubefaas/$imgname:$version
+    docker push kubefaas/$imgname:latest
 }
 
 push_all_envs() {
@@ -108,8 +108,8 @@ push_env_builder_image() {
     fi
     echo "Pushing $envdir -> $imgname:$version"
 
-    docker push fission/$imgname:$version
-    docker push fission/$imgname:latest
+    docker push kubefaas/$imgname:$version
+    docker push kubefaas/$imgname:latest
 }
 
 push_all_env_builders() {
@@ -132,14 +132,14 @@ push_all_env_builders() {
 # Push pre-upgrade-checks image
 push_pre_upgrade_checks_image() {
     local version=$1
-    local tag=fission/pre-upgrade-checks:$version
+    local tag=kubefaas/pre-upgrade-checks:$version
     docker push $tag
 }
 
 push_all() {
     local version=$1
-    push_fission_bundle_image $version
-    push_fission_bundle_image latest
+    push_kubefaas_bundle_image $version
+    push_kubefaas_bundle_image latest
 
     push_fetcher_image $version
     push_fetcher_image latest
@@ -172,8 +172,8 @@ tag_and_release() {
 
     # create gh release
     gothub release \
-	   --user fission \
-	   --repo fission \
+	   --user kubefaas \
+	   --repo kubefaas \
 	   --tag $gittag \
 	   --name "$version" \
 	   --description "$version" \
@@ -187,29 +187,29 @@ attach_github_release_cli() {
     echo "Uploading osx cli"
     gothub upload \
 	   --replace \
-	   --user fission \
-	   --repo fission \
+	   --user kubefaas \
+	   --repo kubefaas \
 	   --tag $gittag \
-	   --name fission-cli-osx \
-	   --file $BUILDDIR/cli/osx/fission-cli-osx
+	   --name kubefaas-cli-osx \
+	   --file $BUILDDIR/cli/osx/kubefaas-cli-osx
 
     echo "Uploading linux cli"
     gothub upload \
 	   --replace \
-	   --user fission \
-	   --repo fission \
+	   --user kubefaas \
+	   --repo kubefaas \
 	   --tag $gittag \
-	   --name fission-cli-linux \
-	   --file $BUILDDIR/cli/linux/fission-cli-linux
+	   --name kubefaas-cli-linux \
+	   --file $BUILDDIR/cli/linux/kubefaas-cli-linux
 
     echo "Uploading windows cli"
     gothub upload \
 	   --replace \
-	   --user fission \
-	   --repo fission \
+	   --user kubefaas \
+	   --repo kubefaas \
 	   --tag  $gittag \
-	   --name fission-cli-windows.exe \
-	   --file $BUILDDIR/cli/windows/fission-cli-windows.exe
+	   --name kubefaas-cli-windows.exe \
+	   --file $BUILDDIR/cli/windows/kubefaas-cli-windows.exe
 }
 
 attach_github_release_charts() {
@@ -219,19 +219,19 @@ attach_github_release_charts() {
     # helm charts
     gothub upload \
 	   --replace \
-	   --user fission \
-	   --repo fission \
+	   --user kubefaas \
+	   --repo kubefaas \
 	   --tag  $gittag \
-	   --name fission-all-$version.tgz \
-	   --file $BUILDDIR/charts/fission-all-$version.tgz
+	   --name kubefaas-all-$version.tgz \
+	   --file $BUILDDIR/charts/kubefaas-all-$version.tgz
 
     gothub upload \
 	   --replace \
-	   --user fission \
-	   --repo fission \
+	   --user kubefaas \
+	   --repo kubefaas \
 	   --tag  $gittag \
-	   --name fission-core-$version.tgz \
-	   --file $BUILDDIR/charts/fission-core-$version.tgz
+	   --name kubefaas-core-$version.tgz \
+	   --file $BUILDDIR/charts/kubefaas-core-$version.tgz
 
 }
 
@@ -239,29 +239,29 @@ attach_github_release_yamls() {
     local version=$1
     local gittag=$version
 
-    for c in fission-all fission-core
+    for c in kubefaas-all kubefaas-core
     do
         # YAML
         gothub upload \
            --replace \
-           --user fission \
-           --repo fission \
+           --user kubefaas \
+           --repo kubefaas \
            --tag $gittag \
            --name ${c}-${version}-minikube.yaml \
            --file $BUILDDIR/yamls/${c}-${version}-minikube.yaml
 
         gothub upload \
            --replace \
-           --user fission \
-           --repo fission \
+           --user kubefaas \
+           --repo kubefaas \
            --tag $gittag \
            --name ${c}-${version}.yaml \
            --file $BUILDDIR/yamls/${c}-${version}.yaml
 
         gothub upload \
            --replace \
-           --user fission \
-           --repo fission \
+           --user kubefaas \
+           --repo kubefaas \
            --tag $gittag \
            --name ${c}-${version}-openshift.yaml \
            --file $BUILDDIR/yamls/${c}-${version}-openshift.yaml
@@ -273,8 +273,8 @@ update_github_charts_repo() {
     local chartsrepo=$2
 
     pushd $chartsrepo
-    cp $BUILDDIR/charts/fission-all-${version}.tgz .
-    cp $BUILDDIR/charts/fission-core-${version}.tgz .
+    cp $BUILDDIR/charts/kubefaas-all-${version}.tgz .
+    cp $BUILDDIR/charts/kubefaas-core-${version}.tgz .
     ./index.sh
     popd
 }
@@ -284,13 +284,13 @@ generate_changelog() {
 
     echo "# ${version}" > new_CHANGELOG.md
     echo
-    echo "[Documentation](https://docs.fission.io/)" >> new_CHANGELOG.md
+    echo "[Documentation](https://docs.kubefaas.io/)" >> new_CHANGELOG.md
     echo
 
     create_downloads_table ${version} >> new_CHANGELOG.md
 
     # generate changelog from github
-    github_changelog_generator -u fission -p fission -t ${GITHUB_TOKEN} --future-release ${version} --no-issues -o tmp_CHANGELOG.md
+    github_changelog_generator -u kubefaas -p kubefaas -t ${GITHUB_TOKEN} --future-release ${version} --no-issues -o tmp_CHANGELOG.md
     sed -i '$ d' tmp_CHANGELOG.md
 
     # concatenate two files
@@ -346,19 +346,19 @@ chartsrepo=$2
 
 if [ -z $chartsrepo ]
 then
-  chartsrepo="$DIR../fission-charts"
+  chartsrepo="$DIR../kubefaas-charts"
 fi
 
 release_environment_check $version $chartsrepo
 
 # Build release-builder image
-docker build -t fission-release-builder -f $GOPATH/src/github.com/srcmesh/kubefaas/hack/Dockerfile .
+docker build -t kubefaas-release-builder -f $GOPATH/src/github.com/srcmesh/kubefaas/hack/Dockerfile .
 
 # Build all binaries & container images in docker
 # Here we mount docker.sock into container so that docker client can communicate with host docker daemon.
 # For more detail please visit https://docs.docker.com/machine/overview/
 docker run --rm -it -v $GOPATH/src:/go/src -v /var/run/docker.sock:/var/run/docker.sock \
-    -e VERSION=$version -w "/go/src/github.com/srcmesh/kubefaas/hack" fission-release-builder sh -c "./release-build.sh"
+    -e VERSION=$version -w "/go/src/github.com/srcmesh/kubefaas/hack" kubefaas-release-builder sh -c "./release-build.sh"
 
 push_all $version
 push_all_envs $version

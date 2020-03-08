@@ -54,37 +54,37 @@ var (
 	// method: the function's http method
 	functionCalls = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "fission_function_calls_total",
-			Help: "Count of Fission function calls",
+			Name: "kubefaas_function_calls_total",
+			Help: "Count of Kubefaas function calls",
 		},
 		labelsStrings,
 	)
 	functionCallErrors = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
-			Name: "fission_function_errors_total",
-			Help: "Count of Fission function errors",
+			Name: "kubefaas_function_errors_total",
+			Help: "Count of Kubefaas function errors",
 		},
 		labelsStrings,
 	)
 	functionCallDuration = prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{
-			Name:       "fission_function_duration_seconds",
-			Help:       "Runtime duration of the Fission function.",
+			Name:       "kubefaas_function_duration_seconds",
+			Help:       "Runtime duration of the Kubefaas function.",
 			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 		},
 		labelsStrings,
 	)
 	functionCallOverhead = prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{
-			Name:       "fission_function_overhead_seconds",
-			Help:       "The function call delay caused by fission.",
+			Name:       "kubefaas_function_overhead_seconds",
+			Help:       "The function call delay caused by kubefaas.",
 			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 		},
 		labelsStrings,
 	)
 	functionCallResponseSize = prometheus.NewSummaryVec(
 		prometheus.SummaryOpts{
-			Name:       "fission_function_response_size_bytes",
+			Name:       "kubefaas_function_response_size_bytes",
 			Help:       "The response size of the http call to target function.",
 			Objectives: map[float64]float64{0.5: 0.05, 0.9: 0.01, 0.99: 0.001},
 		},

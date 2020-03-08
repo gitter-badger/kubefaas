@@ -26,15 +26,15 @@ import (
 )
 
 const (
-	HEADERS_FISSION_FUNCTION_PREFIX = "Fission-Function"
+	HEADERS_KUBEFAAS_FUNCTION_PREFIX = "Kubefaas-Function"
 )
 
 // setFunctionMetadataToHeaders set function metadatas to request header
 func setFunctionMetadataToHeader(meta *metav1.ObjectMeta, request *http.Request) {
-	request.Header.Set(fmt.Sprintf("X-%s-Uid", HEADERS_FISSION_FUNCTION_PREFIX), string(meta.UID))
-	request.Header.Set(fmt.Sprintf("X-%s-Name", HEADERS_FISSION_FUNCTION_PREFIX), meta.Name)
-	request.Header.Set(fmt.Sprintf("X-%s-Namespace", HEADERS_FISSION_FUNCTION_PREFIX), meta.Namespace)
-	request.Header.Set(fmt.Sprintf("X-%s-ResourceVersion", HEADERS_FISSION_FUNCTION_PREFIX), meta.ResourceVersion)
+	request.Header.Set(fmt.Sprintf("X-%s-Uid", HEADERS_KUBEFAAS_FUNCTION_PREFIX), string(meta.UID))
+	request.Header.Set(fmt.Sprintf("X-%s-Name", HEADERS_KUBEFAAS_FUNCTION_PREFIX), meta.Name)
+	request.Header.Set(fmt.Sprintf("X-%s-Namespace", HEADERS_KUBEFAAS_FUNCTION_PREFIX), meta.Namespace)
+	request.Header.Set(fmt.Sprintf("X-%s-ResourceVersion", HEADERS_KUBEFAAS_FUNCTION_PREFIX), meta.ResourceVersion)
 }
 
 // setPathInfoToHeaders set URL path params and full URL path to request header

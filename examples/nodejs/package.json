@@ -1,5 +1,5 @@
 {
-  "name": "fission-nodejs-example",
+  "name": "nodejs-example",
   "version": "0.1.0",
   "author": "Soam Vasani",
   "contributors": [
@@ -12,7 +12,7 @@
       "email": "contact@garyyeap.com"
     }
   ],
-  "description": "Nodejs example for Fission framework",
+  "description": "Nodejs example",
   "engines": {
     "node": ">=7.6.0"
   },

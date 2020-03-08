@@ -1,4 +1,4 @@
-#### Fission release
+#### Kubefaas release
 
 Prerequisites
 -------------
@@ -6,10 +6,10 @@ Prerequisites
 1. Get a dockerhub account if you don't have one.  
 
   Get access to:
-  - The fission dockerhub account (https://hub.docker.com/r/fission/ if you have access, you will see Fission listed in your organizations: https://hub.docker.com/organizations/ )
-  - Fission-charts repo (https://github.com/srcmesh/kubefaas-charts)
-  - Fission Documentation Repo (https://github.com/fission/docs.fission.io)
-  - Fission main repo (https://github.com/srcmesh/kubefaas)
+  - Dockerhub account (https://hub.docker.com/r/kubefaas/ if you have access, you will see Kubefaas listed in your organizations: https://hub.docker.com/organizations/ )
+  - Charts repo (https://github.com/srcmesh/kubefaas-charts)
+  - Documentation Repo (https://github.com/srcmesh/docs.fission.io)
+  - Main repo (https://github.com/srcmesh/kubefaas)
 
 2. Get a Github "personal access token":
    https://help.github.com/articles/creating-a-personal-access-token-for-the-command-line/
@@ -73,7 +73,7 @@ Updating Fission Charts (https://github.com/srcmesh/kubefaas-charts)
 ------------------------------
 a. Switch to srcmesh/kubefaas-charts repo and run `index.sh` in that repo.  (Don't edit the index.yaml in this repo manually.  index.sh generates it, using the helm repo CLI.)
 
-b. You should have index.yaml and fission-core-*, fission-all-* charts as change, add, commit and push it to repo.
+b. You should have index.yaml and kubefaas-core-*, kubefaas-all-* charts as change, add, commit and push it to repo.
 
 9. Go to Github Web UI --> Releases, here you will notice a pre-release for the version x.y.z you just created.
 

@@ -12,7 +12,7 @@ spec:
   resources: {}
   runtime:
     functionendpointport: 0
-    image: fission/node-env
+    image: kubefaas/node-env
     loadendpointpath: ""
     loadendpointport: 0
     container:
@@ -26,19 +26,19 @@ spec:
       # A container which will be merged with for pool manager
       Containers:
       - name: nodehellond
-        image: fission/node-env
+        image: kubefaas/node-env
         volumeMounts:
           - name: funcvol
             mountPath: /etc/funcdata
             readOnly: true
       # A additional container in the pods
       - name: yanode
-        image: fission/node-env
+        image: kubefaas/node-env
         command: ['sh', '-c', 'sleep 36000000000']
       # Init container before function
       initContainers:
       - name: init-node
-        image: fission/node-env 
+        image: kubefaas/node-env
         command: ['sh', '-c', 'cat /etc/infopod/labels']
         volumeMounts:
           - name: infopod
@@ -47,7 +47,7 @@ spec:
       tolerations:
       - key: "reservation"
         operator: "Equal"
-        value: "fission"
+        value: "kubefaas"
         effect: "NoSchedule"      
       # Additional volumes
       volumes:

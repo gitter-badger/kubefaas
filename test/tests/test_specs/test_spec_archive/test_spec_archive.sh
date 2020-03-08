@@ -6,7 +6,7 @@ ROOT=` realpath $(dirname $0)/../../../../`
 
 cleanup() {
     log "Cleaning up..."
-    fission spec destroy
+    kubefaas spec destroy
     rm -rf func
     popd
 }
@@ -21,23 +21,23 @@ pushd $(dirname $0)
 
 [ -d specs ]
 [ -f specs/README ]
-[ -f specs/fission-deployment-config.yaml ]
+[ -f specs/kubefaas-deployment-config.yaml ]
 
 mkdir -p func
 cp $ROOT/examples/nodejs/hello.js func/deploy.js
 cp $ROOT/examples/nodejs/hello.js func/source.js
 
-fission spec destroy || true
+kubefaas spec destroy || true
 
 log "Apply specs"
-fission --verbosity 2 spec apply
+kubefaas --verbosity 2 spec apply
 
 log "verify deployarchive function works"
-fission fn test --name deployarchive
+kubefaas fn test --name deployarchive
 
 timeout 60s bash -c "waitBuild sourcearchive"
 
 log "verify sourcearchive function works"
-fission fn test --name sourcearchive
+kubefaas fn test --name sourcearchive
 
 log "Test PASSED"

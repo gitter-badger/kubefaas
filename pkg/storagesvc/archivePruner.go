@@ -71,7 +71,7 @@ func (pruner *ArchivePruner) insertArchive(archiveID string) {
 	pruner.archiveChan <- archiveID
 }
 
-// A user may have deleted pkgs with kubectl or fission cli. That only deletes crd.Package objects from kubernetes
+// A user may have deleted pkgs with kubectl or kubefaas cli. That only deletes crd.Package objects from kubernetes
 // and not the archives that are referenced by them, leaving the archives as orphans.
 // getOrphanArchives reaps the orphaned archives.
 func (pruner *ArchivePruner) getOrphanArchives() {

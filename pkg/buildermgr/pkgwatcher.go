@@ -176,7 +176,7 @@ func (pkgw *packageWatcher) build(buildCache *cache.Cache, srcpkg *fv1.Package) 
 			// Add the package getter rolebinding to builder sa
 			// we continue here if role binding was not setup succeesffully. this is because without this, the fetcher wont be able to fetch the source pkg into the container and
 			// the build will fail eventually
-			err := utils.SetupRoleBinding(pkgw.logger, pkgw.k8sClient, fv1.PackageGetterRB, pkg.ObjectMeta.Namespace, fv1.PackageGetterCR, fv1.ClusterRole, fv1.FissionBuilderSA, builderNs)
+			err := utils.SetupRoleBinding(pkgw.logger, pkgw.k8sClient, fv1.PackageGetterRB, pkg.ObjectMeta.Namespace, fv1.PackageGetterCR, fv1.ClusterRole, fv1.BuilderSA, builderNs)
 			if err != nil {
 				pkgw.logger.Error("error setting up role binding for package",
 					zap.Error(err),
@@ -186,7 +186,7 @@ func (pkgw *packageWatcher) build(buildCache *cache.Cache, srcpkg *fv1.Package) 
 				continue
 			} else {
 				pkgw.logger.Info("setup rolebinding for sa package",
-					zap.String("sa", fmt.Sprintf("%s.%s", fv1.FissionBuilderSA, builderNs)),
+					zap.String("sa", fmt.Sprintf("%s.%s", fv1.BuilderSA, builderNs)),
 					zap.String("package", fmt.Sprintf("%s.%s", pkg.ObjectMeta.Name, pkg.ObjectMeta.Namespace)))
 			}
 

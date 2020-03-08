@@ -43,8 +43,8 @@ checkFunctionResponse() {
 
     log "Checking for valid response"
     while true; do
-      log curl http://$FISSION_ROUTER/$1
-      response0=$(curl http://$FISSION_ROUTER/$1)
+      log curl http://$KUBEFAAS_ROUTER/$1
+      response0=$(curl http://$KUBEFAAS_ROUTER/$1)
       log $response0 | grep -i ${val}
       if [[ $? -eq 0 ]]; then
         log "test ${type} passed"
@@ -57,16 +57,16 @@ export -f checkFunctionResponse
 
 # Create a hello world function in nodejs, test it with an http trigger
 log "Creating python env"
-fission env create --name $env --image $PYTHON_RUNTIME_IMAGE
+kubefaas env create --name $env --image $PYTHON_RUNTIME_IMAGE
 
 log "Creating secret"
 kubectl create secret generic ${fn_secret} --from-literal=TEST_KEY="TESTVALUE" -n default
 
 log "Creating function with secret"
-fission fn create --name ${fn_secret} --env $env --code $tmp_dir/secret.py --secret ${fn_secret}
+kubefaas fn create --name ${fn_secret} --env $env --code $tmp_dir/secret.py --secret ${fn_secret}
 
 log "Creating route"
-fission route create --function ${fn_secret} --url /${fn_secret} --method GET
+kubefaas route create --function ${fn_secret} --url /${fn_secret} --method GET
 
 log "Waiting for router to catch up"
 sleep 5
@@ -77,10 +77,10 @@ log "Creating second secret"
 kubectl create secret generic ${fn_secret1} --from-literal=TEST_KEY1="TESTVALUE1" -n default
 
 log "Creating function with multiple secrets"
-fission fn create --name ${fn_secret1} --env $env --code $tmp_dir/multisecret.py --secret ${fn_secret} --secret ${fn_secret1}
+kubefaas fn create --name ${fn_secret1} --env $env --code $tmp_dir/multisecret.py --secret ${fn_secret} --secret ${fn_secret1}
 
 log "Creating route"
-fission route create --function ${fn_secret1} --url /${fn_secret1} --method GET
+kubefaas route create --function ${fn_secret1} --url /${fn_secret1} --method GET
 
 log "Waiting for router to catch up"
 sleep 5
@@ -89,10 +89,10 @@ timeout 60 bash -c "checkFunctionResponse ${fn_secret1} 'TESTVALUE-TESTVALUE1' '
 
 log "Creating function with newdeploy executorType and new secret value"
 kubectl patch secrets ${fn_secret} -p '{"data":{"TEST_KEY":"TkVXVkFMCg=="}}' -n default
-fission fn create --name ${fn_secret}-1 --env $env --code $tmp_dir/secret.py --secret ${fn_secret} --executortype newdeploy
+kubefaas fn create --name ${fn_secret}-1 --env $env --code $tmp_dir/secret.py --secret ${fn_secret} --executortype newdeploy
 
 log "Creating route"
-fission route create --function ${fn_secret}-1 --url /${fn_secret}-1 --method GET
+kubefaas route create --function ${fn_secret}-1 --url /${fn_secret}-1 --method GET
 
 log "Waiting for router catch up"
 sleep 5
@@ -103,10 +103,10 @@ log "Creating configmap"
 kubectl create configmap ${fn_cfgmap} --from-literal=TEST_KEY="TESTVALUE" -n default
 
 log "creating function with configmap"
-fission fn create --name ${fn_cfgmap} --env $env --code $tmp_dir/cfgmap.py --configmap ${fn_cfgmap}
+kubefaas fn create --name ${fn_cfgmap} --env $env --code $tmp_dir/cfgmap.py --configmap ${fn_cfgmap}
 
 log "Creating route"
-fission route create --function ${fn_cfgmap} --url /${fn_cfgmap} --method GET
+kubefaas route create --function ${fn_cfgmap} --url /${fn_cfgmap} --method GET
 
 log "Waiting for router to catch up"
 sleep 5
@@ -117,10 +117,10 @@ log "Creating second configmap"
 kubectl create configmap ${fn_cfgmap1} --from-literal=TEST_KEY1="TESTVALUE1" -n default
 
 log "Creating function with multiple configmaps"
-fission fn create --name ${fn_cfgmap1} --env $env --code $tmp_dir/multicfgmap.py --configmap ${fn_cfgmap} --configmap ${fn_cfgmap1}
+kubefaas fn create --name ${fn_cfgmap1} --env $env --code $tmp_dir/multicfgmap.py --configmap ${fn_cfgmap} --configmap ${fn_cfgmap1}
 
 log "Creating route"
-fission route create --function ${fn_cfgmap1} --url /${fn_cfgmap1} --method GET
+kubefaas route create --function ${fn_cfgmap1} --url /${fn_cfgmap1} --method GET
 
 log "Waiting for router to catch up"
 sleep 5
@@ -129,10 +129,10 @@ timeout 60 bash -c "checkFunctionResponse ${fn_cfgmap1} 'TESTVALUE-TESTVALUE1' '
 
 log "Creating function with newdeploy executorType and new configmap value"
 kubectl patch configmap ${fn_cfgmap} -p '{"data":{"TEST_KEY":"NEWVAL"}}' -n default
-fission fn create --name ${fn_cfgmap}-1 --env $env --code $tmp_dir/cfgmap.py --configmap ${fn_cfgmap} --executortype newdeploy
+kubefaas fn create --name ${fn_cfgmap}-1 --env $env --code $tmp_dir/cfgmap.py --configmap ${fn_cfgmap} --executortype newdeploy
 
 log "Creating route"
-fission route create --function ${fn_cfgmap}-1 --url /${fn_cfgmap}-1 --method GET
+kubefaas route create --function ${fn_cfgmap}-1 --url /${fn_cfgmap}-1 --method GET
 
 log "Waiting for router catch up"
 sleep 5
@@ -140,10 +140,10 @@ sleep 5
 timeout 60 bash -c "checkFunctionResponse ${fn_cfgmap}-1 'NEWVAL' 'configmap'"
 
 log "testing creating a function without a secret or configmap"
-fission function create --name ${fn} --env $env --code $(dirname $0)/empty.py
+kubefaas function create --name ${fn} --env $env --code $(dirname $0)/empty.py
 
 log "Creating route"
-fission route create --function ${fn} --url /${fn} --method GET
+kubefaas route create --function ${fn} --url /${fn} --method GET
 
 log "Waiting for router to catch up"
 sleep 5

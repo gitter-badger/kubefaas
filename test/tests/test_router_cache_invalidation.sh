@@ -34,21 +34,21 @@ env=python-$TEST_ID
 fn=python-func-$TEST_ID
 
 log "Creating python env"
-fission env create --name $env --image $PYTHON_RUNTIME_IMAGE
+kubefaas env create --name $env --image $PYTHON_RUNTIME_IMAGE
 
 log "Creating hello.py"
 printf 'def main():\n    return "Hello, world!"' > $tmp_dir/hello.py
 
 log "Creating function " $fn
-fission fn create --name $fn --env $env --code $tmp_dir/hello.py
+kubefaas fn create --name $fn --env $env --code $tmp_dir/hello.py
 
 log "Creating route"
-fission route create --function $fn --url /$fn --method GET
+kubefaas route create --function $fn --url /$fn --method GET
 
 log "Waiting for router to update cache"
 sleep 5
 
-http_status=`curl -sw "%{http_code}" http://$FISSION_ROUTER/$fn -o /dev/null`
+http_status=`curl -sw "%{http_code}" http://$KUBEFAAS_ROUTER/$fn -o /dev/null`
 log "http_status: $http_status"
 if [ "$http_status" -ne "200" ]; then
     log "Something went wrong, http status even before deleting function pod is $http_status"
@@ -62,7 +62,7 @@ log "funcPod : $funcPod"
 kubectl delete pod $funcPod -n $FUNCTION_NAMESPACE --grace-period=0
 log  "deleted function pod $funcPod"
 
-http_status=`curl -sw "%{http_code}" http://$FISSION_ROUTER/$fn -o /dev/null`
+http_status=`curl -sw "%{http_code}" http://$KUBEFAAS_ROUTER/$fn -o /dev/null`
 log "http_status: $http_status"
 if [ "$http_status" -ne "200" ]; then
     log "Something went wrong, http status after deleting function pod is $http_status"

@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
-module Fission
+module Kubefaas
   HEADER_PREFIX = 'HTTP_'
-  PARAM_HEADER_PREFIX = 'HTTP_X_FISSION_PARAMS_'
-  PARAMETERS_KEY = 'fission.request.parameters'
+  PARAM_HEADER_PREFIX = 'HTTP_X_KUBEFAAS_PARAMS_'
+  PARAMETERS_KEY = 'kubefaas.request.parameters'
 
   class Request < Rack::Request
     def headers

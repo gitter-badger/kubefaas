@@ -29,23 +29,23 @@ fn_nd=hello-go-nd-$TEST_ID
 cd $ROOT/examples/go
 
 log "Creating environment for Golang"
-fission env create --name $env --image $GO_RUNTIME_IMAGE --builder $GO_BUILDER_IMAGE --period 5
+kubefaas env create --name $env --image $GO_RUNTIME_IMAGE --builder $GO_BUILDER_IMAGE --period 5
 
 timeout 90 bash -c "wait_for_builder $env"
 
 pkgName=$(generate_test_id)
-fission package create --name $pkgName --src hello.go --env $env
+kubefaas package create --name $pkgName --src hello.go --env $env
 
 # wait for build to finish at most 90s
 timeout 90 bash -c "waitBuild $pkgName"
 
 log "Creating pool manager & new deployment function for Golang"
-fission fn create --name $fn_poolmgr --env $env --pkg $pkgName --entrypoint Handler
-fission fn create --name $fn_nd      --env $env --pkg $pkgName --entrypoint Handler --executortype newdeploy
+kubefaas fn create --name $fn_poolmgr --env $env --pkg $pkgName --entrypoint Handler
+kubefaas fn create --name $fn_nd      --env $env --pkg $pkgName --entrypoint Handler --executortype newdeploy
 
 log "Creating route for new deployment function"
-fission route create --function $fn_poolmgr --url /$fn_poolmgr --method GET
-fission route create --function $fn_nd      --url /$fn_nd      --method GET
+kubefaas route create --function $fn_poolmgr --url /$fn_poolmgr --method GET
+kubefaas route create --function $fn_nd      --url /$fn_nd      --method GET
 
 log "Waiting for router & pools to catch up"
 sleep 5
@@ -60,14 +60,14 @@ timeout 60 bash -c "test_fn $fn_nd 'Hello'"
 cd module-example && zip -r $tmp_dir/module.zip *
 
 pkgName=$(generate_test_id)
-fission package create --name $pkgName --src $tmp_dir/module.zip --env $env
+kubefaas package create --name $pkgName --src $tmp_dir/module.zip --env $env
 
 # wait for build to finish at most 90s
 timeout 90 bash -c "waitBuild $pkgName"
 
 log "Update function package"
-fission fn update --name $fn_poolmgr --pkg $pkgName
-fission fn update --name $fn_nd --pkg $pkgName
+kubefaas fn update --name $fn_poolmgr --pkg $pkgName
+kubefaas fn update --name $fn_nd --pkg $pkgName
 
 log "Waiting for router & pools to catch up"
 sleep 5

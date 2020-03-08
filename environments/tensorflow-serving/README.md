@@ -1,6 +1,6 @@
-# Fission: Tensorflow Serving Environment
+# Kubefaas: Tensorflow Serving Environment
 
-This is the Tensorflow Serving environment for Fission.
+This is the Tensorflow Serving environment for Kubefaas.
 
 It's a Docker image containing a Go runtime, along with a tensorflow serving service.
 
@@ -17,13 +17,13 @@ and get response from the upstream server for user.
 docker build -t USER/tensorflow-serving . && docker push USER/tensorflow-serving
 ```
 
-## Using the image in fission
+## Using the image in kubefaas
 
-You can add this customized image to fission with "fission env create":
+You can add this customized image to kubefaas with "kubefaas env create":
 
 ```
-fission env create --name tensorflow --image USER/tensorflow-serving --version 2
+kubefaas env create --name tensorflow --image USER/tensorflow-serving --version 2
 ```
 
-After this, fission functions that have the env parameter set to the
+After this, kubefaas functions that have the env parameter set to the
 same environment name as this command will use this environment.

@@ -1,20 +1,20 @@
-# Fission: Ruby Environment
+# Kubefaas: Ruby Environment
 
-This is the Ruby environment for Fission.
+This is the Ruby environment for Kubefaas.
 
 It's a Docker image containing a Ruby 2.6.1 runtime. The image uses
 Rack with WEBrick to host the internal web server.
 
 The environment works via convention where you create a Ruby method
-called `handler` with a single optional argument, a `Fission::Context`
+called `handler` with a single optional argument, a `Kubefaas::Context`
 object.
 
-The `Fission::Context` object gives access to the Rack env, a
-request object, and a logger. Please see `fission/context.rb` for the
+The `Kubefaas::Context` object gives access to the Rack env, a
+request object, and a logger. Please see `kubefaas/context.rb` for the
 public api.
 
-The `Fission::Request` object is a subclass of `Rack::Request` and
-provides access to parameters and headers. See `fission/request.rb`
+The `Kubefaas::Request` object is a subclass of `Rack::Request` and
+provides access to parameters and headers. See `kubefaas/request.rb`
 for the public api.
 
 Looking for ready-to-run examples? See the [Ruby examples directory](../../examples/ruby).
@@ -35,20 +35,20 @@ called USER.  Build and push the image to the the registry:
    docker build -t USER/ruby-env . && docker push USER/ruby-env
 ```
 
-## Using the image in fission
+## Using the image in kubefaas
 
-You can add this customized image to fission with "fission env
+You can add this customized image to kubefaas with "kubefaas env
 create":
 
 ```
-   fission env create --name ruby --image USER/ruby-env
+   kubefaas env create --name ruby --image USER/ruby-env
 ```
 
 Or, if you already have an environment, you can update its image:
 
 ```
-   fission env update --name ruby --image USER/ruby-env
+   kubefaas env update --name ruby --image USER/ruby-env
 ```
 
-After this, fission functions that have the env parameter set to the
+After this, kubefaas functions that have the env parameter set to the
 same environment name as this command will use this environment.

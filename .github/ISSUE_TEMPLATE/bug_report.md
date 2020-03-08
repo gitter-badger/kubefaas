@@ -12,12 +12,12 @@ assignees: ''
 <!-- Documentation URL: https://docs.fission.io/ -->
 <!-- Troubleshooting guide: https://docs.fission.io/trouble-shooting/ -->
 
-**Fission/Kubernetes version**
+**Kubefaas/Kubernetes version**
 
 <!-- If you tested with other services, for example Istio, please also provide the version of service as well. -->
 
 <pre>
-$ fission --version
+$ kubefaas --version
 $ kubectl version
 </pre>
 
@@ -36,10 +36,10 @@ $ kubectl version
 **Actual result**
 
 **Screenshots/Dump file**
-<!--If applicable, add screenshots/fission dump file to help explain your problem.-->
+<!--If applicable, add screenshots/kubefaas dump file to help explain your problem.-->
 
 <pre>
-$ fission support dump
+$ kubefaas support dump
 </pre>
 
 **Additional context**

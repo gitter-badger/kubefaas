@@ -127,9 +127,9 @@ func (deploy *NewDeploy) setupRBACObjs(deployNamespace string, fn *fv1.Function)
 	// create fetcher SA in this ns, if not already created
 	err := deploy.fetcherConfig.SetupServiceAccount(deploy.kubernetesClient, deployNamespace, fn.ObjectMeta)
 	if err != nil {
-		deploy.logger.Error("error creating fission fetcher service account for function",
+		deploy.logger.Error("error creating kubefaas fetcher service account for function",
 			zap.Error(err),
-			zap.String("service_account_name", fv1.FissionFetcherSA),
+			zap.String("service_account_name", fv1.FetcherSA),
 			zap.String("service_account_namespace", deployNamespace),
 			zap.String("function_name", fn.ObjectMeta.Name),
 			zap.String("function_namespace", fn.ObjectMeta.Namespace))
@@ -137,7 +137,7 @@ func (deploy *NewDeploy) setupRBACObjs(deployNamespace string, fn *fv1.Function)
 	}
 
 	// create a cluster role binding for the fetcher SA, if not already created, granting access to do a get on packages in any ns
-	err = utils.SetupRoleBinding(deploy.logger, deploy.kubernetesClient, fv1.PackageGetterRB, fn.Spec.Package.PackageRef.Namespace, fv1.PackageGetterCR, fv1.ClusterRole, fv1.FissionFetcherSA, deployNamespace)
+	err = utils.SetupRoleBinding(deploy.logger, deploy.kubernetesClient, fv1.PackageGetterRB, fn.Spec.Package.PackageRef.Namespace, fv1.PackageGetterCR, fv1.ClusterRole, fv1.FetcherSA, deployNamespace)
 	if err != nil {
 		deploy.logger.Error("error creating role binding for function",
 			zap.Error(err),
@@ -148,7 +148,7 @@ func (deploy *NewDeploy) setupRBACObjs(deployNamespace string, fn *fv1.Function)
 	}
 
 	// create rolebinding in function namespace for fetcherSA.envNamespace to be able to get secrets and configmaps
-	err = utils.SetupRoleBinding(deploy.logger, deploy.kubernetesClient, fv1.SecretConfigMapGetterRB, fn.ObjectMeta.Namespace, fv1.SecretConfigMapGetterCR, fv1.ClusterRole, fv1.FissionFetcherSA, deployNamespace)
+	err = utils.SetupRoleBinding(deploy.logger, deploy.kubernetesClient, fv1.SecretConfigMapGetterRB, fn.ObjectMeta.Namespace, fv1.SecretConfigMapGetterCR, fv1.ClusterRole, fv1.FetcherSA, deployNamespace)
 	if err != nil {
 		deploy.logger.Error("error creating role binding for function",
 			zap.Error(err),
@@ -215,7 +215,7 @@ func (deploy *NewDeploy) getDeploymentSpec(fn *fv1.Function, env *fv1.Environmen
 	resources := deploy.getResources(env, fn)
 
 	// Set maxUnavailable and maxSurge to 20% is because we want
-	// fission to rollout newer function version gradually without
+	// kubefaas to rollout newer function version gradually without
 	// affecting any online service. For example, if you set maxSurge
 	// to 100%, the new ReplicaSet scales up immediately and may
 	// consume all remaining compute resources which might be an
@@ -227,7 +227,7 @@ func (deploy *NewDeploy) getDeploymentSpec(fn *fv1.Function, env *fv1.Environmen
 
 	// Newdeploy updates the environment variable "LastUpdateTimestamp" of deployment
 	// whenever a configmap/secret gets an update, but it also leaves multiple ReplicaSets for
-	// rollback purpose. Since fission always update a deployment instead of performing a
+	// rollback purpose. Since kubefaas always update a deployment instead of performing a
 	// rollback, set RevisionHistoryLimit to 0 to disable this feature.
 	revisionHistoryLimit := int32(0)
 
@@ -277,7 +277,7 @@ func (deploy *NewDeploy) getDeploymentSpec(fn *fv1.Function, env *fv1.Environmen
 		},
 		Spec: apiv1.PodSpec{
 			Containers:                    []apiv1.Container{*container},
-			ServiceAccountName:            "fission-fetcher",
+			ServiceAccountName:            "kubefaas-fetcher",
 			TerminationGracePeriodSeconds: &gracePeriodSeconds,
 		},
 	}

@@ -28,11 +28,11 @@ import (
 //   2. Create the type with metadata + the spec
 //   3. Create a list type (for example see FunctionList and Function, below)
 //   4. Add methods at the bottom of this file for satisfying Object and List interfaces
-//   5. Add the type to configureClient in fission/crd/client.go
-//   6. Add the type to EnsureFissionCRDs in fission/crd/crd.go
-//   7. Add tests to fission/crd/crd_test.go
-//   8. Add a CRUD Interface type (analogous to FunctionInterface in fission/crd/function.go)
-//   9. Add a getter method for your interface type to FissionClient in fission/crd/client.go
+//   5. Add the type to configureClient in kubefaas/crd/client.go
+//   6. Add the type to EnsureFissionCRDs in kubefaas/crd/crd.go
+//   7. Add tests to kubefaas/crd/crd_test.go
+//   8. Add a CRUD Interface type (analogous to FunctionInterface in kubefaas/crd/function.go)
+//   9. Add a getter method for your interface type to FissionClient in kubefaas/crd/client.go
 //  10. Follow the instruction in README.md to regenerate CRD type deepcopy methods
 //
 
@@ -302,7 +302,7 @@ type (
 		// functions to share packages, by having different functions within the same
 		// package.
 		//
-		// Fission itself does not interpret this path. It is passed verbatim to
+		// Kubefaas itself does not interpret this path. It is passed verbatim to
 		// build and runtime environments.
 		//
 		// This is optional: if unspecified, the environment has a default name.
@@ -452,7 +452,7 @@ type (
 		FunctionEndpointPort int32 `json:"-"` // `json:"functionendpointport"`
 
 		// (Optional) Container allows the modification of the deployed runtime
-		// container using the Kubernetes Container spec. Fission overrides
+		// container using the Kubernetes Container spec. Kubefaas overrides
 		// the following fields:
 		// - Name
 		// - Image; set to the Runtime.Image
@@ -483,7 +483,7 @@ type (
 		Command string `json:"command,omitempty"`
 
 		// (Optional) Container allows the modification of the deployed builder
-		// container using the Kubernetes Container spec. Fission overrides
+		// container using the Kubernetes Container spec. Kubefaas overrides
 		// the following fields:
 		// - Name
 		// - Image; set to the Builder.Image
@@ -520,7 +520,7 @@ type (
 		// (Optional) Strongly encouraged. Used to populate links from UI, CLI, etc.
 		DocumentationURL string `json:"-"` // `json:"documentationurl,omitempty"`
 
-		// (Optional) defaults to 'single'. Fission workflow uses
+		// (Optional) defaults to 'single'. Kubefaas workflow uses
 		// 'infinite' to load multiple functions in one function pod.
 		// Available value:
 		// - single
@@ -578,7 +578,7 @@ type (
 		// If CreateIngress is true, router will create a ingress definition.
 		CreateIngress bool `json:"createingress"`
 
-		// TODO: make IngressConfig a independent Fission resource
+		// TODO: make IngressConfig a independent resource
 		// IngressConfig for router to set up Ingress.
 		IngressConfig IngressConfig `json:"ingressconfig"`
 	}
