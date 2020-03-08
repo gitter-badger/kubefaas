@@ -4,7 +4,7 @@
 
 ```bash
 $ kubefaas spec init
-$ kubefaas env create --name go --image kubefaas/go-env-1.12:1.7.1 --builder kubefaas/go-builder-1.12:1.7.1 --period 5 --spec
+$ kubefaas env create --name go --image kubefaas/go-env-1.12 --builder kubefaas/go-builder-1.12 --period 5 --spec
 $ kubefaas pkg create --name publisher --src mqtrigger/* --spec
 $ kubefaas fn create --name publisher --env go --pkg publisher --entrypoint "Handler" --spec
 $ kubefaas fn create --name hello --env go --src https://raw.githubusercontent.com/srcmesh/kubefaas/master/examples/go/hello.go --entrypoint "Handler" --spec

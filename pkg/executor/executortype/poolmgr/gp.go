@@ -479,7 +479,7 @@ func (gp *GenericPool) createPool() error {
 	}
 
 	if gp.env.Spec.Runtime.PodSpec != nil {
-		newPodSpec, err := util.MergePodSpec(&deployment.Spec.Template.Spec, gp.env.Spec.Runtime.PodSpec)
+		newPodSpec, err := util.MergePodSpec(gp.runtimeImagePullPolicy, &deployment.Spec.Template.Spec, gp.env.Spec.Runtime.PodSpec)
 		if err != nil {
 			return err
 		}

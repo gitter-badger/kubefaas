@@ -319,7 +319,7 @@ func (deploy *NewDeploy) getDeploymentSpec(fn *fv1.Function, env *fv1.Environmen
 	}
 
 	if env.Spec.Runtime.PodSpec != nil {
-		newPodSpec, err := util.MergePodSpec(&deployment.Spec.Template.Spec, env.Spec.Runtime.PodSpec)
+		newPodSpec, err := util.MergePodSpec(deploy.runtimeImagePullPolicy, &deployment.Spec.Template.Spec, env.Spec.Runtime.PodSpec)
 		if err != nil {
 			return nil, err
 		}

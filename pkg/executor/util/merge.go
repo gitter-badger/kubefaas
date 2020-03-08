@@ -54,7 +54,7 @@ func MergeContainer(dst *apiv1.Container, src *apiv1.Container) (*apiv1.Containe
 	return &dstC, errs.ErrorOrNil()
 }
 
-func MergePodSpec(srcPodSpec *apiv1.PodSpec, targetPodSpec *apiv1.PodSpec) (*apiv1.PodSpec, error) {
+func MergePodSpec(imagePullPolicy apiv1.PullPolicy, srcPodSpec *apiv1.PodSpec, targetPodSpec *apiv1.PodSpec) (*apiv1.PodSpec, error) {
 	if targetPodSpec == nil {
 		return srcPodSpec, nil
 	}
@@ -64,14 +64,14 @@ func MergePodSpec(srcPodSpec *apiv1.PodSpec, targetPodSpec *apiv1.PodSpec) (*api
 	// Get item from spec, if they exist in deployment - merge, else append
 	// Same pattern for all lists (Mergo can not handle lists)
 	// TODO: At some point this is better done with generics/reflection?
-	cList, err := mergeContainerList(srcPodSpec.Containers, targetPodSpec.Containers)
+	cList, err := mergeContainerList(imagePullPolicy, srcPodSpec.Containers, targetPodSpec.Containers)
 	if err != nil {
 		multierr = multierror.Append(multierr, err)
 	} else {
 		srcPodSpec.Containers = cList
 	}
 
-	cList, err = mergeContainerList(srcPodSpec.InitContainers, targetPodSpec.InitContainers)
+	cList, err = mergeContainerList(imagePullPolicy, srcPodSpec.InitContainers, targetPodSpec.InitContainers)
 	if err != nil {
 		multierr = multierror.Append(multierr, err)
 	} else {
@@ -132,7 +132,7 @@ func MergePodSpec(srcPodSpec *apiv1.PodSpec, targetPodSpec *apiv1.PodSpec) (*api
 	return srcPodSpec, multierr.ErrorOrNil()
 }
 
-func mergeContainerList(dst []apiv1.Container, src []apiv1.Container) ([]apiv1.Container, error) {
+func mergeContainerList(imagePullPolicy apiv1.PullPolicy, dst []apiv1.Container, src []apiv1.Container) ([]apiv1.Container, error) {
 	errs := &multierror.Error{}
 
 	list := append(dst, src...)
@@ -155,6 +155,13 @@ func mergeContainerList(dst []apiv1.Container, src []apiv1.Container) ([]apiv1.C
 
 	var containerList []apiv1.Container
 	for _, c := range containers {
+		if len(c.ImagePullPolicy) == 0 {
+			// Kubelet forces a pull if the image tag is :latest
+			// https://kubernetes.io/docs/concepts/configuration/overview/#container-images
+			// To avoid confusion, set it to the runtime image pull
+			// policy if not specified.
+			c.ImagePullPolicy = imagePullPolicy
+		}
 		containerList = append(containerList, *c)
 	}
 

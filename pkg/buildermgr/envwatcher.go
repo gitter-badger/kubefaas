@@ -522,7 +522,7 @@ func (envw *environmentWatcher) createBuilderDeployment(env *fv1.Environment, ns
 	}
 
 	if env.Spec.Builder.PodSpec != nil {
-		newPodSpec, err := util.MergePodSpec(&deployment.Spec.Template.Spec, env.Spec.Builder.PodSpec)
+		newPodSpec, err := util.MergePodSpec(envw.builderImagePullPolicy, &deployment.Spec.Template.Spec, env.Spec.Builder.PodSpec)
 		if err != nil {
 			return nil, err
 		}
