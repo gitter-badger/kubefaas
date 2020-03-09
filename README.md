@@ -1,16 +1,14 @@
 # Kubefaas: Serverless Functions for Kubernetes
 
-Kubefaas is a Function-as-a-Service framework for Kubernetes based on [Fission](https://github.com/fission/fission) 
-with a focus on developer productivity and high performance.
+Kubefaas is a Function-as-a-Service framework for Kubernetes based on [Fission](https://github.com/fission/fission).
 
-Kubefaas operates on _just the code_: Docker and Kubernetes are
-abstracted away under normal operation, though you can use both to
-extend Kubefaas if you want to.
+Kubefaas abstracts away the complexity of Kubernetes which allows 
+you to focus on your daily routines. 
 
-Kubefaas is extensible to any language; the core is written in Go, and
-language-specific parts are isolated in something called
-_environments_. Kubefaas currently supports most of the popular programming languages 
-like NodeJS, Python, Ruby, Go, PHP, and any Linux executable.
+Kubefaas currently supports most of the popular programming languages 
+like NodeJS, Python, Ruby, Go, PHP, and any Linux executable. 
+Want a custom runtime environment? No problem, you can also create a custom runtime 
+environment and use it for your function. 
 
 # Kubernetes is the right place for Serverless
 
@@ -25,15 +23,12 @@ aggregation &mdash; also helps with ops on your Kubefaas deployment.
 
 # Getting started and documentation
 
-## Kubefaas Concepts
-
-Visit [concepts](https://docs.fission.io/docs/concepts/) for more details.
-
 ## Documentations
 
-You can learn more about Kubefaas and get started from [Kubefaas Docs](https://docs.fission.io/docs).
-* See the [installation guide](https://docs.fission.io/docs/installation/) for installing and running Kubefaas.
-* See the [troubleshooting guide](https://docs.fission.io/docs/trouble-shooting/) for debugging your functions and Kubefaas installation.
+You can learn more about Kubefaas and get started from [documentation](https://kubefaas.com/docs).
+* Concepts: https://kubefaas.com/docs/concepts/
+* Installation: https://kubefaas.com/docs/installation/
+* Troubleshooting: https://kubefaas.com/docs/trouble-shooting/
 
 ## Usage
 
@@ -55,11 +50,6 @@ You can learn more about Kubefaas and get started from [Kubefaas Docs](https://d
   Hello, world!
 ```
 
-# Contributing
-
-## Building Kubefaas
-See the [compilation guide](https://docs.fission.io/docs/contributing/).
-
 # Official Releases
 
 Official releases of Kubefaas can be found on [the releases page](https://github.com/srcmesh/kubefaas/releases). 
@@ -70,4 +60,4 @@ and without prior notice.
 
 # Licensing
 
-Kubefaas is an open-core project maintained by [Srcmesh](https://srcmesh.com/) and released under the Apache 2.0 license.
+Kubefaas is an open core project maintained by [Srcmesh](https://srcmesh.com/) and released under the Apache 2.0 license.
