@@ -1,4 +1,4 @@
-ARG BUILDER_IMAGE=kubefaas/builder:latest
+ARG BUILDER_IMAGE=srcmesh/kubefaas-builder
 FROM ${BUILDER_IMAGE}
 
 RUN apk update

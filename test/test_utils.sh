@@ -32,11 +32,13 @@ getGitCommit() {
 }
 
 set_ci_build_and_deploy_env() {
-    export REPO=kubefaas
-    export IMAGE=bundle
-    export FETCHER_IMAGE=$REPO/fetcher
-    export BUILDER_IMAGE=$REPO/builder
-    export PRE_UPGRADE_CHECK_IMAGE=$REPO/pre-upgrade-checks
+    export REPO=srcmesh
+    export IMAGE=kubefaas-bundle
+    export BUNDLE_IMAGE=$REPO/$IMAGE
+    export FETCHER_IMAGE=$REPO/kubefaas-fetcher
+    export BUILDER_IMAGE=$REPO/kubefaas-builder
+    export PRE_UPGRADE_CHECK_IMAGE=$REPO/kubefaas-pre-upgrade-checks
+    export GO_MOD_CACHE_IMAGE=$REPO/kubefaas-go-mod-cache
 
     export BUILD_ID=${CI_BUILD_NUMBER}
     export TAG=test-${BUILD_ID}
@@ -73,11 +75,13 @@ set_ci_test_env() {
 }
 
 set_local_build_and_deploy_env() {
-    export REPO=kubefaas
-    export IMAGE=bundle
-    export FETCHER_IMAGE=$REPO/fetcher
-    export BUILDER_IMAGE=$REPO/builder
-    export PRE_UPGRADE_CHECK_IMAGE=$REPO/pre-upgrade-checks
+    export REPO=srcmesh
+    export IMAGE=kubefaas-bundle
+    export BUNDLE_IMAGE=$REPO/$IMAGE
+    export FETCHER_IMAGE=$REPO/kubefaas-fetcher
+    export BUILDER_IMAGE=$REPO/kubefaas-builder
+    export PRE_UPGRADE_CHECK_IMAGE=$REPO/kubefaas-pre-upgrade-checks
+    export GO_MOD_CACHE_IMAGE=$REPO/kubefaas-go-mod-cache
 
     export BUILD_ID=$(generate_test_id)
     export TAG=test-${BUILD_ID}
@@ -195,23 +199,21 @@ build_and_push_builder() {
 build_and_push_env_runtime() {
     env=$1
     image=$2
-    image_tag=$3
-    variant=$4
+    variant=$3
 
-    log_start build_and_push_env_runtime.$env $image:$image_tag
+    log_start build_and_push_env_runtime.$env $image
 
     dockerfile="Dockerfile"
 
     if [ ! -z ${variant} ]; then
         dockerfile=${dockerfile}-${variant}
-        image=${image}-${variant}
     fi
 
     pushd $ROOT/environments/$env/
-    docker build -q -t ${image}:${image_tag} . -f ${dockerfile}
-    docker tag ${image}:${image_tag} ${image}:latest
+    docker build -q -t ${image} . -f ${dockerfile}
+    docker tag ${image} ${image}:latest
 
-#   docker push ${image}:${image_tag} &
+#   docker push ${image} &
 #   docker push ${image}:latest &
     popd
     log_end build_and_push_env_runtime.$env
@@ -220,25 +222,23 @@ build_and_push_env_runtime() {
 build_and_push_env_builder() {
     env=$1
     image=$2
-    image_tag=$3
-    builder_image=$4
-    variant=$5
+    builder_image=$3
+    variant=$4
 
-    log_start build_and_push_env_builder.$env $image:$image_tag
+    log_start build_and_push_env_builder.$env $image
 
     dockerfile="Dockerfile"
 
     if [ ! -z ${variant} ]; then
         dockerfile=${dockerfile}-${variant}
-        image=${image}-${variant}
     fi
 
     pushd ${ROOT}/environments/${env}/builder
 
-    docker build -q -t ${image}:${image_tag} --build-arg BUILDER_IMAGE=${builder_image} . -f ${dockerfile}
-    docker tag ${image}:${image_tag} ${image}:latest
+    docker build -q -t ${image} --build-arg BUILDER_IMAGE=${builder_image} . -f ${dockerfile}
+    docker tag ${image} ${image}:latest
 
-#   docker push ${image}:${image_tag} &
+#   docker push ${image} &
 #   docker push ${image}:latest &
     popd
     log_end build_and_push_env_builder.$env
@@ -552,38 +552,38 @@ wait_for_CI_cluster() {
 }
 
 build_images_and_cli() {
-    build_and_push_go_mod_cache_image ${REPO}/go-mod-image-cache
-    build_and_push_kubefaas_bundle ${REPO}/$IMAGE:$TAG ${REPO}/go-mod-image-cache
-    build_and_push_pre_upgrade_check_image $PRE_UPGRADE_CHECK_IMAGE:$TAG ${REPO}/go-mod-image-cache
-    build_and_push_fetcher $FETCHER_IMAGE:$TAG ${REPO}/go-mod-image-cache
-    build_and_push_builder $BUILDER_IMAGE:$TAG ${REPO}/go-mod-image-cache
+    build_and_push_go_mod_cache_image ${GO_MOD_CACHE_IMAGE}
+    build_and_push_kubefaas_bundle ${BUNDLE_IMAGE}:$TAG ${GO_MOD_CACHE_IMAGE}
+    build_and_push_pre_upgrade_check_image ${PRE_UPGRADE_CHECK_IMAGE}:$TAG ${GO_MOD_CACHE_IMAGE}
+    build_and_push_fetcher ${FETCHER_IMAGE}:$TAG ${GO_MOD_CACHE_IMAGE}
+    build_and_push_builder ${BUILDER_IMAGE}:$TAG ${GO_MOD_CACHE_IMAGE}
 
     build_kubefaas_cli
 }
 
 build_env_images() {
-    export PYTHON_RUNTIME_IMAGE=${REPO}/python-env:${TAG}
-    export PYTHON_BUILDER_IMAGE=${REPO}/python-builder:${TAG}
-    export JVM_RUNTIME_IMAGE=${REPO}/jvm-env:${TAG}
-    export JVM_BUILDER_IMAGE=${REPO}/jvm-builder:${TAG}
-    export NODE_RUNTIME_IMAGE=${REPO}/node-env:${TAG}
-    export NODE_BUILDER_IMAGE=${REPO}/node-builder:${TAG}
-    export TS_RUNTIME_IMAGE=${REPO}/tensorflow-serving-env:${TAG}
+    export PYTHON_RUNTIME_IMAGE=${REPO}/kubefaas-python-env:${TAG}
+    export PYTHON_BUILDER_IMAGE=${REPO}/kubefaas-python-builder:${TAG}
+    export JVM_RUNTIME_IMAGE=${REPO}/kubefaas-jvm-env:${TAG}
+    export JVM_BUILDER_IMAGE=${REPO}/kubefaas-jvm-builder:${TAG}
+    export NODE_RUNTIME_IMAGE=${REPO}/kubefaas-node-env:${TAG}
+    export NODE_BUILDER_IMAGE=${REPO}/kubefaas-node-builder:${TAG}
+    export TS_RUNTIME_IMAGE=${REPO}/kubefaas-tensorflow-serving-env:${TAG}
 
     go_variant="1.12"
-    export GO_RUNTIME_IMAGE=${REPO}/go-env-${go_variant}:${TAG}
-    export GO_BUILDER_IMAGE=${REPO}/go-builder-${go_variant}:${TAG}
+    export GO_RUNTIME_IMAGE=${REPO}/kubefaas-go-env-${go_variant}:${TAG}
+    export GO_BUILDER_IMAGE=${REPO}/kubefaas-go-builder-${go_variant}:${TAG}
 
-    build_and_push_env_runtime python ${REPO}/python-env $TAG ""
-    build_and_push_env_runtime jvm ${REPO}/jvm-env $TAG ""
-    build_and_push_env_runtime go ${REPO}/go-env $TAG "1.12"
-    build_and_push_env_runtime tensorflow-serving ${REPO}/tensorflow-serving-env $TAG ""
-    build_and_push_env_runtime nodejs ${REPO}/node-env $TAG ""
+    build_and_push_env_runtime python ${PYTHON_RUNTIME_IMAGE} ""
+    build_and_push_env_runtime jvm ${JVM_RUNTIME_IMAGE} ""
+    build_and_push_env_runtime go ${REPO}/go-env "1.12"
+    build_and_push_env_runtime tensorflow-serving ${TS_RUNTIME_IMAGE} ""
+    build_and_push_env_runtime nodejs ${NODE_RUNTIME_IMAGE} ""
 
-    build_and_push_env_builder python ${REPO}/python-builder $TAG $BUILDER_IMAGE:$TAG ""
-    build_and_push_env_builder jvm ${REPO}/jvm-builder $TAG $BUILDER_IMAGE:$TAG ""
-    build_and_push_env_builder go ${REPO}/go-builder $TAG $BUILDER_IMAGE:$TAG "1.12"
-    build_and_push_env_builder nodejs ${REPO}/node-builder $TAG $BUILDER_IMAGE:$TAG ""
+    build_and_push_env_builder python ${PYTHON_BUILDER_IMAGE} $BUILDER_IMAGE:$TAG ""
+    build_and_push_env_builder jvm ${JVM_BUILDER_IMAGE} $BUILDER_IMAGE:$TAG ""
+    build_and_push_env_builder go ${REPO}/go-builder $BUILDER_IMAGE:$TAG "1.12"
+    build_and_push_env_builder nodejs ${NODE_BUILDER_IMAGE} $BUILDER_IMAGE:$TAG ""
 }
 
 

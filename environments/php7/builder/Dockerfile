@@ -1,4 +1,4 @@
-ARG BUILDER_IMAGE=kubefaas/builder
+ARG BUILDER_IMAGE=srcmesh/kubefaas-builder
 FROM ${BUILDER_IMAGE}
 
 FROM php:7.3-alpine

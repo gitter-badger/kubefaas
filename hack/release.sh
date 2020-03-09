@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 #set -x
@@ -37,14 +37,14 @@ push_kubefaas_bundle_image() {
 
 push_fetcher_image() {
     local version=$1
-    local tag=kubefaas/fetcher:$version
+    local tag=srcmesh/kubefaas-fetcher:$version
     docker push $tag
 }
 
 
 push_builder_image() {
     local version=$1
-    local tag=kubefaas/builder:$version
+    local tag=srcmesh/kubefaas-builder:$version
     docker push $tag
 }
 
@@ -65,8 +65,8 @@ push_env_image() {
     fi
     echo "Pushing $envdir -> $imgname:$version"
 
-    docker push kubefaas/$imgname:$version
-    docker push kubefaas/$imgname:latest
+    docker push srcmesh/kubefaas-$imgname:$version
+    docker push srcmesh/kubefaas-$imgname:latest
 }
 
 push_all_envs() {
@@ -74,18 +74,13 @@ push_all_envs() {
 
     # call with version, env dir, image name base, image name variant
     push_env_image "$version" "nodejs"               "node-env"            ""
-    push_env_image "$version" "nodejs"               "node-env"            "debian"
     push_env_image "$version" "binary"               "binary-env"          ""
-    push_env_image "$version" "dotnet"               "dotnet-env"          ""
-    push_env_image "$version" "dotnet20"             "dotnet20-env"        ""
     push_env_image "$version" "go"                   "go-env"              ""
     push_env_image "$version" "go"                   "go-env"              "1.11.4"
     push_env_image "$version" "go"                   "go-env"              "1.12"
     push_env_image "$version" "go"                   "go-env"              "1.13"
-    push_env_image "$version" "perl"                 "perl-env"            ""
     push_env_image "$version" "php7"                 "php-env"             ""
     push_env_image "$version" "python"               "python-env"          ""
-    push_env_image "$version" "python"               "python-env"          "2.7"
     push_env_image "$version" "ruby"                 "ruby-env"            ""
     push_env_image "$version" "jvm"                  "jvm-env"             ""
     push_env_image "$version" "tensorflow-serving"   "tensorflow-serving-env"  ""
@@ -108,8 +103,8 @@ push_env_builder_image() {
     fi
     echo "Pushing $envdir -> $imgname:$version"
 
-    docker push kubefaas/$imgname:$version
-    docker push kubefaas/$imgname:latest
+    docker push srcmesh/kubefaas-$imgname:$version
+    docker push srcmesh/kubefaas-$imgname:latest
 }
 
 push_all_env_builders() {
@@ -132,7 +127,7 @@ push_all_env_builders() {
 # Push pre-upgrade-checks image
 push_pre_upgrade_checks_image() {
     local version=$1
-    local tag=kubefaas/pre-upgrade-checks:$version
+    local tag=srcmesh/kubefaas-pre-upgrade-checks:$version
     docker push $tag
 }
 

@@ -1,4 +1,4 @@
-ARG BUILDER_IMAGE=kubefaas/builder
+ARG BUILDER_IMAGE=srcmesh/kubefaas-builder
 ARG GO_VERSION=1.9.2
 
 FROM ${BUILDER_IMAGE}

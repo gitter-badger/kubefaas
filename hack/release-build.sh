@@ -26,7 +26,7 @@ build_cli() {
     local gitcommit=$5
     arch="amd64" # parameterize if/when we need to
     
-    pushd $DIR/cmd/kubefaas-cli
+    pushd $DIR/cmd/cli
 
     if [ "$osName" == "windows" ]
     then
@@ -53,7 +53,7 @@ build_kubefaas_bundle_image() {
 
     local tag=srcmesh/kubefaas-bundle:$version
 
-    docker build -t $tag -f $DIR/cmd/kubefaas-bundle/Dockerfile --build-arg GITCOMMIT=$gitcommit \
+    docker build -t $tag -f $DIR/cmd/bundle/Dockerfile --build-arg GITCOMMIT=$gitcommit \
         --build-arg BUILDDATE=$date --build-arg BUILDVERSION=$version $DIR
     docker tag $tag srcmesh/kubefaas-bundle:latest
 }
@@ -62,27 +62,22 @@ build_fetcher_image() {
     local version=$1
     local date=$2
     local gitcommit=$3
-    local tag=kubefaas/fetcher:$version
+    local tag=srcmesh/kubefaas-fetcher:$version
 
     docker build -t $tag -f $DIR/cmd/fetcher/Dockerfile --build-arg GITCOMMIT=$gitcommit \
         --build-arg BUILDDATE=$date --build-arg BUILDVERSION=$version $DIR
-    docker tag $tag kubefaas/fetcher:latest
-}
-
-push_fetcher_image() {
-    local version=$1
-    local tag=kubefaas/fetcher:$version
+    docker tag $tag srcmesh/kubefaas-fetcher:latest
 }
 
 build_builder_image() {
     local version=$1
     local date=$2
     local gitcommit=$3
-    local tag=kubefaas/builder:$version
+    local tag=srcmesh/kubefaas-builder:$version
 
     docker build -t $tag -f $DIR/cmd/builder/Dockerfile --build-arg GITCOMMIT=$gitcommit \
         --build-arg BUILDDATE=$date --build-arg BUILDVERSION=$version $DIR
-    docker tag $tag kubefaas/builder:latest
+    docker tag $tag srcmesh/kubefaas-builder:latest
 }
 
 build_env_image() {
@@ -109,8 +104,8 @@ build_env_image() {
     then
        ./build.sh
     fi  
-    docker build -t kubefaas/$imgname:$version -f $dockerfile .
-    docker tag kubefaas/$imgname:$version kubefaas/$imgname:latest
+    docker build -t srcmesh/kubefaas-$imgname:$version -f $dockerfile .
+    docker tag srcmesh/kubefaas-$imgname:$version srcmesh/kubefaas-$imgname:latest
     popd
 }
 
@@ -120,11 +115,11 @@ build_pre_upgrade_checks_image() {
     local date=$2
     local gitcommit=$3
 
-    local tag=kubefaas/pre-upgrade-checks:$version
+    local tag=srcmesh/kubefaas-pre-upgrade-checks:$version
 
     docker build -t $tag -f $DIR/cmd/preupgradechecks/Dockerfile \
         --build-arg GITCOMMIT=$gitcommit --build-arg BUILDDATE=$date --build-arg BUILDVERSION=$version $DIR
-    docker tag $tag kubefaas/pre-upgrade-checks:latest
+    docker tag $tag srcmesh/kubefaas-pre-upgrade-checks:latest
 }
 
 build_all_envs() {
@@ -132,18 +127,13 @@ build_all_envs() {
 
     # call with version, env dir, image name base, image name variant
     build_env_image "$version" "nodejs"               "node-env"            ""
-    build_env_image "$version" "nodejs"               "node-env"            "debian"
     build_env_image "$version" "binary"               "binary-env"          ""
-    build_env_image "$version" "dotnet"               "dotnet-env"          ""
-    build_env_image "$version" "dotnet20"             "dotnet20-env"        ""
     build_env_image "$version" "go"                   "go-env"              ""
     build_env_image "$version" "go"                   "go-env"              "1.11.4"
     build_env_image "$version" "go"                   "go-env"              "1.12"
     build_env_image "$version" "go"                   "go-env"              "1.13"
-    build_env_image "$version" "perl"                 "perl-env"            ""
     build_env_image "$version" "php7"                 "php-env"             ""
     build_env_image "$version" "python"               "python-env"          ""
-    build_env_image "$version" "python"               "python-env"          "2.7"
     build_env_image "$version" "ruby"                 "ruby-env"            ""
     build_env_image "$version" "jvm"                  "jvm-env"             ""
     build_env_image "$version" "tensorflow-serving"   "tensorflow-serving-env"  ""
@@ -169,8 +159,8 @@ build_env_builder_image() {
     echo "Building $envdir -> $imgname:$version using $dockerfile"
 
     pushd $DIR/environments/$envdir/builder
-    docker build -t kubefaas/$imgname:$version -f $dockerfile .
-    docker tag kubefaas/$imgname:$version kubefaas/$imgname:latest
+    docker build -t srcmesh/kubefaas-$imgname:$version -f $dockerfile .
+    docker tag srcmesh/kubefaas-$imgname:$version srcmesh/kubefaas-$imgname:latest
     popd
 }
 
@@ -188,7 +178,6 @@ build_all_env_builders() {
     build_env_builder_image "$version" "nodejs"   "node-builder"     ""
     build_env_builder_image "$version" "php7"     "php-builder"      ""
     build_env_builder_image "$version" "ruby"     "ruby-builder"     ""
-    build_env_builder_image "$version" "dotnet20" "dotnet20-builder" ""
 }
 
 build_charts() {
@@ -199,7 +188,6 @@ build_charts() {
     for c in kubefaas-all kubefaas-core
     do
     # https://github.com/kubernetes/helm/issues/1732
-    helm init --client-only
 	  helm package -u $c/
 	  mv *.tgz $BUILDDIR/charts/
     done
@@ -214,8 +202,6 @@ build_yamls() {
     find . -iname *.~?~ | xargs -r rm
 
     releaseName=kubefaas-$(echo ${version} | sed 's/\./-/g')
-
-    helm init --client-only
 
     for c in kubefaas-all kubefaas-core
     do
@@ -243,30 +229,30 @@ build_all() {
 
     if [ -z "$version" ]
     then
-	echo "Version unspecified"
-	exit 1
+      echo "Version unspecified"
+      exit 1
     fi
 
     local date=$2
 
     if [ -z "$date" ]
     then
-	echo "Build date unspecified"
-	exit 1
+      echo "Build date unspecified"
+      exit 1
     fi
 
     local gitcommit=$3
 
     if [ -z "gitcommit" ]
     then
-	echo "Git commit unspecified"
-	exit 1
+      echo "Git commit unspecified"
+      exit 1
     fi
     
     if [ -e $BUILDDIR ]
     then
-	echo "Removing existing build dir ($BUILDDIR)."
-	rm -rf $BUILDDIR
+      echo "Removing existing build dir ($BUILDDIR)."
+      rm -rf $BUILDDIR
     fi
     
     mkdir -p $BUILDDIR

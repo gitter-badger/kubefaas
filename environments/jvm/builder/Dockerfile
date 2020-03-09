@@ -1,5 +1,5 @@
 ## Kubefaas builder base image
-ARG BUILDER_IMAGE=kubefaas/builder:latest
+ARG BUILDER_IMAGE=srcmesh/kubefaas-builder
 FROM ${BUILDER_IMAGE}
 
 ## Section copied from the openjdk:8-jdk-alpine Dockerfile - (https://github.com/docker-library/openjdk/blob/47a6539cd18023dafb45db9013455136cc0bca07/8/jdk/alpine/Dockerfile)
