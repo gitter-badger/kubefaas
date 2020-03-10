@@ -47,7 +47,7 @@ enableIstio: false
 
 fetcher:
   ## Fetcher repository
-  image: kubefaas/fetcher
+  image: srcmesh/kubefaas-fetcher
   ## Fetcher image version
   imageTag: 1.8.0
   
@@ -229,7 +229,7 @@ heapster: false
 pruneInterval: 60
 
 ## Pre-install/pre-upgrade checks live in this image
-preUpgradeChecksImage: kubefaas/pre-upgrade-checks
+preUpgradeChecksImage: srcmesh/kubefaas-pre-upgrade-checks
 
 ## if there are any pod specialization errors when a function is triggered and this flag is set to true, the error
 ## summary is returned as part of http response
