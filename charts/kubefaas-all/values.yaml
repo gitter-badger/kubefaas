@@ -20,7 +20,7 @@ image: srcmesh/kubefaas-bundle
 pullPolicy: IfNotPresent
 
 ## Bundle image version
-imageTag: 1.8.0
+imageTag: 1.8.1
 
 ## Port at which controller service should be exposed
 controllerPort: 31313
@@ -49,7 +49,7 @@ fetcher:
   ## Fetcher repository
   image: srcmesh/kubefaas-fetcher
   ## Fetcher image version
-  imageTag: 1.8.0
+  imageTag: 1.8.1
   
   ## Fetcher is only for to downloading or uploading archive.
   ## Normally, you don't need to change the value here, unless necessary.

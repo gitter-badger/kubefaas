@@ -41,10 +41,10 @@ Parameter | Description | Default
 `routerServiceType` | Type of Router service to use. For minikube, set this to NodePort, elsewhere use LoadBalancer or ClusterIP. | `LoadBalancer`
 `repository` | Image base repository | `index.docker.io`
 `image` | Bundle image repository | `srcmesh/kubefaas-bundle`
-`imageTag` | Bundle image tag | `1.8.0`
+`imageTag` | Bundle image tag | `1.8.1`
 `pullPolicy` | Image pull policy | `IfNotPresent`
 `fetcher.image` | Fetcher repository | `kubefaas/fetcher`
-`fetcher.imageTag` | Fetcher image tag | `1.8.0`
+`fetcher.imageTag` | Fetcher image tag | `1.8.1`
 `controllerPort` | Controller service port | `31313`
 `routerPort` | Router service port | ` 31314`
 `functionNamespace` | Namespace in which to run functions (this is different from the release namespace) | `kubefaas-function`
