@@ -120,7 +120,6 @@ push_all_env_builders() {
     push_env_builder_image "$version" "jvm"      "jvm-builder"        ""
     push_env_builder_image "$version" "nodejs"   "node-builder"       ""
     push_env_builder_image "$version" "ruby"     "ruby-builder"       ""
-    push_env_builder_image "$version" "dotnet20" "dotnet20-builder"   ""
     push_env_builder_image "$version" "php7"     "php-builder"        ""
 }
 
@@ -167,7 +166,7 @@ tag_and_release() {
 
     # create gh release
     gothub release \
-	   --user kubefaas \
+	   --user srcmesh \
 	   --repo kubefaas \
 	   --tag $gittag \
 	   --name "$version" \
@@ -182,7 +181,7 @@ attach_github_release_cli() {
     echo "Uploading osx cli"
     gothub upload \
 	   --replace \
-	   --user kubefaas \
+	   --user srcmesh \
 	   --repo kubefaas \
 	   --tag $gittag \
 	   --name kubefaas-cli-osx \
@@ -191,7 +190,7 @@ attach_github_release_cli() {
     echo "Uploading linux cli"
     gothub upload \
 	   --replace \
-	   --user kubefaas \
+	   --user srcmesh \
 	   --repo kubefaas \
 	   --tag $gittag \
 	   --name kubefaas-cli-linux \
@@ -200,7 +199,7 @@ attach_github_release_cli() {
     echo "Uploading windows cli"
     gothub upload \
 	   --replace \
-	   --user kubefaas \
+	   --user srcmesh \
 	   --repo kubefaas \
 	   --tag  $gittag \
 	   --name kubefaas-cli-windows.exe \
@@ -214,7 +213,7 @@ attach_github_release_charts() {
     # helm charts
     gothub upload \
 	   --replace \
-	   --user kubefaas \
+	   --user srcmesh \
 	   --repo kubefaas \
 	   --tag  $gittag \
 	   --name kubefaas-all-$version.tgz \
@@ -222,7 +221,7 @@ attach_github_release_charts() {
 
     gothub upload \
 	   --replace \
-	   --user kubefaas \
+	   --user srcmesh \
 	   --repo kubefaas \
 	   --tag  $gittag \
 	   --name kubefaas-core-$version.tgz \
@@ -239,7 +238,7 @@ attach_github_release_yamls() {
         # YAML
         gothub upload \
            --replace \
-           --user kubefaas \
+           --user srcmesh \
            --repo kubefaas \
            --tag $gittag \
            --name ${c}-${version}-minikube.yaml \
@@ -247,7 +246,7 @@ attach_github_release_yamls() {
 
         gothub upload \
            --replace \
-           --user kubefaas \
+           --user srcmesh \
            --repo kubefaas \
            --tag $gittag \
            --name ${c}-${version}.yaml \
@@ -255,7 +254,7 @@ attach_github_release_yamls() {
 
         gothub upload \
            --replace \
-           --user kubefaas \
+           --user srcmesh \
            --repo kubefaas \
            --tag $gittag \
            --name ${c}-${version}-openshift.yaml \
@@ -278,14 +277,16 @@ generate_changelog() {
     local version=$1
 
     echo "# ${version}" > new_CHANGELOG.md
-    echo
-    echo "[Documentation](https://docs.kubefaas.io/)" >> new_CHANGELOG.md
-    echo
+    echo "" >> new_CHANGELOG.md
+    echo "For CHANGELOG before 1.8.1, please visit [here](https://github.com/fission/fission/blob/v1.8.0/CHANGELOG.md)." >> new_CHANGELOG.md
+    echo "" >> new_CHANGELOG.md
+    echo "* [Documentation](https://kubefaas.com/docs)" >> new_CHANGELOG.md
+    echo "" >> new_CHANGELOG.md
 
     create_downloads_table ${version} >> new_CHANGELOG.md
 
     # generate changelog from github
-    github_changelog_generator -u kubefaas -p kubefaas -t ${GITHUB_TOKEN} --future-release ${version} --no-issues -o tmp_CHANGELOG.md
+    github_changelog_generator -u srcmesh -p kubefaas -t ${GITHUB_TOKEN} --future-release ${version} --no-issues -o tmp_CHANGELOG.md
     sed -i '$ d' tmp_CHANGELOG.md
 
     # concatenate two files
