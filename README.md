@@ -1,5 +1,7 @@
 # Kubefaas: Serverless Functions for Kubernetes
 
+[![Join the chat at https://gitter.im/srcmesh-kubefaas/community](https://badges.gitter.im/srcmesh-kubefaas/community.svg)](https://gitter.im/srcmesh-kubefaas/community?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Kubefaas is a Function-as-a-Service framework for Kubernetes based on [Fission](https://github.com/fission/fission).
 
 Kubefaas abstracts away the complexity of Kubernetes which allows 
